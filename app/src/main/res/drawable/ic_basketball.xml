@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- אייקון כדורסל פשוט (וקטורי) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#E8590C"
+        android:pathData="M12,2A10,10 0,1 1,12,22A10,10 0,1 1,12,2Z" />
+    <path
+        android:strokeColor="#3D1A00"
+        android:strokeWidth="1"
+        android:pathData="M2,12H22M12,2V22M5,5C9,9 9,15 5,19M19,5C15,9 15,15 19,19" />
+</vector>

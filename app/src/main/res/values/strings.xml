@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Basketball Shot Analyzer</string>
+
+    <!-- מסך התחברות -->
+    <string name="auth_title">ברוך הבא!</string>
+    <string name="auth_subtitle">התחבר או הירשם כדי לנתח את הזריקות שלך</string>
+    <string name="hint_username">שם משתמש</string>
+    <string name="hint_password">סיסמה</string>
+    <string name="remember_me">הישאר מחובר</string>
+    <string name="btn_login">התחברות</string>
+    <string name="btn_register">הרשמה</string>
+    <string name="error_username">לפחות 3 תווים: אותיות באנגלית, ספרות או _</string>
+    <string name="error_password">לפחות 6 תווים, כולל ספרה אחת</string>
+    <string name="error_user_exists">שם המשתמש כבר תפוס</string>
+    <string name="error_wrong_credentials">שם משתמש או סיסמה שגויים</string>
+    <string name="register_success">נרשמת בהצלחה!</string>
+
+    <!-- מסך ראשי -->
+    <string name="welcome_user">שלום, %1$s</string>
+    <string name="main_instructions">צלם או בחר סרטון קצר (2–5 שניות) של זריקת קפיצה, מהצד, כשכל הגוף בתמונה.</string>
+    <string name="btn_pick_video">בחר סרטון מהגלריה</string>
+    <string name="btn_record_video">צלם סרטון</string>
+    <string name="btn_history">היסטוריה וסטטיסטיקה</string>
+    <string name="btn_logout">התנתקות</string>
+    <string name="analyzing">מנתח את הזריקה…</string>
+    <string name="result_score">ציון: %1$d / 100</string>
+    <string name="result_angles">זווית שחרור: %1$.1f° (אידיאלי %2$.1f°) · מרפק: %3$.1f°</string>
+    <string name="error_permission">אין הרשאה לקרוא סרטונים. ניתן לאשר אותה בהגדרות המכשיר.</string>
+    <string name="error_no_camera">לא נמצאה אפליקציית מצלמה במכשיר</string>
+    <string name="error_no_pose">לא זוהה שחקן בסרטון. ודא שכל הגוף נראה בבירור ונסה שוב.</string>
+    <string name="error_analysis">שגיאה בניתוח הסרטון. נסה סרטון אחר.</string>
+    <string name="label_elbow">מרפק %1$.0f°</string>
+    <string name="label_release">שחרור %1$.0f°</string>
+
+    <!-- מסך היסטוריה -->
+    <string name="history_title">היסטוריית זריקות</string>
+    <string name="stats_title">סטטיסטיקה</string>
+    <string name="stats_summary">סה\"כ זריקות: %1$d · ממוצע: %2$.1f · שיא: %3$d</string>
+    <string name="stats_month">%1$s: ממוצע %2$.1f (%3$d זריקות)</string>
+    <string name="history_empty">עדיין אין זריקות. נתח זריקה ראשונה במסך הראשי!</string>
+    <string name="item_angles">שחרור %1$.1f° · מרפק %2$.1f°</string>
+    <string name="item_note">הערה: %1$s</string>
+    <string name="btn_edit_note">ערוך הערה</string>
+    <string name="btn_delete">מחק</string>
+    <string name="dialog_note_title">הערה לזריקה</string>
+    <string name="dialog_delete_title">למחוק את הזריקה?</string>
+    <string name="dialog_delete_message">לא ניתן לבטל פעולה זו.</string>
+    <string name="btn_save">שמור</string>
+    <string name="btn_cancel">ביטול</string>
+    <string name="shot_deleted">הזריקה נמחקה</string>
+</resources>
