@@ -50,9 +50,10 @@ public class ShotAdapter extends RecyclerView.Adapter<ShotAdapter.ShotViewHolder
     public void onBindViewHolder(@NonNull ShotViewHolder holder, int position) {
         ShotData shot = shots.get(position);
         View item = holder.itemView;
+        int scoreColor = ScoreColors.forScore(item.getContext(), shot.getScore());
         holder.textScore.setText(String.valueOf(shot.getScore()));
-        holder.textScore.setBackgroundTintList(ColorStateList.valueOf(
-                ScoreColors.forScore(item.getContext(), shot.getScore())));
+        holder.textScore.setTextColor(scoreColor);
+        holder.textScore.setBackgroundTintList(ColorStateList.valueOf(scoreColor)); // צבע המסגרת
         holder.textDate.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
                 .format(new Date(shot.getTimestamp())));
         holder.textAngles.setText(item.getContext().getString(R.string.item_angles,

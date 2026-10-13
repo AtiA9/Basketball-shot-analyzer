@@ -23,6 +23,7 @@
             app:navigationIcon="@drawable/ic_arrow_back"
             app:navigationIconTint="@color/text_on_dark"
             app:title="@string/history_title"
+            app:titleTextAppearance="@style/TextAppearance.App.SectionTitle"
             app:titleTextColor="@color/text_on_dark" />
 
         <LinearLayout
@@ -44,6 +45,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_on_dark"
+                        android:fontFamily="serif"
                         android:textSize="26sp"
                         android:textStyle="bold" />
 
@@ -65,7 +67,8 @@
                         android:id="@+id/textStatAverage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/primary"
+                        android:textColor="@color/brass_light"
+                        android:fontFamily="serif"
                         android:textSize="26sp"
                         android:textStyle="bold" />
 
@@ -88,6 +91,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/text_on_dark"
+                        android:fontFamily="serif"
                         android:textSize="26sp"
                         android:textStyle="bold" />
 

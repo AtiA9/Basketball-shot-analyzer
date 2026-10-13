@@ -17,9 +17,9 @@
             android:id="@+id/textItemScore"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:background="@drawable/bg_circle"
+            android:background="@drawable/bg_score_badge"
+            android:fontFamily="serif"
             android:gravity="center"
-            android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -79,7 +79,7 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/btn_edit_note"
                     app:icon="@drawable/ic_edit"
-                    app:iconTint="@color/navy_light" />
+                    app:iconTint="@color/forest" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDelete"
