@@ -18,14 +18,17 @@
 
     <!-- מסך ראשי -->
     <string name="welcome_user">שלום, %1$s</string>
-    <string name="main_instructions">צלם או בחר סרטון קצר (2–5 שניות) של זריקת קפיצה, מהצד, כשכל הגוף בתמונה.</string>
+    <string name="main_instructions">צלם או בחר סרטון (עד דקה) של זריקת קפיצה, מהצד, כשכל הגוף בתמונה.</string>
     <string name="btn_pick_video">בחר סרטון מהגלריה</string>
     <string name="btn_record_video">צלם סרטון</string>
     <string name="btn_history">היסטוריה וסטטיסטיקה</string>
     <string name="btn_logout">התנתקות</string>
-    <string name="analyzing">מנתח את הזריקה…</string>
+    <string name="analyzing">מנתח את הזריקה… בסרטון ארוך זה יכול לקחת כדקה</string>
     <string name="result_score">ציון: %1$d / 100</string>
     <string name="result_angles">זווית שחרור: %1$.1f° (אידיאלי %2$.1f°) · מרפק: %3$.1f°</string>
+    <string name="result_body">נטיית גוף: %1$.1f° · מרפק בסוף התנועה: %2$.1f°</string>
+    <string name="result_follow_only">מרפק בסוף התנועה: %1$.1f° (הירך לא זוהתה)</string>
+    <string name="zoom_hint">צבוט עם שתי אצבעות כדי להגדיל · הקשה כפולה לאיפוס</string>
     <string name="error_permission">אין הרשאה לקרוא סרטונים. ניתן לאשר אותה בהגדרות המכשיר.</string>
     <string name="error_no_camera">לא נמצאה אפליקציית מצלמה במכשיר</string>
     <string name="error_no_pose">לא זוהה שחקן בסרטון. ודא שכל הגוף נראה בבירור ונסה שוב.</string>
