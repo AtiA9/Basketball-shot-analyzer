@@ -4,10 +4,14 @@ package com.example.basketballshotanalyzer.ui;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
@@ -20,8 +24,12 @@ import com.google.mlkit.vision.pose.PoseLandmark;
  * View מותאם אישית (יורש מ-View): מצייר את פריים השחרור, ועליו את השלד -
  * נקודות הגוף, "עצמות" (קווים בין נקודות) ותוויות של הזוויות.
  * כל הציור קורה ב-onDraw שמערכת אנדרואיד קוראת לה בכל פעם שצריך לצייר את ה-View.
+ * תומך בזום: צביטה בשתי אצבעות מגדילה, גרירה מזיזה, הקשה כפולה מאפסת.
  */
 public class PoseOverlayView extends View {
+
+    /** הגדלה מקסימלית (פי 4). */
+    private static final float MAX_ZOOM = 4f;
 
     /** זוגות נקודות שמחוברות בקו (עצם). */
     private static final int[][] BONES = {
@@ -48,9 +56,40 @@ public class PoseOverlayView extends View {
     /** פרמטרי ההתאמה מקואורדינטות התמונה לקואורדינטות ה-View. */
     private float scale, offsetX, offsetY;
 
+    /** מטריצת הזום: שומרת כמה הוגדל וכמה הוזז. מוחלת על כל הציור ב-onDraw. */
+    private final Matrix zoomMatrix = new Matrix();
+    private float zoom = 1f;
+    private final ScaleGestureDetector scaleDetector;
+    private final GestureDetector gestureDetector;
+
     /** הבנאי שאנדרואיד קורא לו כשה-View מוגדר בקובץ XML. */
     public PoseOverlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        // זיהוי צביטה (שתי אצבעות) - getScaleFactor אומר פי כמה האצבעות התרחקו
+        scaleDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                zoomBy(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
+                return true;
+            }
+        });
+        // זיהוי גרירה (להזזת התמונה המוגדלת) והקשה כפולה (איפוס)
+        gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float dx, float dy) {
+                if (zoom > 1f) {
+                    zoomMatrix.postTranslate(-dx, -dy);
+                    invalidate();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                resetZoom();
+                return true;
+            }
+        });
         bonePaint.setColor(Color.WHITE);
         bonePaint.setStrokeWidth(5f);
         armPaint.setColor(ContextCompat.getColor(context, R.color.primary));
@@ -64,6 +103,36 @@ public class PoseOverlayView extends View {
     /** מקבל תוצאת ניתוח חדשה ומבקש ציור מחדש (invalidate גורם לקריאה ל-onDraw). */
     public void setResult(ShotAnalyzer.Result result) {
         this.result = result;
+        resetZoom();
+    }
+
+    /** מעביר כל נגיעה למזהי המחוות (צביטה / גרירה / הקשה כפולה). */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (result == null) {
+            return false;
+        }
+        // בזמן זום - לא לתת ל-ScrollView של המסך "לגנוב" את הנגיעה ולגלול
+        getParent().requestDisallowInterceptTouchEvent(event.getPointerCount() > 1 || zoom > 1f);
+        scaleDetector.onTouchEvent(event);
+        gestureDetector.onTouchEvent(event);
+        return true;
+    }
+
+    /** מגדיל/מקטין סביב הנקודה שבין האצבעות, בטווח 1 עד MAX_ZOOM. */
+    private void zoomBy(float factor, float focusX, float focusY) {
+        float newZoom = Math.max(1f, Math.min(MAX_ZOOM, zoom * factor));
+        zoomMatrix.postScale(newZoom / zoom, newZoom / zoom, focusX, focusY);
+        zoom = newZoom;
+        if (zoom == 1f) {
+            zoomMatrix.reset(); // חזרנו לגודל רגיל - מבטלים גם את ההזזה
+        }
+        invalidate();
+    }
+
+    private void resetZoom() {
+        zoom = 1f;
+        zoomMatrix.reset();
         invalidate();
     }
 
@@ -73,6 +142,8 @@ public class PoseOverlayView extends View {
         if (result == null) {
             return;
         }
+        canvas.save();
+        canvas.concat(zoomMatrix); // כל מה שמצויר מכאן והלאה מוגדל ומוזז לפי הזום
         drawFrame(canvas);
         for (int[] bone : BONES) {
             drawBone(canvas, bone[0], bone[1]);
@@ -84,6 +155,7 @@ public class PoseOverlayView extends View {
         }
         drawLabel(canvas, getContext().getString(R.string.label_elbow, result.elbowAngle), result.elbow);
         drawLabel(canvas, getContext().getString(R.string.label_release, result.releaseAngle), result.wrist);
+        canvas.restore();
     }
 
     /** מצייר את התמונה במרכז ה-View בגודל המקסימלי שנכנס, ושומר את יחס ההגדלה. */

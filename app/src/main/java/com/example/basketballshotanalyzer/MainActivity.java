@@ -159,8 +159,12 @@ public class MainActivity extends AppCompatActivity {
         }
         poseOverlay.setResult(result);
         textScore.setText(getString(R.string.result_score, result.score));
-        textAngles.setText(getString(R.string.result_angles, result.releaseAngle,
-                ShotMathUtils.IDEAL_RELEASE_ANGLE, result.elbowAngle));
+        String angles = getString(R.string.result_angles, result.releaseAngle,
+                ShotMathUtils.IDEAL_RELEASE_ANGLE, result.elbowAngle);
+        String body = Double.isNaN(result.torsoLean)
+                ? getString(R.string.result_follow_only, result.followThroughAngle)
+                : getString(R.string.result_body, result.torsoLean, result.followThroughAngle);
+        textAngles.setText(angles + "\n" + body);
         textFeedback.setText(result.feedback);
         cardResult.setVisibility(View.VISIBLE);
     }

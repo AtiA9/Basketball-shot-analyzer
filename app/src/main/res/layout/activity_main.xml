@@ -80,6 +80,14 @@
                     android:layout_height="320dp" />
 
                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/zoom_hint"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+
+                <TextView
                     android:id="@+id/textScore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

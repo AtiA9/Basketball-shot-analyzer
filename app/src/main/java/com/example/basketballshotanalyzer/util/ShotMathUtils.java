@@ -15,8 +15,14 @@ public final class ShotMathUtils {
     public static final double POINTS_PER_DEGREE = 2.0;
     /** סטייה (במעלות) שעד אליה הזריקה נחשבת "בטווח הטוב". */
     public static final double GOOD_RANGE = 5.0;
-    /** מתחת לזווית מרפק זו היד לא יושרה מספיק ברגע השחרור. */
-    public static final double MIN_ELBOW_EXTENSION = 150.0;
+    /** נטיית גוף (מעלות מהקו האנכי) שעד אליה הגוף נחשב יציב. */
+    public static final double MAX_TORSO_LEAN = 10.0;
+    /** זווית מרפק מינימלית בסוף התנועה - היד צריכה להישאר כמעט ישרה (follow-through). */
+    public static final double MIN_FOLLOW_THROUGH = 160.0;
+    /** משקלות הציון המשוקלל (סכומם 1): זווית שחרור, יציבות גוף, המשך תנועה. */
+    public static final double RELEASE_WEIGHT = 0.6;
+    public static final double STABILITY_WEIGHT = 0.2;
+    public static final double FOLLOW_WEIGHT = 0.2;
 
     private ShotMathUtils() { }
 
@@ -50,17 +56,44 @@ public final class ShotMathUtils {
     }
 
     /**
-     * נוסחת הציון: score = 100 - |סטייה| × 2, מוגבל לטווח 0-100.
+     * נטיית הגוף: הזווית בין קו הגו (ירך אל כתף) לבין הקו האנכי. 0 = גוף זקוף לגמרי.
+     * כאן atan2(dx, dy) ולא atan2(dy, dx), כי מודדים מול האנך ולא מול האופק.
+     */
+    public static double torsoLean(double shoulderX, double shoulderY, double hipX, double hipY) {
+        double dx = Math.abs(shoulderX - hipX);
+        double dy = hipY - shoulderY; // הירך מתחת לכתף, לכן dy חיובי
+        return Math.toDegrees(Math.atan2(dx, dy));
+    }
+
+    /**
+     * ציון זווית השחרור: score = 100 - |סטייה| × 2, מוגבל לטווח 0-100.
      * לדוגמה: זווית 53.5 → סטייה 5 → ציון 90.
      */
     public static int calculateScore(double releaseAngle) {
-        double deviation = Math.abs(deviationFromIdeal(releaseAngle));
-        long score = Math.round(100 - deviation * POINTS_PER_DEGREE);
+        return partScore(Math.abs(deviationFromIdeal(releaseAngle)));
+    }
+
+    /**
+     * ציון משוקלל: 60% זווית שחרור + 20% יציבות גוף + 20% המשך תנועה.
+     * בכל רכיב מורידים 2 נקודות על כל מעלה מעבר לטווח המותר.
+     * torsoLean = NaN אם הירך לא זוהתה - אז לא מורידים נקודות על יציבות.
+     */
+    public static int calculateTotalScore(double releaseAngle, double torsoLean, double followThroughAngle) {
+        int stability = Double.isNaN(torsoLean) ? 100 : partScore(torsoLean - MAX_TORSO_LEAN);
+        int follow = partScore(MIN_FOLLOW_THROUGH - followThroughAngle);
+        double total = RELEASE_WEIGHT * calculateScore(releaseAngle)
+                + STABILITY_WEIGHT * stability + FOLLOW_WEIGHT * follow;
+        return (int) Math.round(total);
+    }
+
+    /** ציון של רכיב אחד: 100 פחות 2 נקודות לכל מעלת חריגה (חריגה שלילית = אין קנס), בטווח 0-100. */
+    private static int partScore(double degreesOver) {
+        long score = Math.round(100 - Math.max(0, degreesOver) * POINTS_PER_DEGREE);
         return (int) Math.max(0, Math.min(100, score));
     }
 
-    /** יוצר משוב טקסטואלי בעברית לפי זווית השחרור וזווית המרפק. */
-    public static String generateFeedback(double releaseAngle, double elbowAngle) {
+    /** יוצר משוב טקסטואלי בעברית לפי זווית השחרור, נטיית הגוף והמשך התנועה. */
+    public static String generateFeedback(double releaseAngle, double torsoLean, double followThroughAngle) {
         double deviation = deviationFromIdeal(releaseAngle);
         StringBuilder feedback = new StringBuilder();
         if (deviation < -GOOD_RANGE) {
@@ -70,8 +103,11 @@ public final class ShotMathUtils {
         } else {
             feedback.append("זווית שחרור מצוינת! המשך כך.");
         }
-        if (elbowAngle < MIN_ELBOW_EXTENSION) {
-            feedback.append("\nהמרפק לא מיושר עד הסוף ברגע השחרור - סיים את התנועה עם יד ישרה.");
+        if (torsoLean > MAX_TORSO_LEAN) {
+            feedback.append("\nהגוף נוטה בזמן הזריקה - נסה לקפוץ ישר למעלה ולנחות באותה נקודה.");
+        }
+        if (followThroughAngle < MIN_FOLLOW_THROUGH) {
+            feedback.append("\nהיד לא נשארה ישרה אחרי השחרור - סיים את התנועה עם יד מושטת אל הסל.");
         }
         return feedback.toString();
     }
