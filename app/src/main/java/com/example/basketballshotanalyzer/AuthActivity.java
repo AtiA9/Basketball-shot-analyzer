@@ -4,7 +4,6 @@ package com.example.basketballshotanalyzer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.CheckBox;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,7 +15,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 /**
- * מסך פתיחה: התחברות והרשמה.
+ * מסך פתיחה: התחברות. ההרשמה נמצאת במסך נפרד (RegisterActivity).
  * אם המשתמש סימן בעבר "הישאר מחובר" - עוברים ישר למסך הראשי.
  */
 public class AuthActivity extends AppCompatActivity {
@@ -46,7 +45,8 @@ public class AuthActivity extends AppCompatActivity {
         editPassword = findViewById(R.id.editPassword);
         checkRemember = findViewById(R.id.checkRemember);
         findViewById(R.id.btnLogin).setOnClickListener(v -> login());
-        findViewById(R.id.btnRegister).setOnClickListener(v -> register());
+        findViewById(R.id.btnGoToRegister).setOnClickListener(v ->
+                startActivity(new Intent(this, RegisterActivity.class)));
     }
 
     /** בודק את הקלט ומציג הודעת שגיאה מתחת לשדה הבעייתי. מחזיר true אם הכול תקין. */
@@ -56,24 +56,6 @@ public class AuthActivity extends AppCompatActivity {
         layoutUsername.setError(usernameOk ? null : getString(R.string.error_username));
         layoutPassword.setError(passwordOk ? null : getString(R.string.error_password));
         return usernameOk && passwordOk;
-    }
-
-    /** הרשמה: יוצר salt ו-hash, שומר משתמש חדש ומחבר אותו. */
-    private void register() {
-        String username = getText(editUsername);
-        String password = getText(editPassword);
-        if (!validateInput(username, password)) {
-            return;
-        }
-        String salt = AuthUtils.generateSalt();
-        String hash = AuthUtils.hashPassword(password, salt);
-        long id = dbHelper.insertUser(new User(username, hash, salt));
-        if (id == -1) {
-            layoutUsername.setError(getString(R.string.error_user_exists));
-            return;
-        }
-        Toast.makeText(this, R.string.register_success, Toast.LENGTH_SHORT).show();
-        completeLogin(id, username);
     }
 
     /** התחברות: מחפש את המשתמש ובודק שה-hash של הסיסמה שהוקלדה תואם לשמור. */
