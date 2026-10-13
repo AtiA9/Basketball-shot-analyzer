@@ -19,12 +19,13 @@
     <!-- מסך ראשי -->
     <string name="welcome_user">שלום, %1$s</string>
     <string name="main_instructions">צלם או בחר סרטון (עד דקה) של זריקת קפיצה, מהצד, כשכל הגוף בתמונה.</string>
-    <string name="btn_pick_video">בחר סרטון מהגלריה</string>
-    <string name="btn_record_video">צלם סרטון</string>
+    <string name="btn_pick_video">גלריה</string>
+    <string name="btn_pick_video_sub">בחר סרטון קיים</string>
+    <string name="btn_record_video">מצלמה</string>
+    <string name="btn_record_video_sub">צלם זריקה חדשה</string>
     <string name="btn_history">היסטוריה וסטטיסטיקה</string>
     <string name="btn_logout">התנתקות</string>
     <string name="analyzing">מנתח את הזריקה… בסרטון ארוך זה יכול לקחת כדקה</string>
-    <string name="result_score">ציון: %1$d / 100</string>
     <string name="result_angles">זווית שחרור: %1$.1f° (אידיאלי %2$.1f°) · מרפק: %3$.1f°</string>
     <string name="result_body">נטיית גוף: %1$.1f° · מרפק בסוף התנועה: %2$.1f°</string>
     <string name="result_follow_only">מרפק בסוף התנועה: %1$.1f° (הירך לא זוהתה)</string>
@@ -36,11 +37,20 @@
     <string name="label_elbow">מרפק %1$.0f°</string>
     <string name="label_release">שחרור %1$.0f°</string>
 
+    <string name="result_title">תוצאת הניתוח</string>
+    <string name="score_label">הציון שלך</string>
+    <string name="score_out_of">מתוך 100</string>
+    <string name="feedback_title">משוב</string>
+
     <!-- מסך היסטוריה -->
     <string name="history_title">היסטוריית זריקות</string>
-    <string name="stats_title">סטטיסטיקה</string>
-    <string name="stats_summary">סה\"כ זריקות: %1$d · ממוצע: %2$.1f · שיא: %3$d</string>
     <string name="stats_month">%1$s: ממוצע %2$.1f (%3$d זריקות)</string>
+    <string name="stat_total">זריקות</string>
+    <string name="stat_average">ממוצע</string>
+    <string name="stat_best">שיא</string>
+    <string name="stat_decimal">%1$.1f</string>
+    <string name="monthly_title">ממוצע לפי חודש</string>
+    <string name="btn_back">חזרה</string>
     <string name="history_empty">עדיין אין זריקות. נתח זריקה ראשונה במסך הראשי!</string>
     <string name="item_angles">שחרור %1$.1f° · מרפק %2$.1f°</string>
     <string name="item_note">הערה: %1$s</string>

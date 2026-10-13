@@ -1,6 +1,7 @@
 // AI-GENERATED (Claude Code) - reviewed and understood by the student
 package com.example.basketballshotanalyzer.ui;
 
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,9 @@ public class ShotAdapter extends RecyclerView.Adapter<ShotAdapter.ShotViewHolder
     public void onBindViewHolder(@NonNull ShotViewHolder holder, int position) {
         ShotData shot = shots.get(position);
         View item = holder.itemView;
-        holder.textScore.setText(item.getContext().getString(R.string.result_score, shot.getScore()));
+        holder.textScore.setText(String.valueOf(shot.getScore()));
+        holder.textScore.setBackgroundTintList(ColorStateList.valueOf(
+                ScoreColors.forScore(item.getContext(), shot.getScore())));
         holder.textDate.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
                 .format(new Date(shot.getTimestamp())));
         holder.textAngles.setText(item.getContext().getString(R.string.item_angles,

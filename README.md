@@ -20,6 +20,7 @@
 | util | `ShotAnalyzer` | חילוץ פריימים (`MediaMetadataRetriever`) + ML Kit + בחירת רגע השחרור |
 | ui | `PoseOverlayView` | View מותאם (`onDraw`): פריים, שלד ותוויות זווית |
 | ui | `ShotAdapter` | Adapter ל-RecyclerView של היסטוריית הזריקות |
+| ui | `ScoreColors` | צבע אחיד לציון בכל המסכים (ירוק / כתום / אדום) |
 | - | `AuthActivity` | מסך התחברות/הרשמה |
 | - | `MainActivity` | הרשאות, גלריה/מצלמה, ניתוח ב-ExecutorService + Handler |
 | - | `HistoryActivity` | רשימת זריקות, עריכת הערה, מחיקה, סטטיסטיקה |
