@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- פלטת צבעים אחידה: כתום כדורסל + כחול כהה -->
-    <color name="primary">#E8590C</color>
-    <color name="primary_dark">#B8440A</color>
-    <color name="secondary">#1C3D5A</color>
-    <color name="background">#FFF8F3</color>
+    <!-- פלטת צבעים אחידה: כתום כדורסל + כחול לילה של אולם -->
+    <color name="primary">#F26B1D</color>
+    <color name="primary_dark">#C2410C</color>
+    <color name="primary_container">#FFE4D3</color>
+    <color name="navy">#0F1C2E</color>
+    <color name="navy_light">#1E3A5F</color>
+    <color name="background">#F4F6FA</color>
     <color name="surface">#FFFFFF</color>
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#616161</color>
-    <color name="error">#C62828</color>
-    <color name="good">#2E7D32</color>
+    <color name="text_primary">#1A1C1E</color>
+    <color name="text_secondary">#5F6B7A</color>
+    <color name="text_on_dark">#FFFFFF</color>
+    <color name="text_on_dark_secondary">#B8C4D6</color>
+    <color name="outline">#D5DAE1</color>
+    <color name="feedback_bg">#FFF4EC</color>
+    <color name="error">#DC2626</color>
+    <color name="score_good">#16A34A</color>
+    <color name="score_medium">#F59E0B</color>
+    <color name="score_bad">#DC2626</color>
     <color name="white">#FFFFFF</color>
 </resources>

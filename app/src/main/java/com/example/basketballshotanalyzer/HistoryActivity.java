@@ -16,6 +16,7 @@ import com.example.basketballshotanalyzer.model.ShotData;
 import com.example.basketballshotanalyzer.model.UserSummary;
 import com.example.basketballshotanalyzer.ui.ShotAdapter;
 import com.example.basketballshotanalyzer.util.SessionManager;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -37,10 +38,8 @@ public class HistoryActivity extends AppCompatActivity implements ShotAdapter.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
-        setTitle(R.string.history_title);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> finish()); // חץ "חזרה"
         dbHelper = new DatabaseHelper(this);
         userId = new SessionManager(this).getUserId();
         RecyclerView recycler = findViewById(R.id.recyclerShots);
@@ -59,13 +58,14 @@ public class HistoryActivity extends AppCompatActivity implements ShotAdapter.On
         showStatistics();
     }
 
-    /** מציג סיכום כללי (מ-JOIN) ושורה לכל חודש (מ-GROUP BY). */
+    /** מציג סיכום כללי (מ-JOIN) בשלוש קוביות, ושורה לכל חודש (מ-GROUP BY). */
     private void showStatistics() {
         UserSummary summary = dbHelper.getUserSummary(userId);
-        TextView textSummary = findViewById(R.id.textSummary);
         if (summary != null) {
-            textSummary.setText(getString(R.string.stats_summary,
-                    summary.getTotalShots(), summary.getAverageScore(), summary.getBestScore()));
+            ((TextView) findViewById(R.id.textStatTotal)).setText(String.valueOf(summary.getTotalShots()));
+            ((TextView) findViewById(R.id.textStatAverage)).setText(
+                    getString(R.string.stat_decimal, summary.getAverageScore()));
+            ((TextView) findViewById(R.id.textStatBest)).setText(String.valueOf(summary.getBestScore()));
         }
         StringBuilder monthly = new StringBuilder();
         for (MonthlyStat stat : dbHelper.getMonthlyStats(userId)) {
@@ -105,12 +105,5 @@ public class HistoryActivity extends AppCompatActivity implements ShotAdapter.On
                 })
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show();
-    }
-
-    /** חץ "חזרה" בסרגל העליון. */
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
     }
 }

@@ -22,9 +22,11 @@ import androidx.core.content.ContextCompat;
 import com.example.basketballshotanalyzer.db.DatabaseHelper;
 import com.example.basketballshotanalyzer.model.ShotData;
 import com.example.basketballshotanalyzer.ui.PoseOverlayView;
+import com.example.basketballshotanalyzer.ui.ScoreColors;
 import com.example.basketballshotanalyzer.util.SessionManager;
 import com.example.basketballshotanalyzer.util.ShotAnalyzer;
 import com.example.basketballshotanalyzer.util.ShotMathUtils;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.concurrent.ExecutorService;
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     private View layoutProgress, cardResult;
     private PoseOverlayView poseOverlay;
+    private CircularProgressIndicator scoreRing;
     private TextView textScore, textAngles, textFeedback;
 
     /** בקשת הרשאה בזמן ריצה. אם אושרה - פותחים את הגלריה. */
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         layoutProgress = findViewById(R.id.layoutProgress);
         cardResult = findViewById(R.id.cardResult);
         poseOverlay = findViewById(R.id.poseOverlay);
+        scoreRing = findViewById(R.id.scoreRing);
         textScore = findViewById(R.id.textScore);
         textAngles = findViewById(R.id.textAngles);
         textFeedback = findViewById(R.id.textFeedback);
@@ -158,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         poseOverlay.setResult(result);
-        textScore.setText(getString(R.string.result_score, result.score));
+        showScore(result.score);
         String angles = getString(R.string.result_angles, result.releaseAngle,
                 ShotMathUtils.IDEAL_RELEASE_ANGLE, result.elbowAngle);
         String body = Double.isNaN(result.torsoLean)
@@ -167,6 +171,13 @@ public class MainActivity extends AppCompatActivity {
         textAngles.setText(angles + "\n" + body);
         textFeedback.setText(result.feedback);
         cardResult.setVisibility(View.VISIBLE);
+    }
+
+    /** מציג את הציון בטבעת: אורך הטבעת = הציון, והצבע לפי רמת הציון. */
+    private void showScore(int score) {
+        textScore.setText(String.valueOf(score));
+        scoreRing.setIndicatorColor(ScoreColors.forScore(this, score));
+        scoreRing.setProgressCompat(score, true);
     }
 
     /** מציג הודעת שגיאה ידידותית בתחתית המסך. */
