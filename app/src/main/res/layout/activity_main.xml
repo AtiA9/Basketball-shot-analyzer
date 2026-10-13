@@ -37,7 +37,7 @@
                 android:text="@string/btn_logout" />
         </LinearLayout>
 
-        <View style="@style/App.Hairline" />
+        <View style="@style/AppHairline" />
 
         <TextView
             android:id="@+id/textWelcome"
@@ -62,7 +62,7 @@
             android:text="@string/section_new_shot"
             android:textAppearance="@style/TextAppearance.App.Label" />
 
-        <View style="@style/App.Hairline" />
+        <View style="@style/AppHairline" />
 
         <LinearLayout
             android:id="@+id/btnPickVideo"
@@ -102,7 +102,7 @@
                 android:src="@drawable/ic_chevron" />
         </LinearLayout>
 
-        <View style="@style/App.Hairline" />
+        <View style="@style/AppHairline" />
 
         <LinearLayout
             android:id="@+id/btnRecordVideo"
@@ -142,7 +142,7 @@
                 android:src="@drawable/ic_chevron" />
         </LinearLayout>
 
-        <View style="@style/App.Hairline" />
+        <View style="@style/AppHairline" />
 
         <!-- מצב "מנתח..." -->
         <LinearLayout
@@ -185,7 +185,7 @@
                 android:text="@string/result_title"
                 android:textAppearance="@style/TextAppearance.App.Label" />
 
-            <View style="@style/App.Hairline" />
+            <View style="@style/AppHairline" />
 
             <com.example.basketballshotanalyzer.ui.PoseOverlayView
                 android:id="@+id/poseOverlay"

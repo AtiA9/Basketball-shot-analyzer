@@ -83,5 +83,5 @@
         </LinearLayout>
     </LinearLayout>
 
-    <View style="@style/App.Hairline" />
+    <View style="@style/AppHairline" />
 </LinearLayout>
