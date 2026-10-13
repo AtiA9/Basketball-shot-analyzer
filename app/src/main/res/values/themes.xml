@@ -3,11 +3,11 @@
     <!-- ערכת נושא Material Design 3 לכל האפליקציה (בלי ActionBar - לכל מסך כותרת משלו) -->
     <style name="Theme.BasketballShotAnalyzer" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/text_on_dark</item>
         <item name="colorPrimaryContainer">@color/primary_container</item>
         <item name="colorOnPrimaryContainer">@color/primary_dark</item>
-        <item name="colorSecondary">@color/navy_light</item>
-        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondary">@color/forest_light</item>
+        <item name="colorOnSecondary">@color/text_on_dark</item>
         <item name="colorSecondaryContainer">@color/primary_container</item>
         <item name="colorOnSecondaryContainer">@color/primary_dark</item>
         <item name="colorSurface">@color/surface</item>
@@ -15,42 +15,60 @@
         <item name="colorOutline">@color/outline</item>
         <item name="colorError">@color/error</item>
         <item name="android:colorBackground">@color/background</item>
-        <item name="android:statusBarColor">@color/navy</item>
+        <item name="android:statusBarColor">@color/forest</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <!-- סגנון משותף לכרטיסים: פינות מעוגלות וצל עדין -->
-    <style name="Widget.App.Card" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardCornerRadius">20dp</item>
-        <item name="cardElevation">3dp</item>
+    <!-- כרטיס: מסגרת דקה במקום צל, פינות קטנות - מראה "נייר" מסודר -->
+    <style name="Widget.App.Card" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardCornerRadius">8dp</item>
+        <item name="cardElevation">0dp</item>
         <item name="cardBackgroundColor">@color/surface</item>
+        <item name="strokeColor">@color/outline</item>
+        <item name="strokeWidth">1dp</item>
     </style>
 
-    <!-- סגנון משותף לשדות קלט -->
+    <!-- שדה קלט -->
     <style name="Widget.App.TextField" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="boxCornerRadiusTopStart">14dp</item>
-        <item name="boxCornerRadiusTopEnd">14dp</item>
-        <item name="boxCornerRadiusBottomStart">14dp</item>
-        <item name="boxCornerRadiusBottomEnd">14dp</item>
-        <item name="startIconTint">@color/primary</item>
+        <item name="boxCornerRadiusTopStart">6dp</item>
+        <item name="boxCornerRadiusTopEnd">6dp</item>
+        <item name="boxCornerRadiusBottomStart">6dp</item>
+        <item name="boxCornerRadiusBottomEnd">6dp</item>
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="startIconTint">@color/brass</item>
     </style>
 
-    <!-- כפתור ראשי גדול -->
+    <!-- כפתור ראשי: בורדו מלא, פינות כמעט ישרות -->
     <style name="Widget.App.Button" parent="Widget.Material3.Button">
-        <item name="android:minHeight">56dp</item>
-        <item name="cornerRadius">16dp</item>
+        <item name="android:minHeight">54dp</item>
+        <item name="cornerRadius">6dp</item>
         <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.03</item>
     </style>
 
     <style name="Widget.App.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="android:minHeight">56dp</item>
-        <item name="cornerRadius">16dp</item>
+        <item name="android:minHeight">54dp</item>
+        <item name="cornerRadius">6dp</item>
         <item name="android:textSize">16sp</item>
+        <item name="strokeColor">@color/primary</item>
     </style>
 
-    <!-- כותרת של אזור במסך -->
+    <!-- כותרות בגופן סריף - נותן מראה קלאסי ורציני -->
+    <style name="TextAppearance.App.Headline" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">serif</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="TextAppearance.App.SectionTitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">serif</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- תווית קטנה באותיות מרווחות בצבע פליז (למשל שם האפליקציה) -->
+    <style name="TextAppearance.App.Overline" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textColor">@color/brass_light</item>
+        <item name="android:letterSpacing">0.25</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 </resources>

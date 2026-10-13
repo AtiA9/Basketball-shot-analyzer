@@ -92,9 +92,9 @@ public class PoseOverlayView extends View {
         });
         bonePaint.setColor(Color.WHITE);
         bonePaint.setStrokeWidth(5f);
-        armPaint.setColor(ContextCompat.getColor(context, R.color.primary));
+        armPaint.setColor(ContextCompat.getColor(context, R.color.brass_light));
         armPaint.setStrokeWidth(9f);
-        pointPaint.setColor(Color.YELLOW);
+        pointPaint.setColor(ContextCompat.getColor(context, R.color.brass));
         textPaint.setColor(Color.WHITE);
         textPaint.setTextSize(40f);
         textPaint.setShadowLayer(4f, 0f, 0f, Color.BLACK);

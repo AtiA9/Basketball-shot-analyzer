@@ -3,7 +3,7 @@
     <string name="app_name">Basketball Shot Analyzer</string>
 
     <!-- מסך התחברות -->
-    <string name="auth_title">ברוך הבא!</string>
+    <string name="auth_title">ברוך הבא</string>
     <string name="auth_subtitle">התחבר או הירשם כדי לנתח את הזריקות שלך</string>
     <string name="hint_username">שם משתמש</string>
     <string name="hint_password">סיסמה</string>
