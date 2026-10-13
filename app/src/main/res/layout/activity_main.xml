@@ -1,334 +1,291 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- מסך ראשי: כותרת, שני כרטיסי פעולה (גלריה/מצלמה), התקדמות ותוצאת הניתוח -->
+<!-- מסך ראשי: ברכה, שתי שורות פעולה (גלריה/מצלמה), התקדמות ותוצאת הניתוח -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/ivory"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="24dp">
+        android:paddingHorizontal="24dp"
+        android:paddingBottom="32dp">
 
-        <!-- כותרת עליונה -->
+        <!-- שורה עליונה: שם האפליקציה + התנתקות -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_header"
-            android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="32dp"
-            android:paddingBottom="64dp">
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/app_name"
+                android:textAppearance="@style/TextAppearance.App.Wordmark" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogout"
+                style="@style/Widget.App.Button.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_logout" />
+        </LinearLayout>
+
+        <View style="@style/App.Hairline" />
+
+        <TextView
+            android:id="@+id/textWelcome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:textAppearance="@style/TextAppearance.App.Display" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="3dp"
+            android:text="@string/main_instructions"
+            android:textAppearance="@style/TextAppearance.App.Body" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/section_new_shot"
+            android:textAppearance="@style/TextAppearance.App.Label" />
+
+        <View style="@style/App.Hairline" />
+
+        <LinearLayout
+            android:id="@+id/btnPickVideo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingVertical="18dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/textWelcome"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textAppearance="@style/TextAppearance.App.Headline"
-                    android:textColor="@color/text_on_dark"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnLogout"
-                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/btn_logout"
-                    app:icon="@drawable/ic_logout"
-                    app:iconTint="@color/text_on_dark" />
+                    android:text="@string/btn_pick_video"
+                    android:textAppearance="@style/TextAppearance.App.Title" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/btn_pick_video_sub"
+                    android:textAppearance="@style/TextAppearance.App.Label" />
             </LinearLayout>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_chevron" />
+        </LinearLayout>
+
+        <View style="@style/App.Hairline" />
+
+        <LinearLayout
+            android:id="@+id/btnRecordVideo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingVertical="18dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_record_video"
+                    android:textAppearance="@style/TextAppearance.App.Title" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/btn_record_video_sub"
+                    android:textAppearance="@style/TextAppearance.App.Label" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_chevron" />
+        </LinearLayout>
+
+        <View style="@style/App.Hairline" />
+
+        <!-- מצב "מנתח..." -->
+        <LinearLayout
+            android:id="@+id/layoutProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/analyzing"
+                android:textAppearance="@style/TextAppearance.App.Body" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:indeterminate="true"
+                app:indicatorColor="@color/accent"
+                app:trackColor="@color/hairline"
+                app:trackThickness="2dp" />
+        </LinearLayout>
+
+        <!-- תוצאת הניתוח -->
+        <LinearLayout
+            android:id="@+id/cardResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/result_title"
+                android:textAppearance="@style/TextAppearance.App.Label" />
+
+            <View style="@style/App.Hairline" />
+
+            <com.example.basketballshotanalyzer.ui.PoseOverlayView
+                android:id="@+id/poseOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="360dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/overlay_bg" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/main_instructions"
-                android:textColor="@color/text_on_dark_secondary" />
-        </LinearLayout>
+                android:gravity="center"
+                android:text="@string/zoom_hint"
+                android:textAppearance="@style/TextAppearance.App.Label"
+                android:textSize="11sp" />
 
-        <!-- שני כרטיסי פעולה שעולים על הכותרת -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="-40dp"
-            android:orientation="horizontal">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnPickVideo"
-                style="@style/Widget.App.Card"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/bg_icon_tile"
-                        android:importantForAccessibility="no"
-                        android:padding="14dp"
-                        android:src="@drawable/ic_gallery"
-                        app:tint="@color/primary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/btn_pick_video"
-                        android:textAppearance="@style/TextAppearance.App.SectionTitle" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/btn_pick_video_sub"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnRecordVideo"
-                style="@style/Widget.App.Card"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/bg_icon_tile"
-                        android:importantForAccessibility="no"
-                        android:padding="14dp"
-                        android:src="@drawable/ic_videocam"
-                        app:tint="@color/primary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/btn_record_video"
-                        android:textAppearance="@style/TextAppearance.App.SectionTitle" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/btn_record_video_sub"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
-
-        <!-- מצב "מנתח..." -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/layoutProgress"
-            style="@style/Widget.App.Card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="16dp"
-            android:visibility="gone">
+                android:layout_marginTop="32dp"
+                android:text="@string/score_label"
+                android:textAppearance="@style/TextAppearance.App.Label" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:baselineAligned="true"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:id="@+id/textScore"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/analyzing"
-                    android:textColor="@color/text_primary" />
+                    android:textAppearance="@style/TextAppearance.App.Display"
+                    android:textSize="64sp" />
 
-                <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:indeterminate="true"
-                    app:trackCornerRadius="4dp"
-                    app:trackThickness="6dp" />
+                    android:layout_marginStart="10dp"
+                    android:text="@string/score_out_of"
+                    android:textAppearance="@style/TextAppearance.App.Label" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <!-- תוצאת הניתוח -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardResult"
-            style="@style/Widget.App.Card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="16dp"
-            android:visibility="gone">
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/scoreBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                app:trackColor="@color/hairline"
+                app:trackThickness="2dp" />
 
+            <TextView
+                android:id="@+id/textAngles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:lineSpacingExtra="4dp"
+                android:textAppearance="@style/TextAppearance.App.Body"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/feedback_title"
+                android:textAppearance="@style/TextAppearance.App.Label" />
+
+            <!-- המשוב בסגנון ציטוט: קו בורדו דק בצד וטקסט סריף -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/accent" />
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:id="@+id/textFeedback"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="@string/result_title"
-                    android:textAppearance="@style/TextAppearance.App.SectionTitle" />
-
-                <com.example.basketballshotanalyzer.ui.PoseOverlayView
-                    android:id="@+id/poseOverlay"
-                    android:layout_width="match_parent"
-                    android:layout_height="340dp"
-                    android:background="@drawable/bg_overlay" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"
-                    android:text="@string/zoom_hint"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
-
-                <!-- טבעת הציון + הזוויות -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <FrameLayout
-                        android:layout_width="104dp"
-                        android:layout_height="104dp">
-
-                        <com.google.android.material.progressindicator.CircularProgressIndicator
-                            android:id="@+id/scoreRing"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:max="100"
-                            app:indicatorSize="104dp"
-                            app:trackColor="@color/outline"
-                            app:trackCornerRadius="2dp"
-                            app:trackThickness="5dp" />
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textScore"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="serif"
-                                android:textColor="@color/text_primary"
-                                android:textSize="30sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/score_out_of"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="11sp" />
-                        </LinearLayout>
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/score_label"
-                            android:textAppearance="@style/TextAppearance.App.SectionTitle" />
-
-                        <TextView
-                            android:id="@+id/textAngles"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:lineSpacingExtra="2dp"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- משוב -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/bg_feedback"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/feedback_title"
-                        android:textColor="@color/primary_dark"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/textFeedback"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:lineSpacingExtra="3dp"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
-                </LinearLayout>
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:fontFamily="serif"
+                    android:lineSpacingExtra="5dp"
+                    android:textColor="@color/ink"
+                    android:textSize="17sp" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnHistory"
-            style="@style/Widget.App.Button"
+            style="@style/Widget.App.Button.Outlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/forest"
-            android:text="@string/btn_history"
-            app:icon="@drawable/ic_history"
-            app:iconGravity="textStart" />
+            android:layout_marginTop="48dp"
+            android:text="@string/btn_history" />
     </LinearLayout>
 </ScrollView>

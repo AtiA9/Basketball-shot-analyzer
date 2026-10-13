@@ -1,126 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- מסך היסטוריה: סרגל עליון, כרטיס סטטיסטיקה ורשימת זריקות (RecyclerView) -->
+<!-- מסך היסטוריה: סרגל עליון, שורת סטטיסטיקה, ממוצע חודשי ורשימת זריקות (RecyclerView) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/ivory"
     android:orientation="vertical">
 
-    <!-- כותרת + סטטיסטיקה על רקע כהה -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/ivory"
+        app:navigationContentDescription="@string/btn_back"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="@color/ink"
+        app:title="@string/history_title"
+        app:titleTextAppearance="@style/TextAppearance.App.Title" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_header"
         android:orientation="vertical"
-        android:paddingBottom="20dp">
+        android:paddingHorizontal="24dp">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationContentDescription="@string/btn_back"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationIconTint="@color/text_on_dark"
-            app:title="@string/history_title"
-            app:titleTextAppearance="@style/TextAppearance.App.SectionTitle"
-            app:titleTextColor="@color/text_on_dark" />
+        <View style="@style/App.Hairline" />
 
+        <!-- שלוש עמודות: סה"כ / ממוצע / שיא -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="4dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingVertical="20dp">
 
-                <LinearLayout
-                    android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textStatTotal"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:textAppearance="@style/TextAppearance.App.Display"
+                    android:textColor="@color/ink"
+                    android:textSize="32sp" />
 
-                    <TextView
-                        android:id="@+id/textStatTotal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_on_dark"
-                        android:fontFamily="serif"
-                        android:textSize="26sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stat_total"
-                        android:textColor="@color/text_on_dark_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:text="@string/stat_total"
+                    android:textAppearance="@style/TextAppearance.App.Label" />
+            </LinearLayout>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/hairline" />
 
-                    <TextView
-                        android:id="@+id/textStatAverage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/brass_light"
-                        android:fontFamily="serif"
-                        android:textSize="26sp"
-                        android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stat_average"
-                        android:textColor="@color/text_on_dark_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/textStatAverage"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:textAppearance="@style/TextAppearance.App.Display"
+                    android:textColor="@color/accent"
+                    android:textSize="32sp" />
 
-                    <TextView
-                        android:id="@+id/textStatBest"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_on_dark"
-                        android:fontFamily="serif"
-                        android:textSize="26sp"
-                        android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_average"
+                    android:textAppearance="@style/TextAppearance.App.Label" />
+            </LinearLayout>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/hairline" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stat_best"
-                        android:textColor="@color/text_on_dark_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textStatBest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.App.Display"
+                    android:textColor="@color/ink"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_best"
+                    android:textAppearance="@style/TextAppearance.App.Label" />
+            </LinearLayout>
         </LinearLayout>
 
+        <View style="@style/App.Hairline" />
+
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:text="@string/monthly_title"
-            android:textColor="@color/text_on_dark"
-            android:textStyle="bold" />
+            android:textAppearance="@style/TextAppearance.App.Label" />
 
         <TextView
             android:id="@+id/textMonthly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="4dp"
-            android:lineSpacingExtra="2dp"
-            android:textColor="@color/text_on_dark_secondary" />
+            android:layout_marginTop="6dp"
+            android:lineSpacingExtra="4dp"
+            android:textAppearance="@style/TextAppearance.App.Body"
+            android:textColor="@color/ink" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/history_list_title"
+            android:textAppearance="@style/TextAppearance.App.Label" />
+
+        <View style="@style/App.Hairline" />
     </LinearLayout>
 
     <TextView
@@ -128,13 +142,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="48dp"
-        android:drawablePadding="12dp"
+        android:layout_marginTop="40dp"
         android:gravity="center"
         android:text="@string/history_empty"
-        android:textColor="@color/text_secondary"
-        android:visibility="gone"
-        app:drawableTopCompat="@drawable/ic_basketball" />
+        android:textAppearance="@style/TextAppearance.App.Body"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerShots"
@@ -142,5 +154,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:padding="16dp" />
+        android:paddingHorizontal="24dp"
+        android:paddingBottom="24dp" />
 </LinearLayout>
