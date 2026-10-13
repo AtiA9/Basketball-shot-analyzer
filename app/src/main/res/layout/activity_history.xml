@@ -24,7 +24,7 @@
         android:orientation="vertical"
         android:paddingHorizontal="24dp">
 
-        <View style="@style/App.Hairline" />
+        <View style="@style/AppHairline" />
 
         <!-- שלוש עמודות: סה"כ / ממוצע / שיא -->
         <LinearLayout
@@ -108,7 +108,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <View style="@style/App.Hairline" />
+        <View style="@style/AppHairline" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -134,7 +134,7 @@
             android:text="@string/history_list_title"
             android:textAppearance="@style/TextAppearance.App.Label" />
 
-        <View style="@style/App.Hairline" />
+        <View style="@style/AppHairline" />
     </LinearLayout>
 
     <TextView
