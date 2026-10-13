@@ -4,12 +4,18 @@
 
     <!-- מסך התחברות -->
     <string name="auth_title">ברוך הבא</string>
-    <string name="auth_subtitle">ניתוח מקצועי של זריקת הקפיצה שלך</string>
+    <string name="auth_subtitle">התחבר כדי להמשיך לנתח את הזריקות שלך</string>
     <string name="hint_username">שם משתמש</string>
     <string name="hint_password">סיסמה</string>
     <string name="remember_me">הישאר מחובר</string>
     <string name="btn_login">התחברות</string>
-    <string name="btn_register">הרשמה</string>
+    <string name="link_to_register">אין לך חשבון? להרשמה</string>
+    <string name="link_to_login">כבר יש לך חשבון? להתחברות</string>
+    <string name="register_title">יצירת חשבון</string>
+    <string name="register_subtitle">בחר שם משתמש וסיסמה כדי לשמור את היסטוריית הזריקות שלך</string>
+    <string name="hint_confirm_password">אימות סיסמה</string>
+    <string name="btn_create_account">יצירת חשבון</string>
+    <string name="error_password_mismatch">הסיסמאות אינן תואמות</string>
     <string name="error_username">לפחות 3 תווים: אותיות באנגלית, ספרות או _</string>
     <string name="error_password">לפחות 6 תווים, כולל ספרה אחת</string>
     <string name="error_user_exists">שם המשתמש כבר תפוס</string>

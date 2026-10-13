@@ -21,6 +21,7 @@
 | ui | `PoseOverlayView` | View מותאם (`onDraw`): פריים, שלד ותוויות זווית |
 | ui | `ShotAdapter` | Adapter ל-RecyclerView של היסטוריית הזריקות |
 | ui | `ScoreColors` | צבע אחיד לציון בכל המסכים (ירוק / כתום / אדום) |
-| - | `AuthActivity` | מסך התחברות/הרשמה |
+| - | `AuthActivity` | מסך התחברות (מסך הפתיחה) |
+| - | `RegisterActivity` | מסך הרשמה: שם משתמש, סיסמה ואימות סיסמה |
 | - | `MainActivity` | הרשאות, גלריה/מצלמה, ניתוח ב-ExecutorService + Handler |
 | - | `HistoryActivity` | רשימת זריקות, עריכת הערה, מחיקה, סטטיסטיקה |
