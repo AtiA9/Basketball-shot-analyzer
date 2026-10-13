@@ -1,32 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- שורה אחת ברשימת הזריקות: עיגול ציון צבעוני + פרטים + כפתורי עריכה ומחיקה -->
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/Widget.App.Card"
+<!-- שורה אחת ברשימת הזריקות: ציון גדול בסריף, פרטים, פעולות וקו מפריד דק -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:paddingTop="20dp"
+        android:paddingBottom="8dp">
 
         <TextView
             android:id="@+id/textItemScore"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="@drawable/bg_score_badge"
-            android:fontFamily="serif"
-            android:gravity="center"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.App.Display"
+            android:textSize="36sp" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -34,24 +30,24 @@
                 android:id="@+id/textItemDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:textAppearance="@style/TextAppearance.App.Label" />
 
             <TextView
                 android:id="@+id/textItemAngles"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textAppearance="@style/TextAppearance.App.SectionTitle"
-                android:textSize="15sp" />
+                android:layout_marginTop="4dp"
+                android:textAppearance="@style/TextAppearance.App.Body"
+                android:textColor="@color/ink"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/textItemFeedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:lineSpacingExtra="2dp"
-                android:textColor="@color/text_primary"
+                android:lineSpacingExtra="3dp"
+                android:textAppearance="@style/TextAppearance.App.Body"
                 android:textSize="14sp" />
 
             <TextView
@@ -59,37 +55,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/bg_feedback"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
-                android:textColor="@color/primary_dark"
-                android:textSize="13sp" />
+                android:fontFamily="serif"
+                android:textColor="@color/accent"
+                android:textSize="14sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:gravity="end"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEditNote"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.App.Button.Text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/btn_edit_note"
-                    app:icon="@drawable/ic_edit"
-                    app:iconTint="@color/forest" />
+                    android:text="@string/btn_edit_note" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDelete"
-                    style="@style/Widget.Material3.Button.IconButton"
+                    style="@style/Widget.App.Button.Text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/btn_delete"
-                    app:icon="@drawable/ic_delete"
-                    app:iconTint="@color/error" />
+                    android:text="@string/btn_delete"
+                    android:textColor="@color/accent" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+
+    <View style="@style/App.Hairline" />
+</LinearLayout>

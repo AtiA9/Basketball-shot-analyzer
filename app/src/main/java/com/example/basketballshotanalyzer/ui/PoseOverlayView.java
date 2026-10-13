@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -90,12 +91,13 @@ public class PoseOverlayView extends View {
                 return true;
             }
         });
-        bonePaint.setColor(Color.WHITE);
-        bonePaint.setStrokeWidth(5f);
+        bonePaint.setColor(Color.argb(170, 255, 255, 255)); // לבן שקוף-למחצה
+        bonePaint.setStrokeWidth(3f);
         armPaint.setColor(ContextCompat.getColor(context, R.color.brass_light));
-        armPaint.setStrokeWidth(9f);
-        pointPaint.setColor(ContextCompat.getColor(context, R.color.brass));
+        armPaint.setStrokeWidth(6f);
+        pointPaint.setColor(ContextCompat.getColor(context, R.color.ivory));
         textPaint.setColor(Color.WHITE);
+        textPaint.setTypeface(Typeface.SERIF);
         textPaint.setTextSize(40f);
         textPaint.setShadowLayer(4f, 0f, 0f, Color.BLACK);
     }
@@ -151,7 +153,7 @@ public class PoseOverlayView extends View {
         drawLine(canvas, result.shoulder, result.elbow, armPaint);
         drawLine(canvas, result.elbow, result.wrist, armPaint);
         for (PoseLandmark landmark : result.landmarks) {
-            canvas.drawCircle(toViewX(landmark.getPosition().x), toViewY(landmark.getPosition().y), 7f, pointPaint);
+            canvas.drawCircle(toViewX(landmark.getPosition().x), toViewY(landmark.getPosition().y), 5f, pointPaint);
         }
         drawLabel(canvas, getContext().getString(R.string.label_elbow, result.elbowAngle), result.elbow);
         drawLabel(canvas, getContext().getString(R.string.label_release, result.releaseAngle), result.wrist);

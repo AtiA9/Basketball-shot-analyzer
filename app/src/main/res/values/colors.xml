@@ -1,25 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- פלטה בהשראת סתיו בחוף המזרחי של ארה"ב: ירוק יער, בורדו, חום גמל ופליז על נייר שנהב -->
-    <color name="primary">#6B1E23</color>
-    <color name="primary_dark">#4A1418</color>
-    <color name="primary_container">#EFE4D2</color>
-    <color name="forest">#1E3328</color>
-    <color name="forest_light">#2F4A3C</color>
-    <color name="forest_dark">#16261E</color>
-    <color name="brass">#B08D57</color>
-    <color name="brass_light">#D9C08F</color>
-    <color name="background">#F5F0E6</color>
-    <color name="surface">#FBF8F2</color>
-    <color name="text_primary">#2B2420</color>
-    <color name="text_secondary">#6E6259</color>
-    <color name="text_on_dark">#F5F0E6</color>
-    <color name="text_on_dark_secondary">#BFC9BF</color>
-    <color name="outline">#D9CFBF</color>
-    <color name="feedback_bg">#F1E8D8</color>
+    <!-- פלטה מינימליסטית ויוקרתית: שנהב, דיו שחור, קווים דקים וצבע הדגשה אחד (בורדו) -->
+    <color name="ivory">#F7F4EE</color>
+    <color name="ink">#1C1B19</color>
+    <color name="ink_secondary">#77706A</color>
+    <color name="hairline">#DAD4C9</color>
+    <color name="accent">#5A1A1F</color>
+    <color name="brass_light">#D2B98B</color>
+    <color name="overlay_bg">#141414</color>
     <color name="error">#8E2C2C</color>
-    <color name="score_good">#3E6B48</color>
-    <color name="score_medium">#B07D2B</color>
-    <color name="score_bad">#8E2C2C</color>
-    <color name="white">#FFFFFF</color>
+    <color name="score_good">#2F4A3C</color>
+    <color name="score_medium">#8A6A2E</color>
+    <color name="score_bad">#5A1A1F</color>
 </resources>
