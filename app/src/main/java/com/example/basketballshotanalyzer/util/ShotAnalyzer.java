@@ -15,6 +15,7 @@ import com.google.mlkit.vision.pose.PoseDetector;
 import com.google.mlkit.vision.pose.PoseLandmark;
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,8 +33,10 @@ public class ShotAnalyzer {
     private static final int MAX_FRAME_WIDTH = 640;
     /** סף ביטחון מינימלי של ML Kit שנקודה באמת נראית בתמונה. */
     private static final float MIN_LIKELIHOOD = 0.5f;
-    /** כמה זמן (מילישניות) לפני שיא התנועה מחפשים את רגע השחרור. */
-    private static final long RELEASE_WINDOW_MS = 500;
+    /** כמה זמן (מילישניות) לפני שיא התנועה מתחילים לחפש את רגע השחרור. */
+    private static final long RELEASE_WINDOW_MS = 700;
+    /** כמה זמן אחרי השיא ממשיכים לחפש (החיפוש הגס דוגם רק כל 250ms, אז השיא האמיתי יכול להיות קצת אחריו). */
+    private static final long AFTER_PEAK_MS = 250;
     /** המרווח בין פריימים בחיפוש המדויק (בערך 30 פריימים בשנייה). */
     private static final long FINE_STEP_MS = 33;
 
@@ -77,7 +80,7 @@ public class ShotAnalyzer {
             if (peak == null) {
                 return null;
             }
-            Result release = findRelease(retriever, peak);
+            Result release = findRelease(retriever, peak, durationMs);
             fillScore(release, peak);
             return release;
         } finally {
@@ -101,28 +104,34 @@ public class ShotAnalyzer {
     }
 
     /**
-     * שלב 2 (חיפוש מדויק): סורק פריים-פריים את חצי השנייה שלפני השיא.
-     * הכדור עוזב את היד כשהיד נעה למעלה הכי מהר - אחרי זה היד מאטה והכדור ממשיך לבד.
-     * לכן מחפשים את זוג הפריימים העוקבים שביניהם היד עלתה הכי הרבה (יחסית לכתף),
-     * ומחזירים את הראשון מביניהם: הרגע האחרון שבו הכדור עדיין ביד.
-     * בודקים רק תנועה שמסתיימת מעל הכתף, כדי לא לבלבל עם הרמת הכדור מהמותן.
+     * שלב 2 (חיפוש מדויק): סורק פריים-פריים מ-0.7 שניות לפני השיא ועד 0.25 שניות אחריו.
+     * הכדור עוזב את היד כשהמרפק מסיים להתיישר, ולכן לכל פריים שומרים את זווית המרפק,
+     * ו-ShotMathUtils.releaseIndex בוחר את הפריים הראשון שבו היד כמעט ישרה.
+     * בודקים רק פריימים שבהם היד מעל הכתף, כדי לא לבלבל עם הרמת הכדור מהמותן.
+     * שומרים רק זמן וזווית (לא את התמונות, כדי לחסוך זיכרון), ובסוף שולפים שוב רק את פריים השחרור.
      */
-    private Result findRelease(MediaMetadataRetriever retriever, Result peak) throws Exception {
-        Result release = peak;
-        Result previous = null;
-        double maxRise = 0;
-        for (long t = Math.max(0, peak.timeMs - RELEASE_WINDOW_MS); t <= peak.timeMs; t += FINE_STEP_MS) {
-            Result current = analyzeAt(retriever, t, peak.rightHand);
-            if (current != null && previous != null && handHeight(current) > 0) {
-                double rise = handHeight(current) - handHeight(previous);
-                if (rise > maxRise) {
-                    maxRise = rise;
-                    release = previous;
-                }
+    private Result findRelease(MediaMetadataRetriever retriever, Result peak, long durationMs)
+            throws Exception {
+        List<Long> times = new ArrayList<>();
+        List<Double> angles = new ArrayList<>();
+        long end = Math.min(durationMs, peak.timeMs + AFTER_PEAK_MS);
+        for (long t = Math.max(0, peak.timeMs - RELEASE_WINDOW_MS); t <= end; t += FINE_STEP_MS) {
+            Result frame = analyzeAt(retriever, t, peak.rightHand);
+            if (frame != null && handHeight(frame) > 0) {
+                times.add(t);
+                angles.add(elbowAngle(frame));
             }
-            previous = current;
         }
-        return release;
+        if (times.isEmpty()) {
+            return peak;
+        }
+        double[] elbowAngles = new double[angles.size()];
+        for (int i = 0; i < elbowAngles.length; i++) {
+            elbowAngles[i] = angles.get(i);
+        }
+        int index = ShotMathUtils.releaseIndex(elbowAngles);
+        Result release = analyzeAt(retriever, times.get(index), peak.rightHand);
+        return release != null ? release : peak;
     }
 
     /**

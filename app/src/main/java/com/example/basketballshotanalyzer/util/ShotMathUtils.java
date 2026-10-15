@@ -23,6 +23,8 @@ public final class ShotMathUtils {
     public static final double RELEASE_WEIGHT = 0.6;
     public static final double STABILITY_WEIGHT = 0.2;
     public static final double FOLLOW_WEIGHT = 0.2;
+    /** כמה מעלות מתחת ליישור המקסימלי של המרפק היד כבר נחשבת מיושרת - זה רגע השחרור. */
+    public static final double RELEASE_EXTENSION_MARGIN = 8.0;
 
     private ShotMathUtils() { }
 
@@ -84,6 +86,41 @@ public final class ShotMathUtils {
         double total = RELEASE_WEIGHT * calculateScore(releaseAngle)
                 + STABILITY_WEIGHT * stability + FOLLOW_WEIGHT * follow;
         return (int) Math.round(total);
+    }
+
+    /**
+     * מוצא את רגע השחרור מתוך זוויות המרפק של פריימים עוקבים (לפי סדר הזמן).
+     * בזריקת קפיצה הכדור עוזב את היד כשהמרפק מסיים להתיישר; אחרי זה היד נשארת ישרה.
+     * 1. מחליקים: כל זווית מוחלפת בחציון של שלושה פריימים שכנים. חציון מסיר פריים בודד
+     *    שבו ML Kit טעה, ובניגוד לממוצע לא "מאחר" כשהזווית עולה בהדרגה.
+     * 2. מוצאים את היישור המקסימלי.
+     * 3. מחזירים את האינדקס הראשון שבו הזווית המוחלקת הגיעה עד RELEASE_EXTENSION_MARGIN מהמקסימום.
+     * לדוגמה: 90, 110, 135, 158, 170, 172, 171 → מקסימום 171, סף 163 → אינדקס 4.
+     */
+    public static int releaseIndex(double[] elbowAngles) {
+        int n = elbowAngles.length;
+        double[] smooth = new double[n];
+        double max = 0;
+        for (int i = 0; i < n; i++) {
+            if (n < 3) {
+                smooth[i] = elbowAngles[i];
+            } else {
+                int center = Math.max(1, Math.min(n - 2, i)); // בקצוות משתמשים בשלושת הקרובים
+                smooth[i] = medianOfThree(elbowAngles[center - 1], elbowAngles[center], elbowAngles[center + 1]);
+            }
+            max = Math.max(max, smooth[i]);
+        }
+        for (int i = 0; i < n; i++) {
+            if (smooth[i] >= max - RELEASE_EXTENSION_MARGIN) {
+                return i;
+            }
+        }
+        return n - 1;
+    }
+
+    /** החציון של שלושה מספרים: הערך האמצעי אחרי מיון. */
+    private static double medianOfThree(double a, double b, double c) {
+        return Math.max(Math.min(a, b), Math.min(Math.max(a, b), c));
     }
 
     /** ציון של רכיב אחד: 100 פחות 2 נקודות לכל מעלת חריגה (חריגה שלילית = אין קנס), בטווח 0-100. */
