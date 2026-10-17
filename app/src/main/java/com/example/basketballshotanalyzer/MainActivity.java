@@ -49,7 +49,13 @@ public class MainActivity extends AppCompatActivity {
     private View layoutProgress, cardResult;
     private PoseOverlayView poseOverlay;
     private LinearProgressIndicator scoreBar;
-    private TextView textScore, textAngles, textFeedback;
+    private TextView textScore, textAngles, textFeedback, textFrameTime;
+    private View btnPrevFrame, btnNextFrame;
+
+    /** הסרטון והתוצאה שמוצגים כרגע, ומזהה הזריקה במסד - נדרשים לתיקון ידני של רגע השחרור. */
+    private Uri currentUri;
+    private ShotAnalyzer.Result currentResult;
+    private long currentShotId = -1;
 
     /** בקשת הרשאה בזמן ריצה. אם אושרה - פותחים את הגלריה. */
     private final ActivityResultLauncher<String> permissionLauncher =
@@ -94,6 +100,11 @@ public class MainActivity extends AppCompatActivity {
         textScore = findViewById(R.id.textScore);
         textAngles = findViewById(R.id.textAngles);
         textFeedback = findViewById(R.id.textFeedback);
+        textFrameTime = findViewById(R.id.textFrameTime);
+        btnPrevFrame = findViewById(R.id.btnPrevFrame);
+        btnNextFrame = findViewById(R.id.btnNextFrame);
+        btnPrevFrame.setOnClickListener(v -> stepFrame(-1));
+        btnNextFrame.setOnClickListener(v -> stepFrame(1));
         findViewById(R.id.btnPickVideo).setOnClickListener(v -> requestVideoPermission());
         findViewById(R.id.btnRecordVideo).setOnClickListener(v -> openCamera());
         findViewById(R.id.btnHistory).setOnClickListener(v ->
@@ -130,13 +141,14 @@ public class MainActivity extends AppCompatActivity {
         if (videoUri == null) {
             return;
         }
+        currentUri = videoUri;
         layoutProgress.setVisibility(View.VISIBLE);
         cardResult.setVisibility(View.GONE);
         executor.execute(() -> {
             try {
                 ShotAnalyzer.Result result = analyzer.analyze(this, videoUri);
                 if (result != null) {
-                    saveShot(result);
+                    currentShotId = saveShot(result);
                 }
                 mainHandler.post(() -> showResult(result));
             } catch (Exception e) {
@@ -145,10 +157,48 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /** שומר את הזריקה במסד (רץ עדיין ב-thread ברקע). */
-    private void saveShot(ShotAnalyzer.Result r) {
-        dbHelper.insertShot(new ShotData(session.getUserId(),
+    /** שומר את הזריקה במסד (רץ עדיין ב-thread ברקע) ומחזיר את ה-id שלה. */
+    private long saveShot(ShotAnalyzer.Result r) {
+        return dbHelper.insertShot(new ShotData(session.getUserId(),
                 r.elbowAngle, r.releaseAngle, r.score, r.feedback));
+    }
+
+    /**
+     * תיקון ידני של רגע השחרור: פריים אחד אחורה (-1) או קדימה (+1).
+     * הניתוח מחדש רץ ברקע; התוצאה מוצגת ומעדכנת את הזריקה שכבר נשמרה במסד.
+     */
+    private void stepFrame(int direction) {
+        ShotAnalyzer.Result from = currentResult;
+        if (from == null || currentUri == null) {
+            return;
+        }
+        setFrameButtonsEnabled(false);
+        executor.execute(() -> {
+            try {
+                ShotAnalyzer.Result r = analyzer.stepFrame(this, currentUri, from, direction);
+                if (r != null && currentShotId != -1) {
+                    dbHelper.updateShotResult(currentShotId, r.elbowAngle, r.releaseAngle, r.score, r.feedback);
+                }
+                mainHandler.post(() -> {
+                    if (r == null) {
+                        setFrameButtonsEnabled(true);
+                        showError(R.string.error_no_pose_frame);
+                    } else {
+                        showResult(r);
+                    }
+                });
+            } catch (Exception e) {
+                mainHandler.post(() -> {
+                    setFrameButtonsEnabled(true);
+                    showError(R.string.error_analysis);
+                });
+            }
+        });
+    }
+
+    private void setFrameButtonsEnabled(boolean enabled) {
+        btnPrevFrame.setEnabled(enabled);
+        btnNextFrame.setEnabled(enabled);
     }
 
     /** מציג את התוצאה על המסך (רץ ב-thread הראשי, דרך ה-Handler). */
@@ -161,7 +211,10 @@ public class MainActivity extends AppCompatActivity {
             showError(R.string.error_no_pose);
             return;
         }
+        currentResult = result;
         poseOverlay.setResult(result);
+        textFrameTime.setText(getString(R.string.frame_time, result.timeMs / 1000.0));
+        setFrameButtonsEnabled(true);
         showScore(result.score);
         String angles = getString(R.string.result_angles, result.releaseAngle,
                 ShotMathUtils.IDEAL_RELEASE_ANGLE, result.elbowAngle);

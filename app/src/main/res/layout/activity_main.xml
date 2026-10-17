@@ -203,6 +203,49 @@
                 android:textAppearance="@style/TextAppearance.App.Label"
                 android:textSize="11sp" />
 
+            <!-- תיקון ידני של רגע השחרור: פריים אחורה / קדימה -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPrevFrame"
+                    style="@style/Widget.App.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="44dp"
+                    android:text="@string/frame_prev" />
+
+                <TextView
+                    android:id="@+id/textFrameTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:gravity="center"
+                    android:textAppearance="@style/TextAppearance.App.Label" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNextFrame"
+                    style="@style/Widget.App.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:minHeight="44dp"
+                    android:text="@string/frame_next" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/frame_hint"
+                android:textAppearance="@style/TextAppearance.App.Label"
+                android:textSize="11sp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

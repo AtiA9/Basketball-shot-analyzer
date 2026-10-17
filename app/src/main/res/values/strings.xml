@@ -36,6 +36,11 @@
     <string name="result_body">נטיית גוף: %1$.1f° · מרפק בסוף התנועה: %2$.1f°</string>
     <string name="result_follow_only">מרפק בסוף התנועה: %1$.1f° (הירך לא זוהתה)</string>
     <string name="zoom_hint">צבוט עם שתי אצבעות כדי להגדיל · הקשה כפולה לאיפוס</string>
+    <string name="frame_prev">פריים אחורה</string>
+    <string name="frame_next">פריים קדימה</string>
+    <string name="frame_time">רגע השחרור: %1$.2f שניות</string>
+    <string name="frame_hint">אם בתמונה הכדור עוד ביד או כבר באוויר, הזז פריים עד הרגע שבו הוא עוזב את היד. הציון יתעדכן.</string>
+    <string name="error_no_pose_frame">לא זוהתה היד בפריימים האלה. נסה לזוז לכיוון השני.</string>
     <string name="error_permission">אין הרשאה לקרוא סרטונים. ניתן לאשר אותה בהגדרות המכשיר.</string>
     <string name="error_no_camera">לא נמצאה אפליקציית מצלמה במכשיר</string>
     <string name="error_no_pose">לא זוהה שחקן בסרטון. ודא שכל הגוף נראה בבירור ונסה שוב.</string>
