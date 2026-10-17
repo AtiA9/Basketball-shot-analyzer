@@ -39,6 +39,8 @@ public class ShotAnalyzer {
     private static final long AFTER_PEAK_MS = 250;
     /** המרווח בין פריימים בחיפוש המדויק (בערך 30 פריימים בשנייה). */
     private static final long FINE_STEP_MS = 33;
+    /** בתיקון ידני: כמה פריימים לכל היותר לדלג אם בפריים אין זיהוי של היד. */
+    private static final int MAX_STEP_TRIES = 3;
 
     /** תוצאת ניתוח: הפריים של רגע השחרור + כל מה שחושב עליו. */
     public static class Result {
@@ -81,7 +83,7 @@ public class ShotAnalyzer {
                 return null;
             }
             Result release = findRelease(retriever, peak, durationMs);
-            fillScore(release, peak);
+            fillScore(release, elbowAngle(peak));
             return release;
         } finally {
             retriever.release();
@@ -195,13 +197,42 @@ public class ShotAnalyzer {
         return result;
     }
 
-    /** מחשב זוויות, ציון ומשוב בעזרת ShotMathUtils. peak = הפריים של סוף התנועה. */
-    private void fillScore(Result r, Result peak) {
+    /**
+     * תיקון ידני של רגע השחרור: עובר פריים אחד אחורה (direction = -1) או קדימה (+1)
+     * מהפריים הנוכחי, עם אותה יד, ומחשב לו מחדש זוויות, ציון ומשוב.
+     * אם בפריים הזה ML Kit לא זיהה את היד, ממשיכים לפריים הבא באותו כיוון (עד MAX_STEP_TRIES).
+     * ה-follow-through נשאר מהניתוח המקורי, כי הוא נמדד בסוף התנועה ולא ברגע השחרור.
+     * מחזיר null אם לא נמצא פריים מתאים. איטית, ולכן רק מ-thread ברקע.
+     */
+    public Result stepFrame(Context context, Uri videoUri, Result current, int direction) throws Exception {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        try {
+            retriever.setDataSource(context, videoUri);
+            long durationMs = getDurationMs(retriever);
+            for (int k = 1; k <= MAX_STEP_TRIES; k++) {
+                long t = current.timeMs + direction * k * FINE_STEP_MS;
+                if (t < 0 || t > durationMs) {
+                    break;
+                }
+                Result r = analyzeAt(retriever, t, current.rightHand);
+                if (r != null) {
+                    fillScore(r, current.followThroughAngle);
+                    return r;
+                }
+            }
+            return null;
+        } finally {
+            retriever.release();
+        }
+    }
+
+    /** מחשב זוויות, ציון ומשוב בעזרת ShotMathUtils. followThrough = זווית המרפק בסוף התנועה. */
+    private void fillScore(Result r, double followThrough) {
         r.elbowAngle = elbowAngle(r);
         r.releaseAngle = ShotMathUtils.releaseAngle(r.elbow.x, r.elbow.y, r.wrist.x, r.wrist.y);
         r.torsoLean = r.hip == null ? Double.NaN
                 : ShotMathUtils.torsoLean(r.shoulder.x, r.shoulder.y, r.hip.x, r.hip.y);
-        r.followThroughAngle = elbowAngle(peak);
+        r.followThroughAngle = followThrough;
         r.score = ShotMathUtils.calculateTotalScore(r.releaseAngle, r.torsoLean, r.followThroughAngle);
         r.feedback = ShotMathUtils.generateFeedback(r.releaseAngle, r.torsoLean, r.followThroughAngle);
     }

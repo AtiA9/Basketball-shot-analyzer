@@ -165,6 +165,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_ID + " = ?", new String[]{String.valueOf(shotId)}) > 0;
     }
 
+    /** Update: מעדכן את תוצאת הניתוח של זריקה (אחרי תיקון ידני של רגע השחרור). */
+    public boolean updateShotResult(long shotId, double elbowAngle, double releaseAngle,
+                                    int score, String feedback) {
+        ContentValues values = new ContentValues();
+        values.put(COL_ELBOW, elbowAngle);
+        values.put(COL_RELEASE, releaseAngle);
+        values.put(COL_SCORE, Math.max(0, Math.min(100, score)));
+        values.put(COL_FEEDBACK, feedback);
+        return getWritableDatabase().update(TABLE_SHOTS, values,
+                COL_ID + " = ?", new String[]{String.valueOf(shotId)}) > 0;
+    }
+
     /** Delete: מוחק זריקה אחת. */
     public boolean deleteShot(long shotId) {
         return getWritableDatabase().delete(TABLE_SHOTS,
