@@ -41,6 +41,8 @@ public class ShotAnalyzer {
     private static final long FINE_STEP_MS = 33;
     /** בתיקון ידני: כמה פריימים לכל היותר לדלג אם בפריים אין זיהוי של היד. */
     private static final int MAX_STEP_TRIES = 3;
+    /** תחילת "היד למעלה": הדגימה הראשונה שבה היד כבר בגובה של לפחות 90% מהשיא. */
+    private static final double PLATEAU_RATIO = 0.9;
 
     /** תוצאת ניתוח: הפריים של רגע השחרור + כל מה שחושב עליו. */
     public static class Result {
@@ -49,7 +51,7 @@ public class ShotAnalyzer {
         public boolean rightHand;
         public List<PoseLandmark> landmarks;
         public PointF shoulder, elbow, wrist;
-        /** הירך בצד של יד הזריקה, או null אם לא זוהתה. */
+        /** הירך בצד של יד הזריקה (חייבת להיות מזוהה, משמשת לחישוב גובה היד ונטיית הגוף). */
         public PointF hip;
         public double elbowAngle, releaseAngle;
         /** נטיית הגוף ברגע השחרור (NaN אם הירך לא זוהתה). */
@@ -70,7 +72,7 @@ public class ShotAnalyzer {
     }
 
     /**
-     * מנתח סרטון ומחזיר את התוצאה ברגע שלפני שהכדור עוזב את היד,
+     * מנתח סרטון ומחזיר את התוצאה ברגע שהכדור עוזב את היד,
      * או null אם לא זוהה שחקן באף פריים.
      */
     public Result analyze(Context context, Uri videoUri) throws Exception {
@@ -78,12 +80,14 @@ public class ShotAnalyzer {
         try {
             retriever.setDataSource(context, videoUri);
             long durationMs = Math.min(getDurationMs(retriever), MAX_DURATION_MS);
-            Result peak = findPeak(retriever, durationMs);
-            if (peak == null) {
+            List<Result> samples = coarseSamples(retriever, durationMs);
+            int top = highestHandIndex(samples);
+            if (top == -1) {
                 return null;
             }
-            Result release = findRelease(retriever, peak, durationMs);
-            fillScore(release, elbowAngle(peak));
+            Result start = samples.get(plateauStartIndex(samples, top));
+            Result release = findRelease(retriever, start, durationMs);
+            fillScore(release, elbowAngle(samples.get(top)));
             return release;
         } finally {
             retriever.release();
@@ -91,18 +95,53 @@ public class ShotAnalyzer {
     }
 
     /**
-     * שלב 1 (חיפוש גס): דוגם פריים כל COARSE_STEP_MS לאורך הסרטון ומוצא את שיא התנועה -
-     * הפריים שבו שורש כף היד הכי גבוה מעל הכתף. זה סוף התנועה, כבר אחרי השחרור.
+     * שלב 1 (חיפוש גס): דוגם פריים כל COARSE_STEP_MS לאורך הסרטון.
+     * מכל דגימה שומרים רק את נקודות הגוף, לא את התמונה, כדי לא למלא את הזיכרון בסרטון ארוך.
+     * במקום שבו לא זוהה שחקן נשמר null.
      */
-    private Result findPeak(MediaMetadataRetriever retriever, long durationMs) throws Exception {
-        Result peak = null;
+    private List<Result> coarseSamples(MediaMetadataRetriever retriever, long durationMs) throws Exception {
+        List<Result> samples = new ArrayList<>();
         for (long t = 0; t <= durationMs; t += COARSE_STEP_MS) {
-            Result candidate = analyzeAt(retriever, t, null);
-            if (candidate != null && (peak == null || handHeight(candidate) > handHeight(peak))) {
-                peak = candidate;
+            Result r = analyzeAt(retriever, t, null);
+            if (r != null) {
+                r.frame = null;
+            }
+            samples.add(r);
+        }
+        return samples;
+    }
+
+    /** האינדקס של הדגימה שבה היד הכי גבוהה (סוף התנועה, אחרי השחרור), או -1 אם אין אף זיהוי. */
+    private int highestHandIndex(List<Result> samples) {
+        int best = -1;
+        for (int i = 0; i < samples.size(); i++) {
+            Result r = samples.get(i);
+            if (r != null && (best == -1 || handHeight(r) > handHeight(samples.get(best)))) {
+                best = i;
             }
         }
-        return peak;
+        return best;
+    }
+
+    /**
+     * הרבה שחקנים מחזיקים את היד למעלה אחרי הזריקה (follow-through), ולכן השיא יכול להגיע
+     * שנייה אחרי שהכדור כבר עזב. הולכים אחורה מהשיא כל עוד היד עדיין בגובה של לפחות 90% ממנו,
+     * ומחזירים את הדגימה הראשונה של "היד למעלה". נעצרים בדגימה נמוכה - שם מתחילה זריקה אחרת.
+     */
+    private int plateauStartIndex(List<Result> samples, int top) {
+        double peakHeight = handHeight(samples.get(top));
+        int start = top;
+        for (int i = top - 1; i >= 0; i--) {
+            Result r = samples.get(i);
+            if (r == null) {
+                continue;
+            }
+            if (handHeight(r) < PLATEAU_RATIO * peakHeight) {
+                break;
+            }
+            start = i;
+        }
+        return start;
     }
 
     /**
@@ -125,7 +164,8 @@ public class ShotAnalyzer {
             }
         }
         if (times.isEmpty()) {
-            return peak;
+            Result fallback = analyzeAt(retriever, peak.timeMs, peak.rightHand); // הדגימה בלי תמונה
+            return fallback != null ? fallback : peak;
         }
         double[] elbowAngles = new double[angles.size()];
         for (int i = 0; i < elbowAngles.length; i++) {
@@ -133,15 +173,17 @@ public class ShotAnalyzer {
         }
         int index = ShotMathUtils.releaseIndex(elbowAngles);
         Result release = analyzeAt(retriever, times.get(index), peak.rightHand);
-        return release != null ? release : peak;
+        return release != null ? release : analyzeAt(retriever, peak.timeMs, peak.rightHand);
     }
 
     /**
-     * גובה שורש כף היד מעל הכתף, בפיקסלים (חיובי = היד מעל הכתף).
-     * מודדים יחסית לכתף ולא לראש התמונה, כדי שהקפיצה של כל הגוף לא תיחשב כתנועת יד.
+     * גובה שורש כף היד מעל הכתף, ביחידות של "אורך גו" (המרחק כתף-ירך). חיובי = היד מעל הכתף.
+     * מודדים יחסית לכתף, כדי שהקפיצה של כל הגוף לא תיחשב כתנועת יד,
+     * ומחלקים באורך הגו, כדי שצילום מקרוב (גוף גדול בתמונה) לא "ינצח" זריקה שצולמה מרחוק.
      */
     private double handHeight(Result r) {
-        return r.shoulder.y - r.wrist.y;
+        double torso = Math.hypot(r.shoulder.x - r.hip.x, r.shoulder.y - r.hip.y);
+        return torso > 0 ? (r.shoulder.y - r.wrist.y) / torso : 0;
     }
 
     /** מחלץ את הפריים בזמן הנתון (מילישניות) ומריץ עליו זיהוי תנוחה. */
@@ -182,10 +224,13 @@ public class ShotAnalyzer {
         PoseLandmark shoulder = pose.getPoseLandmark(useRight ? PoseLandmark.RIGHT_SHOULDER : PoseLandmark.LEFT_SHOULDER);
         PoseLandmark elbow = pose.getPoseLandmark(useRight ? PoseLandmark.RIGHT_ELBOW : PoseLandmark.LEFT_ELBOW);
         PoseLandmark wrist = useRight ? right : left;
-        if (!isVisible(wrist) || !isVisible(shoulder) || !isVisible(elbow)) {
+        PoseLandmark hip = pose.getPoseLandmark(useRight ? PoseLandmark.RIGHT_HIP : PoseLandmark.LEFT_HIP);
+        // כל הנקודות חייבות להיות מזוהות ובתוך התמונה. כך פוסלים פריימים שבהם רק חלק מהגוף נראה
+        // (למשל כשהשחקן עומד צמוד למצלמה) - שם ML Kit "מנחש" נקודות מחוץ לתמונה.
+        if (!isInFrame(wrist, frame) || !isInFrame(shoulder, frame)
+                || !isInFrame(elbow, frame) || !isInFrame(hip, frame)) {
             return null;
         }
-        PoseLandmark hip = pose.getPoseLandmark(useRight ? PoseLandmark.RIGHT_HIP : PoseLandmark.LEFT_HIP);
         Result result = new Result();
         result.frame = frame;
         result.rightHand = useRight;
@@ -193,7 +238,7 @@ public class ShotAnalyzer {
         result.shoulder = shoulder.getPosition();
         result.elbow = elbow.getPosition();
         result.wrist = wrist.getPosition();
-        result.hip = isVisible(hip) ? hip.getPosition() : null; // הירך לא חובה
+        result.hip = hip.getPosition();
         return result;
     }
 
@@ -241,6 +286,15 @@ public class ShotAnalyzer {
     private double elbowAngle(Result r) {
         return ShotMathUtils.angleAtPoint(r.shoulder.x, r.shoulder.y,
                 r.elbow.x, r.elbow.y, r.wrist.x, r.wrist.y);
+    }
+
+    /** נקודה מזוהה בביטחון מספיק וגם נמצאת בתוך גבולות התמונה. */
+    private boolean isInFrame(PoseLandmark landmark, Bitmap frame) {
+        if (!isVisible(landmark)) {
+            return false;
+        }
+        PointF p = landmark.getPosition();
+        return p.x >= 0 && p.y >= 0 && p.x < frame.getWidth() && p.y < frame.getHeight();
     }
 
     private boolean isVisible(PoseLandmark landmark) {
