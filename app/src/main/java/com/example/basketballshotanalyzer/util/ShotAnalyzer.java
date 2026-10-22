@@ -43,6 +43,8 @@ public class ShotAnalyzer {
     private static final int MAX_STEP_TRIES = 3;
     /** תחילת "היד למעלה": הדגימה הראשונה שבה היד כבר בגובה של לפחות 90% מהשיא. */
     private static final double PLATEAU_RATIO = 0.9;
+    /** אורך ירך מינימלי ביחס לאורך הגו - גוף של אדם אמיתי (ולא, למשל, רשת של סל). */
+    private static final double MIN_THIGH_TO_TORSO = 0.5;
 
     /** תוצאת ניתוח: הפריים של רגע השחרור + כל מה שחושב עליו. */
     public static class Result {
@@ -231,6 +233,12 @@ public class ShotAnalyzer {
                 || !isInFrame(elbow, frame) || !isInFrame(hip, frame)) {
             return null;
         }
+        // בדיקת היגיון: ML Kit מחזיר גוף אחד לתמונה, ולפעמים "רואה" אדם במקום שאין -
+        // למשל ברשת של הסל כשהכדור בתוכה. גוף אמיתי עומד: כתף מעל ירך מעל ברך, ועם רגליים באורך סביר.
+        PoseLandmark knee = pose.getPoseLandmark(useRight ? PoseLandmark.RIGHT_KNEE : PoseLandmark.LEFT_KNEE);
+        if (!isInFrame(knee, frame) || !isUprightBody(shoulder.getPosition(), hip.getPosition(), knee.getPosition())) {
+            return null;
+        }
         Result result = new Result();
         result.frame = frame;
         result.rightHand = useRight;
@@ -286,6 +294,16 @@ public class ShotAnalyzer {
     private double elbowAngle(Result r) {
         return ShotMathUtils.angleAtPoint(r.shoulder.x, r.shoulder.y,
                 r.elbow.x, r.elbow.y, r.wrist.x, r.wrist.y);
+    }
+
+    /**
+     * האם הנקודות נראות כמו גוף של אדם עומד: הכתף מעל הירך, הירך מעל הברך
+     * (בתמונה y גדל כלפי מטה), והירך (ירך-ברך) באורך של לפחות חצי מהגו (כתף-ירך).
+     */
+    private boolean isUprightBody(PointF shoulder, PointF hip, PointF knee) {
+        double torso = Math.hypot(shoulder.x - hip.x, shoulder.y - hip.y);
+        double thigh = Math.hypot(hip.x - knee.x, hip.y - knee.y);
+        return shoulder.y < hip.y && hip.y < knee.y && thigh >= MIN_THIGH_TO_TORSO * torso;
     }
 
     /** נקודה מזוהה בביטחון מספיק וגם נמצאת בתוך גבולות התמונה. */
