@@ -1,5 +1,7 @@
 # Basketball Shot Analyzer
 
+**אתר הלימוד לבגרות:** https://atia9.github.io/Basketball-shot-analyzer/ (נבנה מתיקיית `docs`)
+
 פרויקט גמר 5 יח"ל מדעי המחשב - אפליקציית אנדרואיד (Java) לניתוח זריקת קפיצה בכדורסל
 בעזרת Google ML Kit Pose Detection.
 
