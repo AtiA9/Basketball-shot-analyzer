@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הרשמה, הצפנה ו-SharedPreferences · מדריך הבגרות</title>
+<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="guide.css?v=1">
+</head>
+<body>
+<div class="topnav" id="topnav-mount"></div>
+
+<div class="wrap">
+  <div class="lesson-head">
+    <div class="stage-tag">שלב 3</div>
+    <h1>הרשמה, הצפנה ו-SharedPreferences</h1>
+    <div class="weeks">בדיקת קלט, hash ו-salt, ו&quot;הישאר מחובר&quot;</div>
+  </div>
+  <article>
+<section class="ch" id="security">
+  <h2>הרשמה, התחברות והצפנת סיסמאות</h2>
+  <p class="lead">הסיסמה עצמה לא נשמרת בשום מקום. נשמר רק hash שלה, כלומר תוצאה של פונקציה חד-כיוונית, יחד עם salt אקראי.</p>
+
+  <h3>בדיקת קלט</h3>
+  <figure class="code"><figcaption dir="ltr">util/AuthUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** שם משתמש תקין: לפחות 3 תווים, רק אותיות אנגליות, ספרות וקו תחתון. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">boolean</span> isValidUsername(String username) {</span><span class="ln">    <span class="tk">return</span> username != <span class="tk">null</span> &amp;&amp; username.length() &gt;= MIN_USERNAME_LENGTH</span><span class="ln">            &amp;&amp; username.matches(<span class="ts">"[A-Za-z0-9_]+"</span>);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/AuthUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** סיסמה תקינה: לפחות 6 תווים, ולפחות ספרה אחת. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">boolean</span> isValidPassword(String password) {</span><span class="ln">    <span class="tk">return</span> password != <span class="tk">null</span> &amp;&amp; password.length() &gt;= MIN_PASSWORD_LENGTH</span><span class="ln">            &amp;&amp; password.matches(<span class="ts">".*[0-9].*"</span>);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">RegisterActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** בודק את כל השדות ומציג שגיאה מתחת לכל שדה בעייתי. מחזיר true אם הכול תקין. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">boolean</span> validateInput(String username, String password, String confirm) {</span><span class="ln">    <span class="tk">boolean</span> usernameOk = AuthUtils.isValidUsername(username);</span><span class="ln">    <span class="tk">boolean</span> passwordOk = AuthUtils.isValidPassword(password);</span><span class="ln">    <span class="tk">boolean</span> matchOk = password.equals(confirm);</span><span class="ln">    layoutUsername.setError(usernameOk ? <span class="tk">null</span> : getString(R.string.error_username));</span><span class="ln">    layoutPassword.setError(passwordOk ? <span class="tk">null</span> : getString(R.string.error_password));</span><span class="ln">    layoutConfirmPassword.setError(matchOk ? <span class="tk">null</span> : getString(R.string.error_password_mismatch));</span><span class="ln">    <span class="tk">return</span> usernameOk &amp;&amp; passwordOk &amp;&amp; matchOk;</span><span class="ln">}</span></code></pre></figure>
+  <p><code>setError</code> של <code>TextInputLayout</code> מציג הודעה ידידותית מתחת לשדה הבעייתי. כשהשדה תקין מעבירים <code>null</code>, וההודעה נעלמת.</p>
+
+  <h3>salt ו-hash</h3>
+  <figure class="code"><figcaption dir="ltr">util/AuthUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * יוצר salt אקראי: מחרוזת שמצורפת לסיסמה לפני ה-hash.</span></span><span class="ln"><span class="tc"> * כך לשני משתמשים עם אותה סיסמה יהיה hash שונה.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> String generateSalt() {</span><span class="ln">    byte[] bytes = <span class="tk">new</span> byte[SALT_BYTES];</span><span class="ln">    <span class="tk">new</span> SecureRandom().nextBytes(bytes);</span><span class="ln">    <span class="tk">return</span> toHex(bytes);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/AuthUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מחשב SHA-256 של (salt + סיסמה) ומחזיר אותו כמחרוזת הקסדצימלית. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> String hashPassword(String password, String salt) {</span><span class="ln">    <span class="tk">try</span> {</span><span class="ln">        MessageDigest digest = MessageDigest.getInstance(<span class="ts">"SHA-256"</span>);</span><span class="ln">        byte[] hash = digest.digest((salt + password).getBytes(StandardCharsets.UTF_8));</span><span class="ln">        <span class="tk">return</span> toHex(hash);</span><span class="ln">    } <span class="tk">catch</span> (NoSuchAlgorithmException e) {</span><span class="ln">        <span class="tk">throw</span> <span class="tk">new</span> IllegalStateException(<span class="ts">"SHA-256 not available"</span>, e);</span><span class="ln">    }</span><span class="ln">}</span></code></pre></figure>
+  <ol class="steps">
+    <li><div><b>בהרשמה:</b> יוצרים salt אקראי של 16 בתים עם <code>SecureRandom</code>, מחשבים <code>SHA-256(salt + סיסמה)</code>, ושומרים במסד את ה-hash ואת ה-salt.</div></li>
+    <li><div><b>בהתחברות:</b> שולפים את המשתמש לפי שם, מחשבים שוב hash עם הסיסמה שהוקלדה וה-salt השמור, ומשווים ל-hash שבמסד.</div></li>
+  </ol>
+  <figure class="code"><figcaption dir="ltr">AuthActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** התחברות: מחפש את המשתמש ובודק שה-hash של הסיסמה שהוקלדה תואם לשמור. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> login() {</span><span class="ln">    String username = getText(editUsername);</span><span class="ln">    String password = getText(editPassword);</span><span class="ln">    <span class="tk">if</span> (!validateInput(username, password)) {</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    User user = dbHelper.getUserByUsername(username);</span><span class="ln">    <span class="tk">if</span> (user == <span class="tk">null</span> || !AuthUtils.verifyPassword(password, user.getSalt(), user.getPasswordHash())) {</span><span class="ln">        layoutPassword.setError(getString(R.string.error_wrong_credentials));</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    completeLogin(user.getId(), username);</span><span class="ln">}</span></code></pre></figure>
+
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"גם אם מישהו גונב את קובץ המסד, הוא לא רואה סיסמאות. בזכות ה-salt, לשני משתמשים עם אותה סיסמה יש hash שונה, ולכן אי אפשר להשתמש בטבלאות מוכנות של hash-ים נפוצים."</p></div>
+  <div class="qa" data-topic="security"></div>
+</section>
+<section class="ch" id="prefs">
+  <h2>SharedPreferences: "הישאר מחובר"</h2>
+  <p class="lead">SharedPreferences הוא קובץ קטן של זוגות מפתח-ערך, שנשמר בתיקייה הפרטית של האפליקציה. כאן נשמר מי המשתמש המחובר, והאם הוא ביקש להישאר מחובר.</p>
+  <figure class="code"><figcaption dir="ltr">util/SessionManager.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** שומר את המשתמש שהתחבר. apply() כותב לקובץ ברקע. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">void</span> login(<span class="tk">long</span> userId, String username, <span class="tk">boolean</span> rememberMe) {</span><span class="ln">    prefs.edit()</span><span class="ln">            .putLong(KEY_USER_ID, userId)</span><span class="ln">            .putString(KEY_USERNAME, username)</span><span class="ln">            .putBoolean(KEY_REMEMBER, rememberMe)</span><span class="ln">            .apply();</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/SessionManager.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** האם לדלג על מסך ההתחברות (המשתמש ביקש להישאר מחובר). */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">boolean</span> shouldAutoLogin() {</span><span class="ln">    <span class="tk">return</span> prefs.getBoolean(KEY_REMEMBER, <span class="tk">false</span>) &amp;&amp; getUserId() != -<span class="tn">1</span>;</span><span class="ln">}</span></code></pre></figure>
+  <p>המפתחות הם <code>user_id</code>, <code>username</code> ו-<code>remember_me</code> בקובץ <code>session</code>. גם כשלא מסמנים "הישאר מחובר" נשמרים ה-id והשם, כי המסך הראשי וההיסטוריה צריכים לדעת מי מחובר. רק הדגל <code>remember_me</code> קובע אם לדלג על ההתחברות בפתיחה הבאה. בהתנתקות <code>clear()</code> מוחק הכול.</p>
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"SharedPreferences מתאים לכמה ערכים קטנים, כמו הגדרות או מצב התחברות. לנתונים עם מבנה וקשרים, כמו זריקות, משתמשים ב-SQLite."</p></div>
+  <div class="qa" data-topic="prefs"></div>
+</section>
+  </article>
+  <div class="prevnext" id="prevnext-mount"></div>
+</div>
+<script src="nav.js?v=1"></script>
+<script src="effects.js?v=1"></script>
+<script src="guide.js?v=1"></script>
+<script>
+renderTopNav("s3");
+renderPrevNext("s3");
+</script>
+</body>
+</html>

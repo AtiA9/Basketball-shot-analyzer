@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מדריך הבגרות · Basketball Shot Analyzer</title>
+<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="guide.css?v=1">
+</head>
+<body>
+<div class="topnav" id="topnav-mount"></div>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>🏀 מדריך הבגרות</h1>
+    <div class="sub">Basketball Shot Analyzer · פרויקט גמר 5 יח"ל · 11 שלבים · כל הקוד, כל המושגים, וההכנה לבחינה</div>
+  </header>
+
+  <div class="progress-shell">
+    <div class="progress-top">
+      <span id="progress-label">0 מתוך 0 הושלמו</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div class="card-grid" id="cards"></div>
+
+  <footer class="site-footer">
+    ההתקדמות נשמרת בדפדפן הזה בלבד. קטעי הקוד במדריך נלקחו ישירות מהקוד של האפליקציה בריפו.
+  </footer>
+</div>
+<script src="nav.js?v=1"></script>
+<script src="effects.js?v=1"></script>
+<script>
+renderTopNav(null);
+const CHECKLIST = {"s1": ["אני מסביר במשפט אחד מה האפליקציה עושה", "אני מכיר את 4 המסכים ואת 3 המדדים של הציון", "אני מסביר למה הקוד מחולק לשכבות", "אני מתאר את 10 השלבים של ניתוח זריקה"], "s2": ["אני מראה בקוד הכמסה, ירושה, ממשק והעמסה", "אני מסביר Intent מפורש ומרומז", "אני מסביר את finish ודגלי CLEAR_TASK", "אני מסביר למה יש קוד ב-onDestroy"], "s3": ["אני מסביר למה לא שומרים סיסמה כטקסט", "אני מסביר מה זה salt ולמה צריך אותו", "אני מתאר איך בודקים סיסמה בהתחברות", "אני מסביר מה נשמר ב-SharedPreferences ולמה"], "s4": ["אני מתאר את שתי הטבלאות ואת המפתח הזר", "אני מראה איפה כל פעולת CRUD", "אני מסביר את שאילתת GROUP BY", "אני מסביר את ה-LEFT JOIN", "אני מסביר למה משתמשים ב-?"], "s5": ["אני מסביר הרשאות בזמן ריצה", "אני מסביר ActivityResultLauncher", "אני מסביר למה הניתוח לא על ה-thread הראשי", "אני מסביר את התפקיד של Handler"], "s6": ["אני מסביר מה ML Kit מחזיר", "אני מסביר את isInFrame ו-isUprightBody", "אני מחשב זווית עם atan2 בעל-פה", "אני מחשב ציון לדוגמה בעל-פה"], "s7": ["אני מסביר את שלושת שלבי החיפוש", "אני מסביר למה מחלקים באורך הגו", "אני מסביר למה חוזרים לתחילת \"היד למעלה\"", "אני מסביר את releaseIndex ואת החציון", "אני מסביר את כפתורי התיקון הידני"], "s8": ["אני מסביר onDraw, Canvas ו-Paint", "אני מסביר איך עובד הזום", "אני מסביר Adapter ו-ViewHolder", "אני מסביר למה הטקסטים ב-strings.xml"], "s9": ["עברתי על תסריט ההדגמה", "הכנתי סרטונים קצרים שעובדים", "אני יודע לענות על כל המגבלות בכנות"], "s10": ["עברתי על כל השאלות", "סימנתי \"אני יודע את זה\" על כל השאלות"], "s11": ["עברתי על כל המושגים שמסומנים \"בפרויקט שלך\"", "עברתי על שאר המושגים", "אני יודע לענות על השאלה של כל מושג"]};
+const STORAGE_KEY = "bagrut-guide-progress-v1";
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveState(state) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
+let state = loadState();
+function itemKey(id, i) { return id + "-" + i; }
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function render() {
+  const container = document.getElementById("cards");
+  container.innerHTML = "";
+  let totalItems = 0, totalDone = 0;
+  PAGES.forEach(page => {
+    const items = CHECKLIST[page.id] || [];
+    const done = items.filter((_, i) => state[itemKey(page.id, i)]).length;
+    totalItems += items.length;
+    totalDone += done;
+    const pct = items.length ? Math.round((done / items.length) * 100) : 0;
+    const wrap = document.createElement("div");
+    wrap.className = "stage-card-wrap";
+    const checklistHtml = items.length ? `
+      <details class="stage-checklist">
+        <summary>מה אני צריך לדעת (${done}/${items.length})</summary>
+        <ul>
+          ${items.map((label, i) => `
+            <li><label>
+              <input type="checkbox" data-page="${page.id}" data-i="${i}" ${state[itemKey(page.id, i)] ? "checked" : ""}>
+              <span>${escapeHtml(label)}</span>
+            </label></li>`).join("")}
+        </ul>
+      </details>` : "";
+    wrap.innerHTML = `
+      <a class="stage-card" href="${page.href}">
+        <span class="num">${page.label}</span>
+        <span class="name">${page.title}</span>
+        <div class="weeks">${page.weeks} · ${pct}% (${done}/${items.length})</div>
+      </a>
+      ${checklistHtml}`;
+    container.appendChild(wrap);
+  });
+  document.getElementById("progress-label").textContent = `${totalDone} מתוך ${totalItems} הושלמו`;
+  const overallPct = totalItems ? Math.round((totalDone / totalItems) * 100) : 0;
+  document.getElementById("progress-pct").textContent = overallPct + "%";
+  document.getElementById("progress-fill").style.width = overallPct + "%";
+}
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (!t.matches || !t.matches('input[type="checkbox"][data-page]')) return;
+  state[itemKey(t.dataset.page, +t.dataset.i)] = t.checked;
+  saveState(state);
+  const openIds = [...document.querySelectorAll(".stage-checklist[open] input")].map(i => i.dataset.page);
+  render();
+  document.querySelectorAll(".stage-checklist").forEach(d => {
+    const first = d.querySelector("input");
+    if (first && openIds.includes(first.dataset.page)) d.open = true;
+  });
+});
+render();
+</script>
+</body>
+</html>
