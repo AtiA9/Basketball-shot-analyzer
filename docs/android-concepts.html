@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>מושגי Android Studio לבגרות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html, body { margin: 0; }
+[hidden] { display: none !important; }
+
+/* Layout: sticky chapter index on the start side + one reading column; mirrors the app's ivory/ink/oxblood identity */
+:root {
+  --paper: #F7F4EE;
+  --panel: #FBF9F4;
+  --ink: #1C1B19;
+  --muted: #6B645B;
+  --rule: #DCD5C8;
+  --accent: #6B1E23;
+  --brass: #8E6E3F;
+  --code-bg: #EFEAE1;
+  --code-ink: #2A2724;
+  --tk: #6B1E23;
+  --ts: #2F5A3E;
+  --tc: #8C8478;
+  --tn: #8E6E3F;
+  --good: #2F6B45;
+  --medium: #946A1E;
+  --bad: #8E2C2C;
+  --display: "Frank Ruhl Libre", "David Libre", "Times New Roman", serif;
+  --body: "Assistant", "Heebo", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15130F; --panel: #1B1814; --ink: #ECE6DA; --muted: #A69E91; --rule: #36312A;
+    --accent: #D3868B; --brass: #CDB07F; --code-bg: #1F1C17; --code-ink: #E4DED2;
+    --tk: #E19AA0; --ts: #9CC7A6; --tc: #857D71; --tn: #D9BE8C;
+    --good: #8CC79E; --medium: #E0B866; --bad: #E8898C;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15130F; --panel: #1B1814; --ink: #ECE6DA; --muted: #A69E91; --rule: #36312A;
+  --accent: #D3868B; --brass: #CDB07F; --code-bg: #1F1C17; --code-ink: #E4DED2;
+  --tk: #E19AA0; --ts: #9CC7A6; --tc: #857D71; --tn: #D9BE8C;
+  --good: #8CC79E; --medium: #E0B866; --bad: #E8898C;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 64px); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--body); font-size: 17px; line-height: 1.7;
+  padding-inline: 20px; padding-block: 0 64px;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+code, kbd { font-family: var(--mono); font-size: .86em; }
+:not(pre) > code { background: var(--code-bg); padding: 1px 6px; border-radius: 3px; direction: ltr; unicode-bidi: isolate; }
+
+.shell { max-width: 1180px; margin-inline: auto; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 56px; }
+
+/* chapter index */
+.toc { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 40px 24px; }
+.toc .wordmark { font: 600 11px/1.4 var(--body); letter-spacing: .28em; text-transform: uppercase; direction: ltr; text-align: right; color: var(--ink); }
+.toc .rule { width: 36px; height: 1px; background: var(--ink); margin: 12px 0 20px; }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: ch; }
+.toc li a { display: grid; grid-template-columns: 26px 1fr; gap: 6px; padding: 5px 0; color: var(--muted); text-decoration: none; font-size: 14.5px; line-height: 1.4; }
+.toc li a .n { font: 500 12px/1.9 var(--mono); color: var(--rule); }
+.toc li a:hover { color: var(--ink); }
+.toc li a.active { color: var(--accent); }
+.toc li a.active .n { color: var(--accent); }
+.toc .group { margin: 18px 0 6px; font-size: 11.5px; font-weight: 700; color: var(--brass); letter-spacing: .06em; }
+
+main { min-width: 0; max-width: 760px; padding-block: 40px 0; }
+
+.sitenav { display: flex; flex-wrap: wrap; gap: 6px 22px; padding-block: 18px 0; font-size: 14.5px; }
+.sitenav a { color: var(--muted); text-decoration: none; padding-bottom: 4px; border-bottom: 1px solid transparent; }
+.sitenav a:hover { color: var(--ink); }
+.sitenav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+/* hero */
+.hero { padding-block: 24px 40px; border-bottom: 1px solid var(--rule); }
+.eyebrow { font: 600 12.5px/1.4 var(--body); color: var(--brass); letter-spacing: .05em; }
+h1 { font: 500 clamp(36px, 6vw, 58px)/1.08 var(--display); margin: 14px 0 18px; text-wrap: balance; }
+h1 .en { display: block; font-size: .55em; font-weight: 400; color: var(--muted); direction: ltr; text-align: right; margin-top: 8px; }
+.hero p { font-size: 19px; color: var(--muted); max-width: 60ch; margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 32px; border-top: 1px solid var(--rule); }
+.facts div { padding: 16px 0 0; border-inline-start: 1px solid var(--rule); padding-inline-start: 16px; }
+.facts div:first-child { border-inline-start: 0; padding-inline-start: 0; }
+.facts b { display: block; font: 500 34px/1 var(--display); font-variant-numeric: tabular-nums; }
+.facts span { font-size: 13.5px; color: var(--muted); }
+
+/* chapters */
+section.ch { padding-block: 56px 8px; border-bottom: 1px solid var(--rule); }
+.ch-head { display: flex; align-items: baseline; gap: 14px; }
+.ch-num { font: 500 14px var(--mono); color: var(--accent); }
+h2 { font: 500 clamp(28px, 4vw, 38px)/1.15 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 600 21px/1.3 var(--display); margin: 40px 0 10px; }
+h4 { font: 700 13px/1.4 var(--body); color: var(--brass); letter-spacing: .05em; margin: 28px 0 8px; }
+.lead { font-size: 19px; color: var(--muted); margin: 14px 0 8px; max-width: 62ch; }
+p { margin: 12px 0; max-width: 68ch; }
+ul.plain { padding-inline-start: 20px; margin: 10px 0; }
+ul.plain li { margin: 6px 0; }
+
+/* code */
+figure.code { margin: 18px 0; border: 1px solid var(--rule); background: var(--code-bg); min-width: 0; }
+figure.code figcaption { font: 500 12px/1 var(--mono); color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--rule); text-align: left; }
+figure.code pre { margin: 0; padding: 14px; overflow-x: auto; font: 13.2px/1.6 var(--mono); color: var(--code-ink); tab-size: 4; }
+figure.code .ln { display: block; min-height: 1.6em; }
+.tk { color: var(--tk); font-weight: 600; } .ts { color: var(--ts); } .tc { color: var(--tc); } .tn { color: var(--tn); } .ta { color: var(--brass); }
+
+/* "say it to the examiner" */
+.say { margin: 22px 0; padding: 16px 20px; background: var(--panel); border-inline-start: 2px solid var(--accent); }
+.say .lbl { font-size: 12.5px; font-weight: 700; color: var(--accent); letter-spacing: .04em; }
+.say p { margin: 6px 0 0; font-family: var(--display); font-size: 18.5px; line-height: 1.6; }
+
+/* where in code */
+.where { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.where code { font-size: 12.5px; }
+
+/* tables */
+.tbl { overflow-x: auto; margin: 18px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+th, td { text-align: right; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 12.5px; color: var(--muted); font-weight: 700; letter-spacing: .04em; }
+td code { white-space: nowrap; }
+
+/* layer diagram */
+.layers { display: grid; gap: 10px; margin: 22px 0; }
+.layer { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid var(--rule); align-items: baseline; }
+.layer:first-child { border-top: 0; }
+.layer .nm { font: 600 15px var(--mono); color: var(--accent); direction: ltr; text-align: right; }
+.layer .cls { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--mono); font-size: 13.5px; direction: ltr; justify-content: flex-end; }
+.layer .why { grid-column: 2; font-size: 15px; color: var(--muted); }
+
+/* ordered pipeline */
+ol.steps { list-style: none; padding: 0; margin: 20px 0; counter-reset: s; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--rule); }
+ol.steps > li::before { content: counter(s); font: 500 22px/1.2 var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
+ol.steps .th { font-size: 13px; color: var(--brass); font-weight: 700; }
+ol.steps b { font-weight: 700; }
+
+/* Q&A */
+.qa { margin: 18px 0 8px; }
+.qa details { border-top: 1px solid var(--rule); }
+.qa details:last-child { border-bottom: 1px solid var(--rule); }
+.qa summary { cursor: pointer; padding: 13px 0; font-weight: 600; list-style: none; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary::before { content: "+"; font: 400 20px/1.2 var(--mono); color: var(--accent); }
+.qa details[open] summary::before { content: "−"; }
+.qa .ans { padding: 0 30px 16px 0; color: var(--ink); }
+.qa .ans p { margin: 6px 0; }
+
+/* labs */
+.lab { margin: 26px 0; padding: 20px; background: var(--panel); border: 1px solid var(--rule); }
+.lab-title { font: 600 18px var(--display); margin: 0 0 4px; }
+.lab-sub { font-size: 14.5px; color: var(--muted); margin: 0 0 14px; }
+.lab-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.lab svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1px solid var(--rule); touch-action: none; }
+.readout { font: 13px/1.75 var(--mono); direction: ltr; text-align: left; min-width: 0; overflow-x: auto; }
+.readout .big { font: 500 30px/1.2 var(--display); color: var(--accent); }
+.readout .k { color: var(--muted); }
+.ctl { display: grid; gap: 4px; margin-bottom: 14px; }
+.ctl label { font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+.ctl label output { font: 500 14px var(--mono); color: var(--accent); }
+.ctl input[type=range] { width: 100%; accent-color: var(--accent); }
+.chk { font-size: 14px; display: flex; gap: 8px; align-items: center; }
+.scorebox { display: grid; gap: 4px; }
+.score-total { font: 500 64px/1 var(--display); font-variant-numeric: tabular-nums; }
+.bar { height: 3px; background: var(--rule); margin: 6px 0 12px; }
+.bar i { display: block; height: 100%; background: currentColor; transition: width .2s; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+.parts { font: 13px/1.8 var(--mono); direction: ltr; text-align: left; }
+.fb { margin-top: 10px; font-family: var(--display); font-size: 16.5px; white-space: pre-line; }
+
+/* quiz */
+.quiz { margin: 22px 0; padding: 24px; border: 1px solid var(--ink); background: var(--panel); }
+.quiz-top { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; font-size: 14px; color: var(--muted); }
+.quiz select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 6px 10px; }
+.quiz .tag { font-size: 12.5px; color: var(--brass); font-weight: 700; margin-top: 18px; }
+.quiz .q { font: 500 24px/1.4 var(--display); margin: 6px 0 16px; min-height: 2.8em; text-wrap: balance; }
+.quiz .a { border-top: 1px solid var(--rule); padding-top: 14px; }
+.quiz .a p { margin: 6px 0; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+button.b { font: 600 14.5px var(--body); padding: 10px 18px; border: 1px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; border-radius: 2px; }
+button.b.primary { background: var(--ink); color: var(--paper); }
+button.b:hover { border-color: var(--accent); }
+.known { font-size: 14px; display: flex; gap: 8px; align-items: center; }
+
+/* glossary */
+dl.gloss { display: grid; grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); gap: 0 20px; margin: 18px 0; }
+dl.gloss dt { font: 600 14px/1.5 var(--mono); direction: ltr; text-align: right; padding: 10px 0; border-top: 1px solid var(--rule); }
+dl.gloss dd { margin: 0; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 15.5px; }
+
+.check { list-style: none; padding: 0; margin: 14px 0; }
+.check li { position: relative; padding: 8px 28px 8px 0; border-top: 1px solid var(--rule); }
+.check li::before { content: "□"; position: absolute; inset-inline-start: 0; top: 8px; color: var(--accent); font-size: 18px; line-height: 1.4; }
+.note { font-size: 14px; color: var(--muted); }
+footer { padding-block: 40px; font-size: 13.5px; color: var(--muted); }
+
+@media (max-width: 920px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; max-height: none; overflow: visible; padding-block: 10px; background: var(--paper); border-bottom: 1px solid var(--rule); margin-inline: -20px; padding-inline: 20px; }
+  .toc .wordmark, .toc .rule, .toc .group { display: none; }
+  .toc ol { display: flex; overflow-x: auto; gap: 18px; scrollbar-width: none; }
+  .toc li a { display: block; white-space: nowrap; padding: 4px 0; }
+  .toc li a .n { display: none; }
+  main { padding-block: 16px 0; }
+  .lab-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .toc { margin-inline: -16px; padding-inline: 16px; }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .facts div:nth-child(3) { border-inline-start: 0; padding-inline-start: 0; }
+  .layer { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .layer .why { grid-column: 1; }
+  .layer .nm, .layer .cls { text-align: right; justify-content: flex-start; }
+  dl.gloss { grid-template-columns: minmax(0, 1fr); }
+  dl.gloss dd { border-top: 0; padding-top: 0; }
+  .score-total { font-size: 52px; }
+}
+
+.tools { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-top: 26px; }
+.tools input[type=search] { font: inherit; font-size: 16px; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 2px; padding: 10px 14px; flex: 1 1 260px; min-width: 0; }
+.tools .count { font-size: 14px; color: var(--muted); }
+article.concept { padding-block: 26px 10px; border-top: 1px solid var(--rule); }
+article.concept:first-of-type { border-top: 0; }
+.concept-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.concept-head .term { font: 600 17px/1.4 var(--mono); direction: ltr; unicode-bidi: isolate; }
+.concept-head h3 { margin: 0; font-size: 19px; }
+.badge { font-size: 12.5px; font-weight: 700; color: var(--accent); text-decoration: none; border: 1px solid var(--accent); padding: 1px 8px; border-radius: 2px; white-space: nowrap; }
+.badge:hover { background: var(--accent); color: var(--paper); }
+.concept p { margin: 8px 0; }
+.empty-note { color: var(--muted); padding: 30px 0; }
+</style>
+</head>
+<body>
+<div class="shell" dir="rtl" lang="he">
+<nav class="toc" aria-label="פרקים">
+  <div class="wordmark">Basketball Shot Analyzer</div>
+  <div class="rule"></div>
+  <ol id="toc"><li class="group">פרקים</li>
+<li><a href="#g-env"><span class="n">01</span>סביבת הפיתוח ומבנה הפרויקט</a></li>
+<li><a href="#g-screens"><span class="n">02</span>מסכים, Intent ומחזור חיים</a></li>
+<li><a href="#g-ui"><span class="n">03</span>ממשק משתמש ואירועים</a></li>
+<li><a href="#g-lists"><span class="n">04</span>רשימות, דיאלוגים ותפריטים</a></li>
+<li><a href="#g-data"><span class="n">05</span>שמירת נתונים</a></li>
+<li><a href="#g-background"><span class="n">06</span>עבודה ברקע ורכיבי מערכת</a></li>
+<li><a href="#g-hw"><span class="n">07</span>מולטימדיה, חיישנים וגרפיקה</a></li></ol>
+</nav>
+<main>
+  <nav class="sitenav" aria-label="עמודי האתר">
+    <a href="./">מדריך הפרויקט</a>
+    <a href="android-concepts.html" aria-current="page">מושגי Android Studio</a>
+  </nav>
+  <header class="hero">
+    <div class="eyebrow">בגרות 5 יח"ל · פיתוח אפליקציות באנדרואיד</div>
+    <h1>מושגי Android Studio<span class="en">Android concepts for the bagrut</span></h1>
+    <p>המושגים שחוזרים בפרויקטים ובבחינות של פיתוח אנדרואיד: הסבר קצר, דוגמת קוד, ושאלה שבוחן עשוי לשאול. מושג שמסומן "בפרויקט שלך" מקושר לפרק המתאים במדריך הפרויקט. רשימת הנושאים המדויקת משתנה בין בתי ספר, אז כדאי לוודא אותה מול המורה.</p>
+    <div class="tools">
+      <input id="q" type="search" aria-label="חיפוש מושג" placeholder="חיפוש מושג, למשל Intent או SQLite" autocomplete="off">
+      <label class="chk"><input id="onlyProject" type="checkbox"> רק מה שיש בפרויקט שלי</label>
+      <span class="count" id="count"></span>
+    </div>
+  </header>
+<section class="ch" id="g-env"><div class="ch-head"><span class="ch-num">01</span><h2>סביבת הפיתוח ומבנה הפרויקט</h2></div>
+<article class="concept" data-search="android studio סביבת הפיתוח תוכנה של google לכתיבה, בנייה, הרצה ודיבוג של אפליקציות אנדרואיד. כוללת עורך קוד, עורך עיצוב גרפי ל-xml, אמולטור, logcat וכלי דיבוג." data-project="0">
+<div class="concept-head"><span class="term">Android Studio</span><h3>סביבת הפיתוח</h3></div>
+<p>תוכנה של Google לכתיבה, בנייה, הרצה ודיבוג של אפליקציות אנדרואיד. כוללת עורך קוד, עורך עיצוב גרפי ל-XML, אמולטור, Logcat וכלי דיבוג.</p>
+<div class="qa"><details><summary>מה ההבדל בין Android Studio ל-Android SDK?</summary><div class="ans"><p>Android Studio הוא סביבת העבודה (העורך והכלים). ה-SDK הוא אוסף הספריות והכלים של אנדרואיד שהקוד שלך נבנה מולו. Android Studio משתמש ב-SDK.</p></div></details></div>
+</article>
+<article class="concept" data-search="sdk · minsdk · targetsdk · compilesdk גרסאות אנדרואיד בפרויקט minsdk: הגרסה הנמוכה ביותר שהאפליקציה תותקן עליה. targetsdk: הגרסה שהאפליקציה נבדקה מולה, והמערכת מתנהגת לפיה. compilesdk: הגרסה שמולה מקמפלים, כלומר אילו api זמינים בקוד." data-project="1">
+<div class="concept-head"><span class="term">SDK · minSdk · targetSdk · compileSdk</span><h3>גרסאות אנדרואיד בפרויקט</h3><a class="badge" href="./#architecture">בפרויקט שלך · פרק 02 ארכיטקטורה</a></div>
+<p><b>minSdk</b>: הגרסה הנמוכה ביותר שהאפליקציה תותקן עליה. <b>targetSdk</b>: הגרסה שהאפליקציה נבדקה מולה, והמערכת מתנהגת לפיה. <b>compileSdk</b>: הגרסה שמולה מקמפלים, כלומר אילו API זמינים בקוד.</p>
+<figure class="code"><figcaption dir="ltr">build.gradle.kts</figcaption><pre dir="ltr"><code><span class="ln">defaultConfig {</span><span class="ln">    minSdk = <span class="tn">24</span></span><span class="ln">    targetSdk = <span class="tn">34</span></span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>מה קורה אם קוראים לפונקציה שקיימת רק ב-API 33 כש-minSdk הוא 24?</summary><div class="ans"><p>בטלפון עם גרסה ישנה יותר האפליקציה תקרוס. לכן בודקים את <code>Build.VERSION.SDK_INT</code> לפני הקריאה, כמו בבקשת ההרשאה לווידאו בפרויקט.</p></div></details></div>
+</article>
+<article class="concept" data-search="gradle מערכת הבנייה gradle מוריד ספריות (dependencies), מקמפל את הקוד ובונה קובץ apk. ההגדרות נמצאות בקבצי build.gradle (או .kts)." data-project="1">
+<div class="concept-head"><span class="term">Gradle</span><h3>מערכת הבנייה</h3><a class="badge" href="./#architecture">בפרויקט שלך · פרק 02 ארכיטקטורה</a></div>
+<p>Gradle מוריד ספריות (dependencies), מקמפל את הקוד ובונה קובץ APK. ההגדרות נמצאות בקבצי <code>build.gradle</code> (או <code>.kts</code>).</p>
+<figure class="code"><figcaption dir="ltr">build.gradle.kts</figcaption><pre dir="ltr"><code><span class="ln">dependencies {</span><span class="ln">    implementation(<span class="ts">"androidx.recyclerview:recyclerview:1.3.2"</span>)</span><span class="ln">    implementation(<span class="ts">"com.google.mlkit:pose-detection:18.0.0-beta5"</span>)</span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>מה זה Gradle Sync?</summary><div class="ans"><p>הרגע שבו Android Studio קורא את קבצי Gradle, מוריד את הספריות החסרות ומעדכן את הפרויקט. צריך אותו אחרי כל שינוי בקבצי ה-build.</p></div></details></div>
+</article>
+<article class="concept" data-search="androidmanifest.xml קובץ ההצהרה של האפליקציה מתאר את האפליקציה למערכת: כל ה-activities, איזה מסך נפתח ראשון (launcher), הרשאות, אייקון, שם וערכת נושא. activity שלא רשומה בו לא תיפתח." data-project="1">
+<div class="concept-head"><span class="term">AndroidManifest.xml</span><h3>קובץ ההצהרה של האפליקציה</h3><a class="badge" href="./#activities">בפרויקט שלך · פרק 05 Activities ו-Intent</a></div>
+<p>מתאר את האפליקציה למערכת: כל ה-Activities, איזה מסך נפתח ראשון (LAUNCHER), הרשאות, אייקון, שם וערכת נושא. Activity שלא רשומה בו לא תיפתח.</p>
+<figure class="code"><figcaption dir="ltr">XML</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">&lt;activity</span> android:name=<span class="ts">".AuthActivity"</span> android:exported=<span class="ts">"true"</span><span class="tk">&gt;</span></span><span class="ln">    <span class="tk">&lt;intent</span>-filter<span class="tk">&gt;</span></span><span class="ln">        <span class="tk">&lt;action</span> android:name=<span class="ts">"android.intent.action.MAIN"</span> <span class="tk">/&gt;</span></span><span class="ln">        <span class="tk">&lt;category</span> android:name=<span class="ts">"android.intent.category.LAUNCHER"</span> <span class="tk">/&gt;</span></span><span class="ln">    <span class="tk">&lt;/intent</span>-filter<span class="tk">&gt;</span></span><span class="ln"><span class="tk">&lt;/activity</span><span class="tk">&gt;</span></span></code></pre></figure>
+<div class="qa"><details><summary>מה קורה אם שוכחים לרשום Activity ב-Manifest?</summary><div class="ans"><p>ניסיון לפתוח אותה עם Intent יזרוק <code>ActivityNotFoundException</code> והאפליקציה תקרוס.</p></div></details></div>
+</article>
+<article class="concept" data-search="res · r תיקיית המשאבים ומחלקת r ב-res נמצאים כל המשאבים: layout (מסכים), values (strings, colors, themes), drawable (תמונות ואייקונים), mipmap (אייקון האפליקציה). android studio יוצר מחלקה בשם r עם מזהה מספרי לכל משאב." data-project="1">
+<div class="concept-head"><span class="term">res · R</span><h3>תיקיית המשאבים ומחלקת R</h3><a class="badge" href="./#ui">בפרויקט שלך · פרק 16 עיצוב ומשאבים</a></div>
+<p>ב-<code>res</code> נמצאים כל המשאבים: <code>layout</code> (מסכים), <code>values</code> (strings, colors, themes), <code>drawable</code> (תמונות ואייקונים), <code>mipmap</code> (אייקון האפליקציה). Android Studio יוצר מחלקה בשם <b>R</b> עם מזהה מספרי לכל משאב.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">setContentView(R.layout.activity_main);</span><span class="ln">String title = getString(R.string.app_name);</span><span class="ln">Button b = findViewById(R.id.btnLogin);</span></code></pre></figure>
+<div class="qa"><details><summary>למה לא כותבים טקסט ישירות ב-XML?</summary><div class="ans"><p>כל הטקסטים ב-<code>strings.xml</code>: קל לשנות במקום אחד, לתרגם לשפה אחרת, ולשמור על עקביות. גם המחוון דורש את זה.</p></div></details></div>
+</article>
+<article class="concept" data-search="emulator · avd אמולטור טלפון וירטואלי שרץ על המחשב. יוצרים אותו ב-device manager (avd = android virtual device) ובוחרים דגם וגרסת מערכת." data-project="0">
+<div class="concept-head"><span class="term">Emulator · AVD</span><h3>אמולטור</h3></div>
+<p>טלפון וירטואלי שרץ על המחשב. יוצרים אותו ב-Device Manager (AVD = Android Virtual Device) ובוחרים דגם וגרסת מערכת.</p>
+<div class="qa"><details><summary>מתי עדיף טלפון אמיתי על אמולטור?</summary><div class="ans"><p>כשצריך חומרה אמיתית: מצלמה, חיישנים, ביצועים אמיתיים. בפרויקט הזה, ניתוח ML Kit על סרטון אמיתי.</p></div></details></div>
+</article>
+<article class="concept" data-search="logcat · log יומן הודעות ודיבוג חלון ב-android studio שמציג הודעות מהאפליקציה ומהמערכת, כולל שגיאות וקריסות (fatal exception). כותבים אליו עם log." data-project="0">
+<div class="concept-head"><span class="term">Logcat · Log</span><h3>יומן הודעות ודיבוג</h3></div>
+<p>חלון ב-Android Studio שמציג הודעות מהאפליקציה ומהמערכת, כולל שגיאות וקריסות (FATAL EXCEPTION). כותבים אליו עם <code>Log</code>.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">Log.d(<span class="ts">"MainActivity"</span>, <span class="ts">"score = "</span> + score);</span></code></pre></figure>
+<div class="qa"><details><summary>איך מוצאים למה האפליקציה קרסה?</summary><div class="ans"><p>פותחים Logcat ומחפשים <code>FATAL EXCEPTION</code>. שם כתוב סוג החריגה ובאיזו שורה בקוד היא קרתה.</p></div></details></div>
+</article>
+<article class="concept" data-search="debugger · breakpoint דיבוג נקודת עצירה (breakpoint) עוצרת את הריצה בשורה מסוימת. אפשר לראות את ערכי המשתנים ולהתקדם שורה אחרי שורה (step over / step into). מריצים עם הכפתור debug ולא run." data-project="0">
+<div class="concept-head"><span class="term">Debugger · Breakpoint</span><h3>דיבוג</h3></div>
+<p>נקודת עצירה (breakpoint) עוצרת את הריצה בשורה מסוימת. אפשר לראות את ערכי המשתנים ולהתקדם שורה אחרי שורה (Step Over / Step Into). מריצים עם הכפתור Debug ולא Run.</p>
+<div class="qa"><details><summary>מה ההבדל בין Step Over ל-Step Into?</summary><div class="ans"><p>Step Over מריץ את השורה כולה, כולל פונקציות שנקראות בה. Step Into נכנס לתוך הפונקציה שנקראת, כדי לראות מה קורה בה.</p></div></details></div>
+</article>
+<article class="concept" data-search="apk קובץ ההתקנה android package: הקובץ שמותקן על הטלפון. gradle בונה אותו מהקוד והמשאבים. run מתקין apk של דיבוג על המכשיר." data-project="0">
+<div class="concept-head"><span class="term">APK</span><h3>קובץ ההתקנה</h3></div>
+<p>Android Package: הקובץ שמותקן על הטלפון. Gradle בונה אותו מהקוד והמשאבים. Run מתקין APK של דיבוג על המכשיר.</p>
+<div class="qa"><details><summary>מה יש בתוך APK?</summary><div class="ans"><p>הקוד המקומפל (קבצי dex), המשאבים (layouts, תמונות, strings), ה-Manifest והספריות.</p></div></details></div>
+</article>
+<article class="concept" data-search="context הקשר אובייקט שנותן גישה למשאבי האפליקציה ולשירותי המערכת: מחרוזות, sharedpreferences, מסד נתונים, פתיחת מסכים. activity היא context, ולכן מעבירים this." data-project="1">
+<div class="concept-head"><span class="term">Context</span><h3>הקשר</h3><a class="badge" href="./#prefs">בפרויקט שלך · פרק 07 SharedPreferences</a></div>
+<p>אובייקט שנותן גישה למשאבי האפליקציה ולשירותי המערכת: מחרוזות, SharedPreferences, מסד נתונים, פתיחת מסכים. Activity היא Context, ולכן מעבירים <code>this</code>.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">SharedPreferences p = context.getSharedPreferences(<span class="ts">"session"</span>, Context.MODE_PRIVATE);</span><span class="ln">Toast.makeText(<span class="tk">this</span>, <span class="ts">"שלום"</span>, Toast.LENGTH_SHORT).show();</span></code></pre></figure>
+<div class="qa"><details><summary>למה בנאי של DatabaseHelper מקבל Context?</summary><div class="ans"><p>כי כדי ליצור או לפתוח את קובץ המסד צריך לדעת איפה נמצאת התיקייה הפרטית של האפליקציה, ואת זה נותן ה-Context.</p></div></details></div>
+</article>
+</section>
+<section class="ch" id="g-screens"><div class="ch-head"><span class="ch-num">02</span><h2>מסכים, Intent ומחזור חיים</h2></div>
+<article class="concept" data-search="activity מסך מחלקה שמייצגת מסך אחד. יורשת מ-appcompatactivity, וב-oncreate מחברים אותה ל-layout עם setcontentview." data-project="1">
+<div class="concept-head"><span class="term">Activity</span><h3>מסך</h3><a class="badge" href="./#activities">בפרויקט שלך · פרק 05 Activities ו-Intent</a></div>
+<p>מחלקה שמייצגת מסך אחד. יורשת מ-<code>AppCompatActivity</code>, וב-<code>onCreate</code> מחברים אותה ל-layout עם <code>setContentView</code>.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">public</span> <span class="tk">class</span> MainActivity <span class="tk">extends</span> AppCompatActivity {</span><span class="ln">    <span class="ta">@Override</span></span><span class="ln">    <span class="tk">protected</span> <span class="tk">void</span> onCreate(Bundle savedInstanceState) {</span><span class="ln">        <span class="tk">super</span>.onCreate(savedInstanceState);</span><span class="ln">        setContentView(R.layout.activity_main);</span><span class="ln">    }</span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>למה קוראים ל-super.onCreate?</summary><div class="ans"><p>כדי שמחלקת האב תבצע את האתחול שלה. בלי זה אנדרואיד זורקת חריגה.</p></div></details></div>
+</article>
+<article class="concept" data-search="activity lifecycle מחזור החיים של מסך המערכת קוראת למתודות לפי המצב של המסך: oncreate (נוצר) ← onstart (נראה) ← onresume (בחזית, מגיב למגע) ← onpause (מסך אחר מכסה חלקית) ← onstop (לא נראה) ← ondestroy (נהרס). אחרי onstop אפשר לחזור דרך onrestart ← onstart." data-project="1">
+<div class="concept-head"><span class="term">Activity Lifecycle</span><h3>מחזור החיים של מסך</h3><a class="badge" href="./#activities">בפרויקט שלך · פרק 05 Activities ו-Intent</a></div>
+<p>המערכת קוראת למתודות לפי המצב של המסך: <b>onCreate</b> (נוצר) ← <b>onStart</b> (נראה) ← <b>onResume</b> (בחזית, מגיב למגע) ← <b>onPause</b> (מסך אחר מכסה חלקית) ← <b>onStop</b> (לא נראה) ← <b>onDestroy</b> (נהרס). אחרי onStop אפשר לחזור דרך <b>onRestart</b> ← onStart.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">protected</span> <span class="tk">void</span> onDestroy() {</span><span class="ln">    <span class="tk">super</span>.onDestroy();</span><span class="ln">    executor.shutdownNow();   <span class="tc">// עוצרים עבודה ברקע</span></span><span class="ln">    analyzer.close();         <span class="tc">// משחררים את ML Kit</span></span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>מה קורה למסך כשמסובבים את הטלפון?</summary><div class="ans"><p>כברירת מחדל ה-Activity נהרסת ונבנית מחדש: onPause, onStop, onDestroy ואז onCreate, onStart, onResume. לכן משתנים רגילים מתאפסים, אלא אם שומרים אותם.</p></div></details></div>
+</article>
+<article class="concept" data-search="intent (explicit) intent מפורש בקשה לפתוח רכיב מסוים באפליקציה שלך, לפי שם המחלקה." data-project="1">
+<div class="concept-head"><span class="term">Intent (explicit)</span><h3>Intent מפורש</h3><a class="badge" href="./#activities">בפרויקט שלך · פרק 05 Activities ו-Intent</a></div>
+<p>בקשה לפתוח רכיב מסוים באפליקציה שלך, לפי שם המחלקה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">Intent intent = <span class="tk">new</span> Intent(<span class="tk">this</span>, HistoryActivity.<span class="tk">class</span>);</span><span class="ln">startActivity(intent);</span></code></pre></figure>
+<div class="qa"><details><summary>מה ההבדל בין Intent מפורש למרומז?</summary><div class="ans"><p>מפורש אומר בדיוק איזו מחלקה לפתוח. מרומז אומר רק מה רוצים לעשות (פעולה), והמערכת מוצאת אפליקציה שיודעת לעשות את זה.</p></div></details></div>
+</article>
+<article class="concept" data-search="intent (implicit) intent מרומז בקשה לפעולה, בלי לציין מי יבצע אותה: לצלם, לפתוח קישור, לחייג, לשתף. המערכת בוחרת אפליקציה מתאימה." data-project="1">
+<div class="concept-head"><span class="term">Intent (implicit)</span><h3>Intent מרומז</h3><a class="badge" href="./#media">בפרויקט שלך · פרק 09 הרשאות ומדיה</a></div>
+<p>בקשה לפעולה, בלי לציין מי יבצע אותה: לצלם, לפתוח קישור, לחייג, לשתף. המערכת בוחרת אפליקציה מתאימה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">Intent intent = <span class="tk">new</span> Intent(MediaStore.ACTION_VIDEO_CAPTURE);</span><span class="ln">cameraLauncher.launch(intent);</span><span class="ln"></span><span class="ln">Intent web = <span class="tk">new</span> Intent(Intent.ACTION_VIEW, Uri.parse(<span class="ts">"https://example.com"</span>));</span><span class="ln">startActivity(web);</span></code></pre></figure>
+<div class="qa"><details><summary>מה קורה אם אין במכשיר אפליקציה שיודעת לבצע את ה-Intent?</summary><div class="ans"><p>נזרקת <code>ActivityNotFoundException</code>. בפרויקט תופסים אותה ומציגים הודעה "לא נמצאה אפליקציית מצלמה".</p></div></details></div>
+</article>
+<article class="concept" data-search="putextra · getextra העברת נתונים בין מסכים מצרפים ל-intent ערכים בזוגות מפתח-ערך, ובמסך החדש קוראים אותם." data-project="0">
+<div class="concept-head"><span class="term">putExtra · getExtra</span><h3>העברת נתונים בין מסכים</h3></div>
+<p>מצרפים ל-Intent ערכים בזוגות מפתח-ערך, ובמסך החדש קוראים אותם.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">// במסך השולח</span></span><span class="ln">intent.putExtra(<span class="ts">"username"</span>, <span class="ts">"guy"</span>);</span><span class="ln">startActivity(intent);</span><span class="ln"></span><span class="ln"><span class="tc">// במסך המקבל</span></span><span class="ln">String name = getIntent().getStringExtra(<span class="ts">"username"</span>);</span></code></pre></figure>
+<div class="qa"><details><summary>איך מעבירים אובייקט שלם בין מסכים?</summary><div class="ans"><p>המחלקה צריכה לממש <code>Serializable</code> או <code>Parcelable</code>. דרך פשוטה יותר: להעביר רק id ולטעון את האובייקט מהמסד במסך החדש.</p></div></details></div>
+</article>
+<article class="concept" data-search="activityresultlauncher קבלת תוצאה ממסך אחר הדרך המודרנית לפתוח מסך ולקבל ממנו תוצאה, במקום startactivityforresult הישן. רושמים launcher כשדה, ומקבלים את התוצאה ב-callback." data-project="1">
+<div class="concept-head"><span class="term">ActivityResultLauncher</span><h3>קבלת תוצאה ממסך אחר</h3><a class="badge" href="./#media">בפרויקט שלך · פרק 09 הרשאות ומדיה</a></div>
+<p>הדרך המודרנית לפתוח מסך ולקבל ממנו תוצאה, במקום <code>startActivityForResult</code> הישן. רושמים launcher כשדה, ומקבלים את התוצאה ב-callback.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">ActivityResultLauncher&lt;String&gt; galleryLauncher =</span><span class="ln">        registerForActivityResult(<span class="tk">new</span> ActivityResultContracts.GetContent(), uri -&gt; {</span><span class="ln">            <span class="tk">if</span> (uri != <span class="tk">null</span>) startAnalysis(uri);</span><span class="ln">        });</span><span class="ln"></span><span class="ln">galleryLauncher.launch(<span class="ts">"video/*"</span>);</span></code></pre></figure>
+<div class="qa"><details><summary>למה רושמים את ה-launcher כשדה ולא בתוך לחיצה?</summary><div class="ans"><p>כי הרישום חייב לקרות לפני שהמסך מגיע למצב STARTED. אם המסך נהרס ונבנה מחדש באמצע, התוצאה עדיין מגיעה ל-callback הנכון.</p></div></details></div>
+</article>
+<article class="concept" data-search="finish() · back stack סגירת מסך וערימת המסכים כל מסך חדש נכנס לראש ערימה (back stack). כפתור חזרה מוציא את המסך העליון. finish() סוגר את המסך הנוכחי. דגלים כמו flag_activity_clear_task מנקים את הערימה." data-project="1">
+<div class="concept-head"><span class="term">finish() · Back Stack</span><h3>סגירת מסך וערימת המסכים</h3><a class="badge" href="./#activities">בפרויקט שלך · פרק 05 Activities ו-Intent</a></div>
+<p>כל מסך חדש נכנס לראש ערימה (back stack). כפתור חזרה מוציא את המסך העליון. <code>finish()</code> סוגר את המסך הנוכחי. דגלים כמו <code>FLAG_ACTIVITY_CLEAR_TASK</code> מנקים את הערימה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">startActivity(<span class="tk">new</span> Intent(<span class="tk">this</span>, MainActivity.<span class="tk">class</span>));</span><span class="ln">finish();  <span class="tc">// מסך ההתחברות יוצא מהערימה</span></span></code></pre></figure>
+<div class="qa"><details><summary>למה אחרי התחברות קוראים ל-finish()?</summary><div class="ans"><p>כדי שלחיצה על "חזרה" במסך הראשי לא תחזיר למסך ההתחברות.</p></div></details></div>
+</article>
+<article class="concept" data-search="fragment פרגמנט חלק ממסך, עם layout ומחזור חיים משלו, שחי בתוך activity. מאפשר להחליף חלק מהמסך (למשל לשוניות) בלי לפתוח מסך חדש." data-project="0">
+<div class="concept-head"><span class="term">Fragment</span><h3>פרגמנט</h3></div>
+<p>חלק ממסך, עם layout ומחזור חיים משלו, שחי בתוך Activity. מאפשר להחליף חלק מהמסך (למשל לשוניות) בלי לפתוח מסך חדש.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">getSupportFragmentManager().beginTransaction()</span><span class="ln">        .replace(R.id.container, <span class="tk">new</span> HistoryFragment())</span><span class="ln">        .commit();</span></code></pre></figure>
+<div class="qa"><details><summary>מה ההבדל בין Fragment ל-Activity?</summary><div class="ans"><p>Activity היא מסך שלם. Fragment הוא חלק ממסך שחייב לחיות בתוך Activity, ואפשר לשלב כמה פרגמנטים במסך אחד.</p></div></details></div>
+</article>
+</section>
+<section class="ch" id="g-ui"><div class="ch-head"><span class="ch-num">03</span><h2>ממשק משתמש ואירועים</h2></div>
+<article class="concept" data-search="layout (xml) קובץ עיצוב מסך קובץ xml שמתאר אילו רכיבים יש במסך ואיך הם מסודרים. כל רכיב הוא view, ורכיבים שמכילים אחרים הם viewgroup." data-project="1">
+<div class="concept-head"><span class="term">Layout (XML)</span><h3>קובץ עיצוב מסך</h3><a class="badge" href="./#ui">בפרויקט שלך · פרק 16 עיצוב ומשאבים</a></div>
+<p>קובץ XML שמתאר אילו רכיבים יש במסך ואיך הם מסודרים. כל רכיב הוא View, ורכיבים שמכילים אחרים הם ViewGroup.</p>
+<div class="qa"><details><summary>מה ההבדל בין View ל-ViewGroup?</summary><div class="ans"><p>View הוא רכיב בודד, כמו כפתור או טקסט. ViewGroup הוא מכל שמכיל רכיבים אחרים ומסדר אותם, כמו LinearLayout.</p></div></details></div>
+</article>
+<article class="concept" data-search="linearlayout סידור בשורה או בטור מסדר את הילדים אחד אחרי השני, אנכית או אופקית (orientation). עם layout_weight אפשר לחלק את המקום ביחס." data-project="1">
+<div class="concept-head"><span class="term">LinearLayout</span><h3>סידור בשורה או בטור</h3><a class="badge" href="./#ui">בפרויקט שלך · פרק 16 עיצוב ומשאבים</a></div>
+<p>מסדר את הילדים אחד אחרי השני, אנכית או אופקית (<code>orientation</code>). עם <code>layout_weight</code> אפשר לחלק את המקום ביחס.</p>
+<figure class="code"><figcaption dir="ltr">XML</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">&lt;LinearLayout</span></span><span class="ln">    android:layout_width=<span class="ts">"match_parent"</span></span><span class="ln">    android:layout_height=<span class="ts">"wrap_content"</span></span><span class="ln">    android:orientation=<span class="ts">"horizontal"</span><span class="tk">&gt;</span></span><span class="ln">    <span class="tk">&lt;Button</span> android:layout_width=<span class="ts">"0dp"</span> android:layout_weight=<span class="ts">"1"</span> ... <span class="tk">/&gt;</span></span><span class="ln">    <span class="tk">&lt;Button</span> android:layout_width=<span class="ts">"0dp"</span> android:layout_weight=<span class="ts">"1"</span> ... <span class="tk">/&gt;</span></span><span class="ln"><span class="tk">&lt;/LinearLayout</span><span class="tk">&gt;</span></span></code></pre></figure>
+<div class="qa"><details><summary>למה עם layout_weight כותבים layout_width=&quot;0dp&quot;?</summary><div class="ans"><p>כדי שהרוחב ייקבע רק לפי המשקל. אחרת אנדרואיד מחשבת קודם רוחב לפי התוכן ורק אז מחלקת את מה שנשאר.</p></div></details></div>
+</article>
+<article class="concept" data-search="constraintlayout · relativelayout · framelayout סוגי layout נוספים constraintlayout: כל רכיב ממוקם בעזרת &quot;אילוצים&quot; ביחס לאחרים או להורה. גמיש ושטוח. relativelayout: מיקום יחסי (מתחת ל-, מימין ל-), ישן יותר. framelayout: רכיבים זה על גבי זה. scrollview: מאפשר גלילה לילד אחד." data-project="1">
+<div class="concept-head"><span class="term">ConstraintLayout · RelativeLayout · FrameLayout</span><h3>סוגי Layout נוספים</h3><a class="badge" href="./#ui">בפרויקט שלך · פרק 16 עיצוב ומשאבים</a></div>
+<p><b>ConstraintLayout</b>: כל רכיב ממוקם בעזרת "אילוצים" ביחס לאחרים או להורה. גמיש ושטוח. <b>RelativeLayout</b>: מיקום יחסי (מתחת ל-, מימין ל-), ישן יותר. <b>FrameLayout</b>: רכיבים זה על גבי זה. <b>ScrollView</b>: מאפשר גלילה לילד אחד.</p>
+<div class="qa"><details><summary>מתי משתמשים ב-FrameLayout?</summary><div class="ans"><p>כשרוצים להניח רכיבים זה על זה, למשל טקסט על תמונה, או מכל לפרגמנט.</p></div></details></div>
+</article>
+<article class="concept" data-search="match_parent · wrap_content · dp · sp גדלים ויחידות match_parent: כגודל ההורה. wrap_content: כגודל התוכן. dp: יחידה שלא תלויה בצפיפות המסך, לגדלים ומרווחים. sp: כמו dp, אבל גדלה לפי הגדרת גודל הגופן של המשתמש, ולכן מיועדת לטקסט." data-project="1">
+<div class="concept-head"><span class="term">match_parent · wrap_content · dp · sp</span><h3>גדלים ויחידות</h3><a class="badge" href="./#ui">בפרויקט שלך · פרק 16 עיצוב ומשאבים</a></div>
+<p><b>match_parent</b>: כגודל ההורה. <b>wrap_content</b>: כגודל התוכן. <b>dp</b>: יחידה שלא תלויה בצפיפות המסך, לגדלים ומרווחים. <b>sp</b>: כמו dp, אבל גדלה לפי הגדרת גודל הגופן של המשתמש, ולכן מיועדת לטקסט.</p>
+<div class="qa"><details><summary>למה לא להשתמש בפיקסלים (px)?</summary><div class="ans"><p>כי במסכים בצפיפות שונה אותו מספר פיקסלים נראה בגודל אחר. dp נראה באותו גודל פיזי בכל מסך.</p></div></details></div>
+</article>
+<article class="concept" data-search="padding · margin · gravity · layout_gravity מרווחים ויישור padding: רווח פנימי, בין גבול הרכיב לתוכן שלו. margin: רווח חיצוני, בין הרכיב לשכנים. gravity: איך התוכן מיושר בתוך הרכיב. layout_gravity: איך הרכיב עצמו מיושר בתוך ההורה." data-project="0">
+<div class="concept-head"><span class="term">padding · margin · gravity · layout_gravity</span><h3>מרווחים ויישור</h3></div>
+<p><b>padding</b>: רווח פנימי, בין גבול הרכיב לתוכן שלו. <b>margin</b>: רווח חיצוני, בין הרכיב לשכנים. <b>gravity</b>: איך התוכן מיושר בתוך הרכיב. <b>layout_gravity</b>: איך הרכיב עצמו מיושר בתוך ההורה.</p>
+<div class="qa"><details><summary>מה ההבדל בין gravity ל-layout_gravity?</summary><div class="ans"><p>gravity מיישר את מה שבתוך הרכיב (למשל טקסט בתוך כפתור). layout_gravity מיישר את הרכיב עצמו בתוך ה-Layout שמכיל אותו.</p></div></details></div>
+</article>
+<article class="concept" data-search="textview · edittext · button · imageview רכיבים בסיסיים textview: טקסט. edittext: שדה קלט (inputtype קובע מקלדת, למשל סיסמה). button: כפתור. imageview: תמונה. ב-material: materialbutton, textinputlayout ו-textinputedittext." data-project="1">
+<div class="concept-head"><span class="term">TextView · EditText · Button · ImageView</span><h3>רכיבים בסיסיים</h3><a class="badge" href="./#security">בפרויקט שלך · פרק 06 הרשמה והצפנה</a></div>
+<p><b>TextView</b>: טקסט. <b>EditText</b>: שדה קלט (<code>inputType</code> קובע מקלדת, למשל סיסמה). <b>Button</b>: כפתור. <b>ImageView</b>: תמונה. ב-Material: <code>MaterialButton</code>, <code>TextInputLayout</code> ו-<code>TextInputEditText</code>.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">EditText edit = findViewById(R.id.editUsername);</span><span class="ln">String text = edit.getText().toString().trim();</span><span class="ln">TextView title = findViewById(R.id.textWelcome);</span><span class="ln">title.setText(getString(R.string.welcome_user, text));</span></code></pre></figure>
+<div class="qa"><details><summary>איך מציגים הודעת שגיאה מתחת לשדה קלט?</summary><div class="ans"><p>עם <code>TextInputLayout.setError("...")</code>, או <code>EditText.setError</code>. כשהשדה תקין מעבירים <code>null</code>.</p></div></details></div>
+</article>
+<article class="concept" data-search="checkbox · radiobutton · switch · seekbar · spinner רכיבי בחירה checkbox: סימון כן/לא (ischecked()). radiobutton בתוך radiogroup: בחירה אחת מכמה. switch: מתג. seekbar: מחוון ערך. spinner: רשימה נפתחת, עם adapter." data-project="1">
+<div class="concept-head"><span class="term">CheckBox · RadioButton · Switch · SeekBar · Spinner</span><h3>רכיבי בחירה</h3><a class="badge" href="./#prefs">בפרויקט שלך · פרק 07 SharedPreferences</a></div>
+<p><b>CheckBox</b>: סימון כן/לא (<code>isChecked()</code>). <b>RadioButton</b> בתוך <b>RadioGroup</b>: בחירה אחת מכמה. <b>Switch</b>: מתג. <b>SeekBar</b>: מחוון ערך. <b>Spinner</b>: רשימה נפתחת, עם Adapter.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">CheckBox remember = findViewById(R.id.checkRemember);</span><span class="ln"><span class="tk">boolean</span> stay = remember.isChecked();</span></code></pre></figure>
+<div class="qa"><details><summary>איך יודעים איזה RadioButton נבחר?</summary><div class="ans"><p><code>radioGroup.getCheckedRadioButtonId()</code> מחזיר את ה-id של הכפתור שנבחר, או ‎-1 אם אף אחד.</p></div></details></div>
+</article>
+<article class="concept" data-search="findviewbyid · viewbinding חיבור קוד לרכיבי מסך findviewbyid(r.id.x) מחפש רכיב לפי ה-id שלו ב-layout. viewbinding היא חלופה שיוצרת מחלקה עם שדה לכל רכיב, בלי חיפוש ובלי casting." data-project="1">
+<div class="concept-head"><span class="term">findViewById · ViewBinding</span><h3>חיבור קוד לרכיבי מסך</h3><a class="badge" href="./#ui">בפרויקט שלך · פרק 16 עיצוב ומשאבים</a></div>
+<p><code>findViewById(R.id.x)</code> מחפש רכיב לפי ה-id שלו ב-layout. <b>ViewBinding</b> היא חלופה שיוצרת מחלקה עם שדה לכל רכיב, בלי חיפוש ובלי casting.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">TextView textScore = findViewById(R.id.textScore);</span></code></pre></figure>
+<div class="qa"><details><summary>מה קורה אם קוראים ל-findViewById לפני setContentView?</summary><div class="ans"><p>מוחזר <code>null</code>, כי עוד אין מסך לחפש בו, והשימוש הראשון ברכיב יזרוק <code>NullPointerException</code>.</p></div></details></div>
+</article>
+<article class="concept" data-search="onclicklistener טיפול בלחיצות ממשק עם מתודה אחת, onclick(view v). אפשר לממש אותו במחלקה (implements), במחלקה אנונימית, ב-lambda, או דרך android:onclick ב-xml." data-project="1">
+<div class="concept-head"><span class="term">OnClickListener</span><h3>טיפול בלחיצות</h3><a class="badge" href="./#activities">בפרויקט שלך · פרק 05 Activities ו-Intent</a></div>
+<p>ממשק עם מתודה אחת, <code>onClick(View v)</code>. אפשר לממש אותו במחלקה (<code>implements</code>), במחלקה אנונימית, ב-lambda, או דרך <code>android:onClick</code> ב-XML.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">// מחלקה אנונימית</span></span><span class="ln">btn.setOnClickListener(<span class="tk">new</span> View.OnClickListener() {</span><span class="ln">    <span class="ta">@Override</span></span><span class="ln">    <span class="tk">public</span> <span class="tk">void</span> onClick(View v) { login(); }</span><span class="ln">});</span><span class="ln"></span><span class="ln"><span class="tc">// lambda (אותו דבר, קצר יותר)</span></span><span class="ln">btn.setOnClickListener(v -&gt; login());</span></code></pre></figure>
+<div class="qa"><details><summary>מה זה lambda ולמה אפשר להשתמש בה כאן?</summary><div class="ans"><p>כתיבה מקוצרת למימוש ממשק שיש בו מתודה אחת בלבד (ממשק פונקציונלי). OnClickListener הוא ממשק כזה.</p></div></details></div>
+</article>
+<article class="concept" data-search="toast · snackbar הודעות קצרות toast: הודעה קצרה שצפה ונעלמת. snackbar (material): הודעה בתחתית המסך, יכולה לכלול כפתור פעולה." data-project="1">
+<div class="concept-head"><span class="term">Toast · Snackbar</span><h3>הודעות קצרות</h3><a class="badge" href="./#ui">בפרויקט שלך · פרק 16 עיצוב ומשאבים</a></div>
+<p><b>Toast</b>: הודעה קצרה שצפה ונעלמת. <b>Snackbar</b> (Material): הודעה בתחתית המסך, יכולה לכלול כפתור פעולה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">Toast.makeText(<span class="tk">this</span>, R.string.register_success, Toast.LENGTH_SHORT).show();</span><span class="ln">Snackbar.make(view, R.string.shot_deleted, Snackbar.LENGTH_SHORT).show();</span></code></pre></figure>
+<div class="qa"><details><summary>מה שוכחים הכי הרבה ב-Toast?</summary><div class="ans"><p>את <code>.show()</code> בסוף. בלעדיו ההודעה נוצרת אבל לא מוצגת.</p></div></details></div>
+</article>
+<article class="concept" data-search="theme · style · material design עיצוב אחיד theme: הגדרות לכל האפליקציה (צבעים ראשיים, רקע). style: אוסף מאפיינים לרכיב, שאפשר להשתמש בו בהרבה מקומות. material design: שפת העיצוב של google." data-project="1">
+<div class="concept-head"><span class="term">Theme · Style · Material Design</span><h3>עיצוב אחיד</h3><a class="badge" href="./#ui">בפרויקט שלך · פרק 16 עיצוב ומשאבים</a></div>
+<p><b>Theme</b>: הגדרות לכל האפליקציה (צבעים ראשיים, רקע). <b>Style</b>: אוסף מאפיינים לרכיב, שאפשר להשתמש בו בהרבה מקומות. <b>Material Design</b>: שפת העיצוב של Google.</p>
+<figure class="code"><figcaption dir="ltr">XML</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">&lt;style</span> name=<span class="ts">"Widget.App.Button"</span> parent=<span class="ts">"Widget.Material3.Button"</span><span class="tk">&gt;</span></span><span class="ln">    <span class="tk">&lt;item</span> name=<span class="ts">"cornerRadius"</span><span class="tk">&gt;</span>2dp<span class="tk">&lt;/item</span><span class="tk">&gt;</span></span><span class="ln"><span class="tk">&lt;/style</span><span class="tk">&gt;</span></span></code></pre></figure>
+<div class="qa"><details><summary>מה הבעיה בשם סגנון כמו App.Hairline בלי parent?</summary><div class="ans"><p>נקודה בשם אומרת לאנדרואיד שהסגנון יורש מסגנון בשם <code>App</code>. אם הוא לא קיים, הבנייה נכשלת. זו בדיוק השגיאה שהייתה בפרויקט.</p></div></details></div>
+</article>
+</section>
+<section class="ch" id="g-lists"><div class="ch-head"><span class="ch-num">04</span><h2>רשימות, דיאלוגים ותפריטים</h2></div>
+<article class="concept" data-search="listview · arrayadapter רשימה פשוטה listview מציג רשימה, ו-adapter מחבר אותה לנתונים. arrayadapter מתאים לרשימת מחרוזות. כיום משתמשים בעיקר ב-recyclerview." data-project="1">
+<div class="concept-head"><span class="term">ListView · ArrayAdapter</span><h3>רשימה פשוטה</h3><a class="badge" href="./#recycler">בפרויקט שלך · פרק 15 RecyclerView</a></div>
+<p>ListView מציג רשימה, ו-Adapter מחבר אותה לנתונים. <code>ArrayAdapter</code> מתאים לרשימת מחרוזות. כיום משתמשים בעיקר ב-RecyclerView.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">ArrayAdapter&lt;String&gt; adapter = <span class="tk">new</span> ArrayAdapter&lt;&gt;(<span class="tk">this</span>,</span><span class="ln">        android.R.layout.simple_list_item_1, names);</span><span class="ln">listView.setAdapter(adapter);</span><span class="ln">listView.setOnItemClickListener((parent, view, pos, id) -&gt; open(names.get(pos)));</span></code></pre></figure>
+<div class="qa"><details><summary>מה היתרון של RecyclerView על ListView?</summary><div class="ans"><p>RecyclerView מחייב שימוש ב-ViewHolder וממחזר שורות ביעילות. הוא גם גמיש יותר: רשימה, רשת, אופקי, ואנימציות.</p></div></details></div>
+</article>
+<article class="concept" data-search="recyclerview · adapter · viewholder רשימה יעילה recyclerview יוצר רק את השורות שנראות וממחזר אותן בגלילה. ה-adapter יוצר שורות (oncreateviewholder), ממלא אותן (onbindviewholder) ואומר כמה יש (getitemcount). ה-viewholder שומר הפניות לרכיבי השורה." data-project="1">
+<div class="concept-head"><span class="term">RecyclerView · Adapter · ViewHolder</span><h3>רשימה יעילה</h3><a class="badge" href="./#recycler">בפרויקט שלך · פרק 15 RecyclerView</a></div>
+<p>RecyclerView יוצר רק את השורות שנראות וממחזר אותן בגלילה. ה-Adapter יוצר שורות (<code>onCreateViewHolder</code>), ממלא אותן (<code>onBindViewHolder</code>) ואומר כמה יש (<code>getItemCount</code>). ה-ViewHolder שומר הפניות לרכיבי השורה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">recycler.setLayoutManager(<span class="tk">new</span> LinearLayoutManager(<span class="tk">this</span>));</span><span class="ln">recycler.setAdapter(<span class="tk">new</span> ShotAdapter(shots, <span class="tk">this</span>));</span></code></pre></figure>
+<div class="qa"><details><summary>מה עושה notifyDataSetChanged?</summary><div class="ans"><p>אומר ל-RecyclerView שהנתונים השתנו ושצריך לצייר מחדש את השורות.</p></div></details></div>
+</article>
+<article class="concept" data-search="alertdialog חלון דיאלוג חלון קטן מעל המסך, עם כותרת, הודעה וכפתורים (חיובי, שלילי, ניטרלי). אפשר לשים בו view משלך, למשל שדה טקסט." data-project="1">
+<div class="concept-head"><span class="term">AlertDialog</span><h3>חלון דיאלוג</h3><a class="badge" href="./#recycler">בפרויקט שלך · פרק 15 RecyclerView</a></div>
+<p>חלון קטן מעל המסך, עם כותרת, הודעה וכפתורים (חיובי, שלילי, ניטרלי). אפשר לשים בו View משלך, למשל שדה טקסט.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">new</span> MaterialAlertDialogBuilder(<span class="tk">this</span>)</span><span class="ln">        .setTitle(R.string.dialog_delete_title)</span><span class="ln">        .setMessage(R.string.dialog_delete_message)</span><span class="ln">        .setPositiveButton(R.string.btn_delete, (d, w) -&gt; deleteShot())</span><span class="ln">        .setNegativeButton(R.string.btn_cancel, <span class="tk">null</span>)</span><span class="ln">        .show();</span></code></pre></figure>
+<div class="qa"><details><summary>למה מבקשים אישור לפני מחיקה?</summary><div class="ans"><p>כי מחיקה לא הפיכה. דיאלוג אישור מונע מחיקה בטעות.</p></div></details></div>
+</article>
+<article class="concept" data-search="custom dialog דיאלוג מותאם דיאלוג עם layout שעיצבת בעצמך: יוצרים dialog, קוראים ל-setcontentview עם layout, ומחברים רכיבים כמו במסך רגיל." data-project="0">
+<div class="concept-head"><span class="term">Custom Dialog</span><h3>דיאלוג מותאם</h3></div>
+<p>דיאלוג עם layout שעיצבת בעצמך: יוצרים <code>Dialog</code>, קוראים ל-<code>setContentView</code> עם layout, ומחברים רכיבים כמו במסך רגיל.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">Dialog dialog = <span class="tk">new</span> Dialog(<span class="tk">this</span>);</span><span class="ln">dialog.setContentView(R.layout.dialog_note);</span><span class="ln">Button save = dialog.findViewById(R.id.btnSave);</span><span class="ln">save.setOnClickListener(v -&gt; dialog.dismiss());</span><span class="ln">dialog.show();</span></code></pre></figure>
+<div class="qa"><details><summary>למה ב-Custom Dialog קוראים dialog.findViewById ולא findViewById?</summary><div class="ans"><p>כי הרכיבים נמצאים ב-layout של הדיאלוג, לא ב-layout של המסך. findViewById של ה-Activity לא ימצא אותם.</p></div></details></div>
+</article>
+<article class="concept" data-search="options menu תפריט אפשרויות תפריט בסרגל העליון. מגדירים אותו בקובץ res/menu, טוענים ב-oncreateoptionsmenu, ומטפלים בבחירה ב-onoptionsitemselected." data-project="0">
+<div class="concept-head"><span class="term">Options Menu</span><h3>תפריט אפשרויות</h3></div>
+<p>תפריט בסרגל העליון. מגדירים אותו בקובץ <code>res/menu</code>, טוענים ב-<code>onCreateOptionsMenu</code>, ומטפלים בבחירה ב-<code>onOptionsItemSelected</code>.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> <span class="tk">boolean</span> onCreateOptionsMenu(Menu menu) {</span><span class="ln">    getMenuInflater().inflate(R.menu.main_menu, menu);</span><span class="ln">    <span class="tk">return</span> <span class="tk">true</span>;</span><span class="ln">}</span><span class="ln"></span><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> <span class="tk">boolean</span> onOptionsItemSelected(MenuItem item) {</span><span class="ln">    <span class="tk">if</span> (item.getItemId() == R.id.action_logout) {</span><span class="ln">        logout();</span><span class="ln">        <span class="tk">return</span> <span class="tk">true</span>;</span><span class="ln">    }</span><span class="ln">    <span class="tk">return</span> <span class="tk">super</span>.onOptionsItemSelected(item);</span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>מה ההבדל בין Options Menu ל-Context Menu?</summary><div class="ans"><p>Options Menu שייך למסך ומופיע בסרגל העליון. Context Menu נפתח בלחיצה ארוכה על רכיב מסוים (<code>registerForContextMenu</code>, <code>onCreateContextMenu</code>).</p></div></details></div>
+</article>
+</section>
+<section class="ch" id="g-data"><div class="ch-head"><span class="ch-num">05</span><h2>שמירת נתונים</h2></div>
+<article class="concept" data-search="sharedpreferences שמירה של ערכים קטנים קובץ קטן של זוגות מפתח-ערך שנשמר בתיקייה הפרטית של האפליקציה. מתאים להגדרות ולמצב התחברות. apply() שומר ברקע, ו-commit() שומר מיד ומחזיר הצלחה." data-project="1">
+<div class="concept-head"><span class="term">SharedPreferences</span><h3>שמירה של ערכים קטנים</h3><a class="badge" href="./#prefs">בפרויקט שלך · פרק 07 SharedPreferences</a></div>
+<p>קובץ קטן של זוגות מפתח-ערך שנשמר בתיקייה הפרטית של האפליקציה. מתאים להגדרות ולמצב התחברות. <code>apply()</code> שומר ברקע, ו-<code>commit()</code> שומר מיד ומחזיר הצלחה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">SharedPreferences prefs = getSharedPreferences(<span class="ts">"session"</span>, MODE_PRIVATE);</span><span class="ln">prefs.edit().putLong(<span class="ts">"user_id"</span>, id).putBoolean(<span class="ts">"remember_me"</span>, <span class="tk">true</span>).apply();</span><span class="ln"><span class="tk">long</span> userId = prefs.getLong(<span class="ts">"user_id"</span>, -<span class="tn">1</span>);</span></code></pre></figure>
+<div class="qa"><details><summary>מה המשמעות של הערך השני ב-getLong(&quot;user_id&quot;, -1)?</summary><div class="ans"><p>ערך ברירת מחדל: מה מוחזר אם המפתח לא קיים. כאן ‎-1 מסמן "אין משתמש מחובר".</p></div></details></div>
+</article>
+<article class="concept" data-search="sqlite · sqliteopenhelper מסד נתונים מקומי מסד נתונים יחסי שנשמר כקובץ באפליקציה. יורשים מ-sqliteopenhelper: ב-oncreate יוצרים טבלאות, ב-onupgrade משדרגים כשמעלים גרסה." data-project="1">
+<div class="concept-head"><span class="term">SQLite · SQLiteOpenHelper</span><h3>מסד נתונים מקומי</h3><a class="badge" href="./#sqlite">בפרויקט שלך · פרק 08 SQLite</a></div>
+<p>מסד נתונים יחסי שנשמר כקובץ באפליקציה. יורשים מ-<code>SQLiteOpenHelper</code>: ב-<code>onCreate</code> יוצרים טבלאות, ב-<code>onUpgrade</code> משדרגים כשמעלים גרסה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">public</span> <span class="tk">class</span> DatabaseHelper <span class="tk">extends</span> SQLiteOpenHelper {</span><span class="ln">    <span class="tk">public</span> DatabaseHelper(Context context) {</span><span class="ln">        <span class="tk">super</span>(context, <span class="ts">"basketball.db"</span>, <span class="tk">null</span>, <span class="tn">1</span>);</span><span class="ln">    }</span><span class="ln">    <span class="ta">@Override</span></span><span class="ln">    <span class="tk">public</span> <span class="tk">void</span> onCreate(SQLiteDatabase db) {</span><span class="ln">        db.execSQL(<span class="ts">"CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE)"</span>);</span><span class="ln">    }</span><span class="ln">    <span class="ta">@Override</span></span><span class="ln">    <span class="tk">public</span> <span class="tk">void</span> onUpgrade(SQLiteDatabase db, <span class="tk">int</span> oldV, <span class="tk">int</span> newV) { }</span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>מתי נקראת onCreate של SQLiteOpenHelper?</summary><div class="ans"><p>רק פעם אחת: בפעם הראשונה שמבקשים את המסד והקובץ עוד לא קיים. אם משנים טבלה צריך להעלות את מספר הגרסה, ואז נקראת onUpgrade.</p></div></details></div>
+</article>
+<article class="concept" data-search="contentvalues · cursor כתיבה וקריאה מהמסד contentvalues: מפה של עמודה ← ערך, להוספה ולעדכון. cursor: מצביע על שורות התוצאה של שאילתה. עוברים עליו עם movetonext() וסוגרים בסוף." data-project="1">
+<div class="concept-head"><span class="term">ContentValues · Cursor</span><h3>כתיבה וקריאה מהמסד</h3><a class="badge" href="./#sqlite">בפרויקט שלך · פרק 08 SQLite</a></div>
+<p><b>ContentValues</b>: מפה של עמודה ← ערך, להוספה ולעדכון. <b>Cursor</b>: מצביע על שורות התוצאה של שאילתה. עוברים עליו עם <code>moveToNext()</code> וסוגרים בסוף.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">ContentValues v = <span class="tk">new</span> ContentValues();</span><span class="ln">v.put(<span class="ts">"score"</span>, <span class="tn">87</span>);</span><span class="ln">db.insert(<span class="ts">"shots"</span>, <span class="tk">null</span>, v);</span><span class="ln"></span><span class="ln">Cursor c = db.rawQuery(<span class="ts">"SELECT score FROM shots WHERE user_id = ?"</span>, <span class="tk">new</span> String[]{<span class="ts">"1"</span>});</span><span class="ln"><span class="tk">while</span> (c.moveToNext()) {</span><span class="ln">    <span class="tk">int</span> score = c.getInt(<span class="tn">0</span>);</span><span class="ln">}</span><span class="ln">c.close();</span></code></pre></figure>
+<div class="qa"><details><summary>למה כותבים ? ולא מחברים את הערך למחרוזת ה-SQL?</summary><div class="ans"><p>כדי למנוע SQL Injection: הערך מועבר כנתון ולא כחלק מהפקודה.</p></div></details></div>
+</article>
+<article class="concept" data-search="crud ארבע הפעולות על נתונים create (insert), read (query / rawquery), update (update), delete (delete). כל מערכת עם מסד נתונים צריכה את ארבעתן." data-project="1">
+<div class="concept-head"><span class="term">CRUD</span><h3>ארבע הפעולות על נתונים</h3><a class="badge" href="./#sqlite">בפרויקט שלך · פרק 08 SQLite</a></div>
+<p>Create (insert), Read (query / rawQuery), Update (update), Delete (delete). כל מערכת עם מסד נתונים צריכה את ארבעתן.</p>
+<div class="qa"><details><summary>איפה יש Update בפרויקט שלך?</summary><div class="ans"><p><code>updateShotNote</code> (עריכת הערה) ו-<code>updateShotResult</code> (אחרי תיקון ידני של רגע השחרור). גם <code>updateUserPassword</code> בטבלת המשתמשים.</p></div></details></div>
+</article>
+<article class="concept" data-search="internal storage קבצים פרטיים כתיבה וקריאה של קבצים בתיקייה הפרטית של האפליקציה, בלי הרשאות. מתאים לקבצי טקסט או נתונים." data-project="0">
+<div class="concept-head"><span class="term">Internal Storage</span><h3>קבצים פרטיים</h3></div>
+<p>כתיבה וקריאה של קבצים בתיקייה הפרטית של האפליקציה, בלי הרשאות. מתאים לקבצי טקסט או נתונים.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">FileOutputStream out = openFileOutput(<span class="ts">"notes.txt"</span>, MODE_PRIVATE);</span><span class="ln">out.write(<span class="ts">"שלום"</span>.getBytes());</span><span class="ln">out.close();</span></code></pre></figure>
+<div class="qa"><details><summary>מה ההבדל בין Internal Storage לבין SQLite?</summary><div class="ans"><p>קובץ הוא רצף נתונים פשוט. SQLite הוא מסד עם טבלאות, קשרים ושאילתות, ומתאים לנתונים עם מבנה.</p></div></details></div>
+</article>
+<article class="concept" data-search="firebase מסד נתונים בענן שירות של google לאפליקציות: התחברות משתמשים (authentication), מסד נתונים בענן (firestore / realtime database) ואחסון קבצים. הנתונים נשמרים בשרת ומסונכרנים בין מכשירים. נפוץ בפרויקטים, אבל לא בפרויקט הזה." data-project="0">
+<div class="concept-head"><span class="term">Firebase</span><h3>מסד נתונים בענן</h3></div>
+<p>שירות של Google לאפליקציות: התחברות משתמשים (Authentication), מסד נתונים בענן (Firestore / Realtime Database) ואחסון קבצים. הנתונים נשמרים בשרת ומסונכרנים בין מכשירים. נפוץ בפרויקטים, אבל לא בפרויקט הזה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">FirebaseAuth.getInstance()</span><span class="ln">        .signInWithEmailAndPassword(email, password)</span><span class="ln">        .addOnCompleteListener(task -&gt; {</span><span class="ln">            <span class="tk">if</span> (task.isSuccessful()) openMain();</span><span class="ln">        });</span></code></pre></figure>
+<div class="qa"><details><summary>למה בפרויקט שלך SQLite ולא Firebase?</summary><div class="ans"><p>הנתונים של כל משתמש נשארים בטלפון שלו, האפליקציה עובדת בלי אינטרנט, וזה מאפשר להראות שאילתות SQL כמו GROUP BY ו-JOIN.</p></div></details></div>
+</article>
+</section>
+<section class="ch" id="g-background"><div class="ch-head"><span class="ch-num">06</span><h2>עבודה ברקע ורכיבי מערכת</h2></div>
+<article class="concept" data-search="ui thread · anr ה-thread הראשי ה-thread שמצייר את המסך ומגיב לנגיעות. עבודה ארוכה עליו מקפיאה את המסך, ואחרי כ-5 שניות מופיעה הודעת anr (application not responding). רק הוא מותר לעדכן views." data-project="1">
+<div class="concept-head"><span class="term">UI Thread · ANR</span><h3>ה-thread הראשי</h3><a class="badge" href="./#threads">בפרויקט שלך · פרק 10 Thread ו-Handler</a></div>
+<p>ה-thread שמצייר את המסך ומגיב לנגיעות. עבודה ארוכה עליו מקפיאה את המסך, ואחרי כ-5 שניות מופיעה הודעת ANR (Application Not Responding). רק הוא מותר לעדכן Views.</p>
+<div class="qa"><details><summary>מה יקרה אם תעדכן TextView מ-thread אחר?</summary><div class="ans"><p>תיזרק <code>CalledFromWrongThreadException</code>. צריך להחזיר את העדכון ל-thread הראשי.</p></div></details></div>
+</article>
+<article class="concept" data-search="thread · runnable thread חדש thread מריץ קוד במקביל. את הקוד מעבירים כ-runnable (ממשק עם run())." data-project="1">
+<div class="concept-head"><span class="term">Thread · Runnable</span><h3>thread חדש</h3><a class="badge" href="./#threads">בפרויקט שלך · פרק 10 Thread ו-Handler</a></div>
+<p><code>Thread</code> מריץ קוד במקביל. את הקוד מעבירים כ-<code>Runnable</code> (ממשק עם <code>run()</code>).</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">new</span> Thread(() -&gt; {</span><span class="ln">    <span class="tk">int</span> result = heavyCalculation();</span><span class="ln">    runOnUiThread(() -&gt; textView.setText(<span class="ts">""</span> + result));</span><span class="ln">}).start();</span></code></pre></figure>
+<div class="qa"><details><summary>מה ההבדל בין start() ל-run()?</summary><div class="ans"><p><code>start()</code> יוצר thread חדש ומריץ בו את run. קריאה ישירה ל-<code>run()</code> מריצה את הקוד באותו thread, בלי מקביליות.</p></div></details></div>
+</article>
+<article class="concept" data-search="handler · looper · runonuithread חזרה ל-thread הראשי ל-thread הראשי יש תור הודעות ו-looper. handler המחובר ל-looper.getmainlooper() שולח אליו קוד עם post. runonuithread של activity עושה את אותו דבר בקיצור." data-project="1">
+<div class="concept-head"><span class="term">Handler · Looper · runOnUiThread</span><h3>חזרה ל-thread הראשי</h3><a class="badge" href="./#threads">בפרויקט שלך · פרק 10 Thread ו-Handler</a></div>
+<p>ל-thread הראשי יש תור הודעות ו-Looper. <code>Handler</code> המחובר ל-<code>Looper.getMainLooper()</code> שולח אליו קוד עם <code>post</code>. <code>runOnUiThread</code> של Activity עושה את אותו דבר בקיצור.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">Handler mainHandler = <span class="tk">new</span> Handler(Looper.getMainLooper());</span><span class="ln">mainHandler.post(() -&gt; showResult(result));</span><span class="ln"></span><span class="ln"><span class="tc">// הרצה עם השהיה</span></span><span class="ln">mainHandler.postDelayed(() -&gt; hideMessage(), <span class="tn">2000</span>);</span></code></pre></figure>
+<div class="qa"><details><summary>מה עושה postDelayed?</summary><div class="ans"><p>מריץ את הקוד על ה-thread של ה-Handler אחרי זמן מסוים (במילישניות). שימושי לטיימרים ולמסכי פתיחה.</p></div></details></div>
+</article>
+<article class="concept" data-search="executorservice מנהל threads מנהל threads ומריץ עליהם משימות, במקום ליצור thread חדש בכל פעם. newsinglethreadexecutor מריץ משימות אחת אחרי השנייה." data-project="1">
+<div class="concept-head"><span class="term">ExecutorService</span><h3>מנהל threads</h3><a class="badge" href="./#threads">בפרויקט שלך · פרק 10 Thread ו-Handler</a></div>
+<p>מנהל threads ומריץ עליהם משימות, במקום ליצור Thread חדש בכל פעם. <code>newSingleThreadExecutor</code> מריץ משימות אחת אחרי השנייה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">ExecutorService executor = Executors.newSingleThreadExecutor();</span><span class="ln">executor.execute(() -&gt; analyze());</span><span class="ln"><span class="tc">// ב-onDestroy:</span></span><span class="ln">executor.shutdownNow();</span></code></pre></figure>
+<div class="qa"><details><summary>למה ExecutorService עדיף על new Thread בכל לחיצה?</summary><div class="ans"><p>הוא משתמש באותו thread שוב, שומר על סדר בין משימות, ומאפשר לעצור הכול במקום אחד (<code>shutdownNow</code>).</p></div></details></div>
+</article>
+<article class="concept" data-search="asynctask הדרך הישנה לעבודה ברקע מחלקה ישנה עם doinbackground (ברקע) ו-onpostexecute (על ה-thread הראשי). הוצאה משימוש (deprecated) מאנדרואיד 11, וכדאי להכיר אותה כי היא מופיעה בחומרים ישנים." data-project="0">
+<div class="concept-head"><span class="term">AsyncTask</span><h3>הדרך הישנה לעבודה ברקע</h3></div>
+<p>מחלקה ישנה עם <code>doInBackground</code> (ברקע) ו-<code>onPostExecute</code> (על ה-thread הראשי). הוצאה משימוש (deprecated) מאנדרואיד 11, וכדאי להכיר אותה כי היא מופיעה בחומרים ישנים.</p>
+<div class="qa"><details><summary>למה AsyncTask הוצאה משימוש?</summary><div class="ans"><p>היא גרמה לדליפות זיכרון (החזיקה הפניה למסך שכבר נהרס), ולבעיות כשהמסך מסתובב באמצע. היום משתמשים ב-ExecutorService עם Handler.</p></div></details></div>
+</article>
+<article class="concept" data-search="service שירות ברקע רכיב שעובד בלי מסך, גם כשהמשתמש לא באפליקציה, למשל נגן מוזיקה. מתחילים עם startservice, והעבודה ב-onstartcommand. מאנדרואיד 8 עבודה ארוכה ברקע צריכה foreground service עם התראה. יש לרשום אותו ב-manifest." data-project="0">
+<div class="concept-head"><span class="term">Service</span><h3>שירות ברקע</h3></div>
+<p>רכיב שעובד בלי מסך, גם כשהמשתמש לא באפליקציה, למשל נגן מוזיקה. מתחילים עם <code>startService</code>, והעבודה ב-<code>onStartCommand</code>. מאנדרואיד 8 עבודה ארוכה ברקע צריכה Foreground Service עם התראה. יש לרשום אותו ב-Manifest.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">public</span> <span class="tk">class</span> MusicService <span class="tk">extends</span> Service {</span><span class="ln">    <span class="ta">@Override</span></span><span class="ln">    <span class="tk">public</span> <span class="tk">int</span> onStartCommand(Intent intent, <span class="tk">int</span> flags, <span class="tk">int</span> startId) {</span><span class="ln">        player.start();</span><span class="ln">        <span class="tk">return</span> START_STICKY;</span><span class="ln">    }</span><span class="ln">    <span class="ta">@Override</span></span><span class="ln">    <span class="tk">public</span> IBinder onBind(Intent intent) { <span class="tk">return</span> <span class="tk">null</span>; }</span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>מה ההבדל בין Service ל-Thread?</summary><div class="ans"><p>Thread הוא מנגנון להרצה במקביל בתוך התהליך. Service הוא רכיב אנדרואיד שמסמן למערכת שהאפליקציה עובדת גם בלי מסך. Service רץ כברירת מחדל על ה-thread הראשי, ולכן עבודה כבדה בתוכו עדיין צריכה thread.</p></div></details></div>
+</article>
+<article class="concept" data-search="broadcastreceiver קליטת אירועי מערכת רכיב שמקבל הודעות (broadcasts) מהמערכת או מאפליקציות: סוללה חלשה, מצב טיסה, חיבור לחשמל. רושמים אותו בקוד (registerreceiver) או ב-manifest." data-project="0">
+<div class="concept-head"><span class="term">BroadcastReceiver</span><h3>קליטת אירועי מערכת</h3></div>
+<p>רכיב שמקבל הודעות (broadcasts) מהמערכת או מאפליקציות: סוללה חלשה, מצב טיסה, חיבור לחשמל. רושמים אותו בקוד (<code>registerReceiver</code>) או ב-Manifest.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">BroadcastReceiver receiver = <span class="tk">new</span> BroadcastReceiver() {</span><span class="ln">    <span class="ta">@Override</span></span><span class="ln">    <span class="tk">public</span> <span class="tk">void</span> onReceive(Context context, Intent intent) {</span><span class="ln">        <span class="tk">int</span> level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -<span class="tn">1</span>);</span><span class="ln">    }</span><span class="ln">};</span><span class="ln">registerReceiver(receiver, <span class="tk">new</span> IntentFilter(Intent.ACTION_BATTERY_CHANGED));</span></code></pre></figure>
+<div class="qa"><details><summary>למה צריך unregisterReceiver?</summary><div class="ans"><p>Receiver שנרשם בקוד צריך להתבטל (למשל ב-onDestroy או onPause), אחרת הוא ממשיך להחזיק את המסך בזיכרון.</p></div></details></div>
+</article>
+<article class="concept" data-search="notification התראה הודעה בשורת ההתראות. מאנדרואיד 8 צריך notificationchannel, ומאנדרואיד 13 צריך הרשאת post_notifications. pendingintent קובע מה נפתח בלחיצה." data-project="0">
+<div class="concept-head"><span class="term">Notification</span><h3>התראה</h3></div>
+<p>הודעה בשורת ההתראות. מאנדרואיד 8 צריך <b>NotificationChannel</b>, ומאנדרואיד 13 צריך הרשאת <code>POST_NOTIFICATIONS</code>. <b>PendingIntent</b> קובע מה נפתח בלחיצה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">NotificationCompat.Builder b = <span class="tk">new</span> NotificationCompat.Builder(<span class="tk">this</span>, <span class="ts">"shots"</span>)</span><span class="ln">        .setSmallIcon(R.drawable.ic_basketball)</span><span class="ln">        .setContentTitle(<span class="ts">"ניתוח הסתיים"</span>)</span><span class="ln">        .setContentText(<span class="ts">"הציון שלך: 87"</span>)</span><span class="ln">        .setContentIntent(pendingIntent);</span><span class="ln">NotificationManagerCompat.from(<span class="tk">this</span>).notify(<span class="tn">1</span>, b.build());</span></code></pre></figure>
+<div class="qa"><details><summary>מה זה PendingIntent?</summary><div class="ans"><p>Intent ש"נתת רשות" למערכת להפעיל בשמך מאוחר יותר, למשל כשהמשתמש לוחץ על ההתראה.</p></div></details></div>
+</article>
+<article class="concept" data-search="alarmmanager תזמון פעולה מפעיל pendingintent בזמן מסוים, גם כשהאפליקציה סגורה. מתאים לתזכורות." data-project="0">
+<div class="concept-head"><span class="term">AlarmManager</span><h3>תזמון פעולה</h3></div>
+<p>מפעיל PendingIntent בזמן מסוים, גם כשהאפליקציה סגורה. מתאים לתזכורות.</p>
+<div class="qa"><details><summary>מה ההבדל בין AlarmManager ל-Handler.postDelayed?</summary><div class="ans"><p>postDelayed עובד רק כל עוד האפליקציה רצה. AlarmManager מנוהל על ידי המערכת ויפעל גם אם האפליקציה נסגרה.</p></div></details></div>
+</article>
+<article class="concept" data-search="permissions הרשאות הרשאות רגילות (כמו internet) מאושרות אוטומטית מה-manifest. הרשאות מסוכנות (מצלמה, מיקום, קבצים, אנשי קשר) צריכות גם אישור של המשתמש בזמן ריצה, מאנדרואיד 6." data-project="1">
+<div class="concept-head"><span class="term">Permissions</span><h3>הרשאות</h3><a class="badge" href="./#media">בפרויקט שלך · פרק 09 הרשאות ומדיה</a></div>
+<p>הרשאות <b>רגילות</b> (כמו INTERNET) מאושרות אוטומטית מה-Manifest. הרשאות <b>מסוכנות</b> (מצלמה, מיקום, קבצים, אנשי קשר) צריכות גם אישור של המשתמש בזמן ריצה, מאנדרואיד 6.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">if</span> (ContextCompat.checkSelfPermission(<span class="tk">this</span>, permission) == PackageManager.PERMISSION_GRANTED) {</span><span class="ln">    openGallery();</span><span class="ln">} <span class="tk">else</span> {</span><span class="ln">    permissionLauncher.launch(permission);</span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>מה קורה אם המשתמש מסרב להרשאה?</summary><div class="ans"><p>ה-callback מקבל false. צריך להציג הודעה ידידותית שמסבירה למה ההרשאה נדרשת, ולא לקרוס.</p></div></details></div>
+</article>
+</section>
+<section class="ch" id="g-hw"><div class="ch-head"><span class="ch-num">07</span><h2>מולטימדיה, חיישנים וגרפיקה</h2></div>
+<article class="concept" data-search="camera · gallery מצלמה וגלריה הדרך הפשוטה: intent מרומז לאפליקציית המצלמה (action_image_capture / action_video_capture) ובחירה מהגלריה (getcontent עם &quot;image/*&quot; או &quot;video/*&quot;). התוצאה היא uri או bitmap." data-project="1">
+<div class="concept-head"><span class="term">Camera · Gallery</span><h3>מצלמה וגלריה</h3><a class="badge" href="./#media">בפרויקט שלך · פרק 09 הרשאות ומדיה</a></div>
+<p>הדרך הפשוטה: Intent מרומז לאפליקציית המצלמה (<code>ACTION_IMAGE_CAPTURE</code> / <code>ACTION_VIDEO_CAPTURE</code>) ובחירה מהגלריה (<code>GetContent</code> עם <code>"image/*"</code> או <code>"video/*"</code>). התוצאה היא <code>Uri</code> או <code>Bitmap</code>.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">galleryLauncher.launch(<span class="ts">"video/*"</span>);</span><span class="ln">cameraLauncher.launch(<span class="tk">new</span> Intent(MediaStore.ACTION_VIDEO_CAPTURE));</span></code></pre></figure>
+<div class="qa"><details><summary>מה זה Uri?</summary><div class="ans"><p>כתובת שמזהה משאב, למשל סרטון בגלריה. לא הקובץ עצמו אלא דרך לגשת אליו.</p></div></details></div>
+</article>
+<article class="concept" data-search="mediaplayer ניגון שמע ווידאו מנגן קבצי שמע ווידאו. חשוב לשחרר אותו בסוף עם release()." data-project="0">
+<div class="concept-head"><span class="term">MediaPlayer</span><h3>ניגון שמע ווידאו</h3></div>
+<p>מנגן קבצי שמע ווידאו. חשוב לשחרר אותו בסוף עם <code>release()</code>.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">MediaPlayer player = MediaPlayer.create(<span class="tk">this</span>, R.raw.whistle);</span><span class="ln">player.start();</span><span class="ln"><span class="tc">// בסוף:</span></span><span class="ln">player.release();</span></code></pre></figure>
+<div class="qa"><details><summary>למה צריך release()?</summary><div class="ans"><p>MediaPlayer מחזיק משאבי חומרה. בלי שחרור הם נשארים תפוסים ועלולים לגרום לבעיות באפליקציות אחרות.</p></div></details></div>
+</article>
+<article class="concept" data-search="mediametadataretriever חילוץ פריימים ומידע מסרטון קורא מידע על סרטון (אורך, רזולוציה) ומחלץ תמונה מזמן מסוים כ-bitmap." data-project="1">
+<div class="concept-head"><span class="term">MediaMetadataRetriever</span><h3>חילוץ פריימים ומידע מסרטון</h3><a class="badge" href="./#media">בפרויקט שלך · פרק 09 הרשאות ומדיה</a></div>
+<p>קורא מידע על סרטון (אורך, רזולוציה) ומחלץ תמונה מזמן מסוים כ-Bitmap.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">retriever.setDataSource(context, uri);</span><span class="ln">Bitmap frame = retriever.getFrameAtTime(timeMs * <span class="tn">1000</span>, MediaMetadataRetriever.OPTION_CLOSEST);</span><span class="ln">retriever.release();</span></code></pre></figure>
+<div class="qa"><details><summary>למה מכפילים ב-1000?</summary><div class="ans"><p><code>getFrameAtTime</code> מקבל זמן במיקרו-שניות, והזמן אצלנו במילישניות.</p></div></details></div>
+</article>
+<article class="concept" data-search="sensors · sensormanager חיישנים גישה לחיישני הטלפון: תאוצה (accelerometer), ג&#x27;ירוסקופ, אור, קרבה. נרשמים ל-sensoreventlistener ומקבלים ערכים ב-onsensorchanged. מבטלים רישום ב-onpause כדי לחסוך סוללה." data-project="0">
+<div class="concept-head"><span class="term">Sensors · SensorManager</span><h3>חיישנים</h3></div>
+<p>גישה לחיישני הטלפון: תאוצה (Accelerometer), ג'ירוסקופ, אור, קרבה. נרשמים ל-<code>SensorEventListener</code> ומקבלים ערכים ב-<code>onSensorChanged</code>. מבטלים רישום ב-<code>onPause</code> כדי לחסוך סוללה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);</span><span class="ln">Sensor acc = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);</span><span class="ln">sm.registerListener(<span class="tk">this</span>, acc, SensorManager.SENSOR_DELAY_NORMAL);</span><span class="ln"></span><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> <span class="tk">void</span> onSensorChanged(SensorEvent e) {</span><span class="ln">    <span class="tk">float</span> x = e.values[<span class="tn">0</span>], y = e.values[<span class="tn">1</span>], z = e.values[<span class="tn">2</span>];</span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>למה מבטלים את הרישום לחיישן ב-onPause?</summary><div class="ans"><p>כדי שהחיישן לא ימשיך לעבוד ולבזבז סוללה כשהמסך לא בחזית.</p></div></details></div>
+</article>
+<article class="concept" data-search="custom view · canvas · paint ציור מותאם יורשים מ-view ודורסים את ondraw(canvas). canvas קובע מה מציירים (קווים, עיגולים, טקסט, תמונות). paint קובע איך (צבע, עובי). invalidate() מבקש ציור מחדש." data-project="1">
+<div class="concept-head"><span class="term">Custom View · Canvas · Paint</span><h3>ציור מותאם</h3><a class="badge" href="./#customview">בפרויקט שלך · פרק 14 View מותאם</a></div>
+<p>יורשים מ-<code>View</code> ודורסים את <code>onDraw(Canvas)</code>. <b>Canvas</b> קובע מה מציירים (קווים, עיגולים, טקסט, תמונות). <b>Paint</b> קובע איך (צבע, עובי). <code>invalidate()</code> מבקש ציור מחדש.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">protected</span> <span class="tk">void</span> onDraw(Canvas canvas) {</span><span class="ln">    <span class="tk">super</span>.onDraw(canvas);</span><span class="ln">    canvas.drawLine(x1, y1, x2, y2, bonePaint);</span><span class="ln">    canvas.drawCircle(x, y, <span class="tn">5f</span>, pointPaint);</span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>למה לא יוצרים Paint בתוך onDraw?</summary><div class="ans"><p>onDraw נקראת הרבה פעמים. יצירת אובייקטים בה מעמיסה על הזיכרון וגורמת לגמגום. יוצרים אותם פעם אחת בבנאי.</p></div></details></div>
+</article>
+<article class="concept" data-search="ontouchevent · gestures נגיעות ומחוות ontouchevent(motionevent) מקבל כל נגיעה: action_down, action_move, action_up. למחוות מורכבות יש gesturedetector (גרירה, הקשה כפולה) ו-scalegesturedetector (צביטה)." data-project="1">
+<div class="concept-head"><span class="term">onTouchEvent · Gestures</span><h3>נגיעות ומחוות</h3><a class="badge" href="./#customview">בפרויקט שלך · פרק 14 View מותאם</a></div>
+<p><code>onTouchEvent(MotionEvent)</code> מקבל כל נגיעה: ACTION_DOWN, ACTION_MOVE, ACTION_UP. למחוות מורכבות יש <code>GestureDetector</code> (גרירה, הקשה כפולה) ו-<code>ScaleGestureDetector</code> (צביטה).</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> <span class="tk">boolean</span> onTouchEvent(MotionEvent event) {</span><span class="ln">    scaleDetector.onTouchEvent(event);</span><span class="ln">    gestureDetector.onTouchEvent(event);</span><span class="ln">    <span class="tk">return</span> <span class="tk">true</span>;</span><span class="ln">}</span></code></pre></figure>
+<div class="qa"><details><summary>מה המשמעות של return true ב-onTouchEvent?</summary><div class="ans"><p>שהרכיב "לקח" את הנגיעה, ולכן ימשיך לקבל את שאר האירועים שלה (MOVE, UP).</p></div></details></div>
+</article>
+<article class="concept" data-search="animation אנימציה הנפשה של רכיבים: שקיפות, הזזה, סיבוב, הגדלה. הדרך הנפוצה היום: view.animate() או objectanimator." data-project="0">
+<div class="concept-head"><span class="term">Animation</span><h3>אנימציה</h3></div>
+<p>הנפשה של רכיבים: שקיפות, הזזה, סיבוב, הגדלה. הדרך הנפוצה היום: <code>view.animate()</code> או <code>ObjectAnimator</code>.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">imageView.animate().alpha(<span class="tn">0f</span>).translationY(<span class="tn">100f</span>).setDuration(<span class="tn">500</span>).start();</span></code></pre></figure>
+<div class="qa"><details><summary>מה ההבדל בין View Animation ל-Property Animation?</summary><div class="ans"><p>View Animation (הישנה) רק מציירת את הרכיב במקום אחר, והוא לא באמת זז. Property Animation (<code>animate</code>, <code>ObjectAnimator</code>) משנה את המאפיינים עצמם.</p></div></details></div>
+</article>
+<article class="concept" data-search="webview דף אינטרנט בתוך האפליקציה רכיב שמציג דף אינטרנט בתוך המסך. צריך הרשאת internet ב-manifest." data-project="0">
+<div class="concept-head"><span class="term">WebView</span><h3>דף אינטרנט בתוך האפליקציה</h3></div>
+<p>רכיב שמציג דף אינטרנט בתוך המסך. צריך הרשאת INTERNET ב-Manifest.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">WebView web = findViewById(R.id.web);</span><span class="ln">web.getSettings().setJavaScriptEnabled(<span class="tk">true</span>);</span><span class="ln">web.loadUrl(<span class="ts">"https://example.com"</span>);</span></code></pre></figure>
+<div class="qa"><details><summary>איזו הרשאה נדרשת ל-WebView?</summary><div class="ans"><p><code>android.permission.INTERNET</code> ב-Manifest. זו הרשאה רגילה, ולכן לא צריך לבקש אותה בזמן ריצה.</p></div></details></div>
+</article>
+<article class="concept" data-search="ml kit למידת מכונה על המכשיר ספריות של google שמריצות מודלים על הטלפון, בלי אינטרנט: זיהוי תנוחת גוף, פנים, טקסט, ברקודים, תיוג תמונות. מקבלות inputimage ומחזירות task עם התוצאה." data-project="1">
+<div class="concept-head"><span class="term">ML Kit</span><h3>למידת מכונה על המכשיר</h3><a class="badge" href="./#mlkit">בפרויקט שלך · פרק 11 ML Kit</a></div>
+<p>ספריות של Google שמריצות מודלים על הטלפון, בלי אינטרנט: זיהוי תנוחת גוף, פנים, טקסט, ברקודים, תיוג תמונות. מקבלות <code>InputImage</code> ומחזירות <code>Task</code> עם התוצאה.</p>
+<figure class="code"><figcaption dir="ltr">Java</figcaption><pre dir="ltr"><code><span class="ln">PoseDetector detector = PoseDetection.getClient(options);</span><span class="ln">Task&lt;Pose&gt; task = detector.process(InputImage.fromBitmap(frame, <span class="tn">0</span>));</span><span class="ln">task.addOnSuccessListener(pose -&gt; showPose(pose));</span></code></pre></figure>
+<div class="qa"><details><summary>מה ההבדל בין addOnSuccessListener ל-Tasks.await?</summary><div class="ans"><p>addOnSuccessListener לא חוסם: התוצאה מגיעה ל-callback על ה-thread הראשי. Tasks.await חוסם עד שהתוצאה מגיעה, ולכן מותר רק ב-thread ברקע, כמו בפרויקט.</p></div></details></div>
+</article>
+</section>
+  <p class="empty-note" id="empty" hidden>לא נמצא מושג שמתאים לחיפוש.</p>
+  <footer>חלק מאתר הלימוד של Basketball Shot Analyzer. דוגמאות הקוד שמסומנות "בפרויקט שלך" מבוססות על הקוד בריפו.</footer>
+</main>
+</div>
+<script>
+(function () {
+  "use strict";
+  var q = document.getElementById("q"), only = document.getElementById("onlyProject");
+  var arts = Array.prototype.slice.call(document.querySelectorAll("article.concept"));
+  var total = arts.length;
+  function apply() {
+    var term = q.value.trim().toLowerCase(), shown = 0;
+    arts.forEach(function (a) {
+      var ok = (!term || a.getAttribute("data-search").indexOf(term) !== -1) && (!only.checked || a.getAttribute("data-project") === "1");
+      a.hidden = !ok; if (ok) shown++;
+    });
+    document.querySelectorAll("section.ch").forEach(function (s) {
+      s.hidden = !s.querySelector("article.concept:not([hidden])");
+    });
+    document.getElementById("count").textContent = shown === total ? total + " מושגים" : shown + " מתוך " + total + " מושגים";
+    document.getElementById("empty").hidden = shown !== 0;
+  }
+  q.addEventListener("input", apply);
+  only.addEventListener("change", apply);
+  apply();
+  var links = {};
+  document.querySelectorAll("#toc a").forEach(function (a) { links[a.getAttribute("href").slice(1)] = a; });
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          Object.keys(links).forEach(function (k) { links[k].classList.remove("active"); });
+          if (links[en.target.id]) links[en.target.id].classList.add("active");
+        }
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+    document.querySelectorAll("section.ch").forEach(function (s) { io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
