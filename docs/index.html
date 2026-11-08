@@ -1,100 +1,1202 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מדריך הבגרות · Basketball Shot Analyzer</title>
-<link rel="stylesheet" href="style.css?v=1">
-<link rel="stylesheet" href="guide.css?v=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html,body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>מדריך Basketball Shot Analyzer</title>
+<meta name="description" content="מדריך לימוד מלא לפרויקט הגמר: האפליקציה, כל הקוד, המושגים וההכנה לבחינה">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: sticky chapter index on the start side + one reading column; mirrors the app's ivory/ink/oxblood identity */
+:root {
+  --paper: #F7F4EE;
+  --panel: #FBF9F4;
+  --ink: #1C1B19;
+  --muted: #6B645B;
+  --rule: #DCD5C8;
+  --accent: #6B1E23;
+  --brass: #8E6E3F;
+  --code-bg: #EFEAE1;
+  --code-ink: #2A2724;
+  --tk: #6B1E23;
+  --ts: #2F5A3E;
+  --tc: #8C8478;
+  --tn: #8E6E3F;
+  --good: #2F6B45;
+  --medium: #946A1E;
+  --bad: #8E2C2C;
+  --display: "Frank Ruhl Libre", "David Libre", "Times New Roman", serif;
+  --body: "Assistant", "Heebo", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15130F; --panel: #1B1814; --ink: #ECE6DA; --muted: #A69E91; --rule: #36312A;
+    --accent: #D3868B; --brass: #CDB07F; --code-bg: #1F1C17; --code-ink: #E4DED2;
+    --tk: #E19AA0; --ts: #9CC7A6; --tc: #857D71; --tn: #D9BE8C;
+    --good: #8CC79E; --medium: #E0B866; --bad: #E8898C;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15130F; --panel: #1B1814; --ink: #ECE6DA; --muted: #A69E91; --rule: #36312A;
+  --accent: #D3868B; --brass: #CDB07F; --code-bg: #1F1C17; --code-ink: #E4DED2;
+  --tk: #E19AA0; --ts: #9CC7A6; --tc: #857D71; --tn: #D9BE8C;
+  --good: #8CC79E; --medium: #E0B866; --bad: #E8898C;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 64px); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--body); font-size: 17px; line-height: 1.7;
+  padding-inline: 20px; padding-block: 0 64px;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+code, kbd { font-family: var(--mono); font-size: .86em; }
+:not(pre) > code { background: var(--code-bg); padding: 1px 6px; border-radius: 3px; direction: ltr; unicode-bidi: isolate; }
+
+.shell { max-width: 1180px; margin-inline: auto; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 56px; }
+
+/* chapter index */
+.toc { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 40px 24px; }
+.toc .wordmark { font: 600 11px/1.4 var(--body); letter-spacing: .28em; text-transform: uppercase; direction: ltr; text-align: right; color: var(--ink); }
+.toc .rule { width: 36px; height: 1px; background: var(--ink); margin: 12px 0 20px; }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: ch; }
+.toc li a { display: grid; grid-template-columns: 26px 1fr; gap: 6px; padding: 5px 0; color: var(--muted); text-decoration: none; font-size: 14.5px; line-height: 1.4; }
+.toc li a .n { font: 500 12px/1.9 var(--mono); color: var(--rule); }
+.toc li a:hover { color: var(--ink); }
+.toc li a.active { color: var(--accent); }
+.toc li a.active .n { color: var(--accent); }
+.toc .group { margin: 18px 0 6px; font-size: 11.5px; font-weight: 700; color: var(--brass); letter-spacing: .06em; }
+
+main { min-width: 0; max-width: 760px; padding-block: 40px 0; }
+
+.sitenav { display: flex; flex-wrap: wrap; gap: 6px 22px; padding-block: 18px 0; font-size: 14.5px; }
+.sitenav a { color: var(--muted); text-decoration: none; padding-bottom: 4px; border-bottom: 1px solid transparent; }
+.sitenav a:hover { color: var(--ink); }
+.sitenav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+/* hero */
+.hero { padding-block: 24px 40px; border-bottom: 1px solid var(--rule); }
+.eyebrow { font: 600 12.5px/1.4 var(--body); color: var(--brass); letter-spacing: .05em; }
+h1 { font: 500 clamp(36px, 6vw, 58px)/1.08 var(--display); margin: 14px 0 18px; text-wrap: balance; }
+h1 .en { display: block; font-size: .55em; font-weight: 400; color: var(--muted); direction: ltr; text-align: right; margin-top: 8px; }
+.hero p { font-size: 19px; color: var(--muted); max-width: 60ch; margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 32px; border-top: 1px solid var(--rule); }
+.facts div { padding: 16px 0 0; border-inline-start: 1px solid var(--rule); padding-inline-start: 16px; }
+.facts div:first-child { border-inline-start: 0; padding-inline-start: 0; }
+.facts b { display: block; font: 500 34px/1 var(--display); font-variant-numeric: tabular-nums; }
+.facts span { font-size: 13.5px; color: var(--muted); }
+
+/* chapters */
+section.ch { padding-block: 56px 8px; border-bottom: 1px solid var(--rule); }
+.ch-head { display: flex; align-items: baseline; gap: 14px; }
+.ch-num { font: 500 14px var(--mono); color: var(--accent); }
+h2 { font: 500 clamp(28px, 4vw, 38px)/1.15 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 600 21px/1.3 var(--display); margin: 40px 0 10px; }
+h4 { font: 700 13px/1.4 var(--body); color: var(--brass); letter-spacing: .05em; margin: 28px 0 8px; }
+.lead { font-size: 19px; color: var(--muted); margin: 14px 0 8px; max-width: 62ch; }
+p { margin: 12px 0; max-width: 68ch; }
+ul.plain { padding-inline-start: 20px; margin: 10px 0; }
+ul.plain li { margin: 6px 0; }
+
+/* code */
+figure.code { margin: 18px 0; border: 1px solid var(--rule); background: var(--code-bg); min-width: 0; }
+figure.code figcaption { font: 500 12px/1 var(--mono); color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--rule); text-align: left; }
+figure.code pre { margin: 0; padding: 14px; overflow-x: auto; font: 13.2px/1.6 var(--mono); color: var(--code-ink); tab-size: 4; }
+figure.code .ln { display: block; min-height: 1.6em; }
+.tk { color: var(--tk); font-weight: 600; } .ts { color: var(--ts); } .tc { color: var(--tc); } .tn { color: var(--tn); } .ta { color: var(--brass); }
+
+/* "say it to the examiner" */
+.say { margin: 22px 0; padding: 16px 20px; background: var(--panel); border-inline-start: 2px solid var(--accent); }
+.say .lbl { font-size: 12.5px; font-weight: 700; color: var(--accent); letter-spacing: .04em; }
+.say p { margin: 6px 0 0; font-family: var(--display); font-size: 18.5px; line-height: 1.6; }
+
+/* where in code */
+.where { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.where code { font-size: 12.5px; }
+
+/* tables */
+.tbl { overflow-x: auto; margin: 18px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+th, td { text-align: right; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 12.5px; color: var(--muted); font-weight: 700; letter-spacing: .04em; }
+td code { white-space: nowrap; }
+
+/* layer diagram */
+.layers { display: grid; gap: 10px; margin: 22px 0; }
+.layer { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid var(--rule); align-items: baseline; }
+.layer:first-child { border-top: 0; }
+.layer .nm { font: 600 15px var(--mono); color: var(--accent); direction: ltr; text-align: right; }
+.layer .cls { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--mono); font-size: 13.5px; direction: ltr; justify-content: flex-end; }
+.layer .why { grid-column: 2; font-size: 15px; color: var(--muted); }
+
+/* ordered pipeline */
+ol.steps { list-style: none; padding: 0; margin: 20px 0; counter-reset: s; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--rule); }
+ol.steps > li::before { content: counter(s); font: 500 22px/1.2 var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
+ol.steps .th { font-size: 13px; color: var(--brass); font-weight: 700; }
+ol.steps b { font-weight: 700; }
+
+/* Q&A */
+.qa { margin: 18px 0 8px; }
+.qa details { border-top: 1px solid var(--rule); }
+.qa details:last-child { border-bottom: 1px solid var(--rule); }
+.qa summary { cursor: pointer; padding: 13px 0; font-weight: 600; list-style: none; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary::before { content: "+"; font: 400 20px/1.2 var(--mono); color: var(--accent); }
+.qa details[open] summary::before { content: "−"; }
+.qa .ans { padding: 0 30px 16px 0; color: var(--ink); }
+.qa .ans p { margin: 6px 0; }
+
+/* labs */
+.lab { margin: 26px 0; padding: 20px; background: var(--panel); border: 1px solid var(--rule); }
+.lab-title { font: 600 18px var(--display); margin: 0 0 4px; }
+.lab-sub { font-size: 14.5px; color: var(--muted); margin: 0 0 14px; }
+.lab-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.lab svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1px solid var(--rule); touch-action: none; }
+.readout { font: 13px/1.75 var(--mono); direction: ltr; text-align: left; min-width: 0; overflow-x: auto; }
+.readout .big { font: 500 30px/1.2 var(--display); color: var(--accent); }
+.readout .k { color: var(--muted); }
+.ctl { display: grid; gap: 4px; margin-bottom: 14px; }
+.ctl label { font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+.ctl label output { font: 500 14px var(--mono); color: var(--accent); }
+.ctl input[type=range] { width: 100%; accent-color: var(--accent); }
+.chk { font-size: 14px; display: flex; gap: 8px; align-items: center; }
+.scorebox { display: grid; gap: 4px; }
+.score-total { font: 500 64px/1 var(--display); font-variant-numeric: tabular-nums; }
+.bar { height: 3px; background: var(--rule); margin: 6px 0 12px; }
+.bar i { display: block; height: 100%; background: currentColor; transition: width .2s; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+.parts { font: 13px/1.8 var(--mono); direction: ltr; text-align: left; }
+.fb { margin-top: 10px; font-family: var(--display); font-size: 16.5px; white-space: pre-line; }
+
+/* quiz */
+.quiz { margin: 22px 0; padding: 24px; border: 1px solid var(--ink); background: var(--panel); }
+.quiz-top { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; font-size: 14px; color: var(--muted); }
+.quiz select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 6px 10px; }
+.quiz .tag { font-size: 12.5px; color: var(--brass); font-weight: 700; margin-top: 18px; }
+.quiz .q { font: 500 24px/1.4 var(--display); margin: 6px 0 16px; min-height: 2.8em; text-wrap: balance; }
+.quiz .a { border-top: 1px solid var(--rule); padding-top: 14px; }
+.quiz .a p { margin: 6px 0; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+button.b { font: 600 14.5px var(--body); padding: 10px 18px; border: 1px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; border-radius: 2px; }
+button.b.primary { background: var(--ink); color: var(--paper); }
+button.b:hover { border-color: var(--accent); }
+.known { font-size: 14px; display: flex; gap: 8px; align-items: center; }
+
+/* glossary */
+dl.gloss { display: grid; grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); gap: 0 20px; margin: 18px 0; }
+dl.gloss dt { font: 600 14px/1.5 var(--mono); direction: ltr; text-align: right; padding: 10px 0; border-top: 1px solid var(--rule); }
+dl.gloss dd { margin: 0; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 15.5px; }
+
+.check { list-style: none; padding: 0; margin: 14px 0; }
+.check li { position: relative; padding: 8px 28px 8px 0; border-top: 1px solid var(--rule); }
+.check li::before { content: "□"; position: absolute; inset-inline-start: 0; top: 8px; color: var(--accent); font-size: 18px; line-height: 1.4; }
+.note { font-size: 14px; color: var(--muted); }
+footer { padding-block: 40px; font-size: 13.5px; color: var(--muted); }
+
+@media (max-width: 920px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; max-height: none; overflow: visible; padding-block: 10px; background: var(--paper); border-bottom: 1px solid var(--rule); margin-inline: -20px; padding-inline: 20px; }
+  .toc .wordmark, .toc .rule, .toc .group { display: none; }
+  .toc ol { display: flex; overflow-x: auto; gap: 18px; scrollbar-width: none; }
+  .toc li a { display: block; white-space: nowrap; padding: 4px 0; }
+  .toc li a .n { display: none; }
+  main { padding-block: 16px 0; }
+  .lab-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .toc { margin-inline: -16px; padding-inline: 16px; }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .facts div:nth-child(3) { border-inline-start: 0; padding-inline-start: 0; }
+  .layer { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .layer .why { grid-column: 1; }
+  .layer .nm, .layer .cls { text-align: right; justify-content: flex-start; }
+  dl.gloss { grid-template-columns: minmax(0, 1fr); }
+  dl.gloss dd { border-top: 0; padding-top: 0; }
+  .score-total { font-size: 52px; }
+}
+</style>
+
 </head>
 <body>
-<div class="topnav" id="topnav-mount"></div>
+<div class="shell" dir="rtl" lang="he">
+<nav class="toc" aria-label="פרקים">
+  <div class="wordmark">Basketball Shot Analyzer</div>
+  <div class="rule"></div>
+  <ol id="toc">
+    <li class="group">הפרויקט</li>
+    <li><a href="#overview"><span class="n">01</span>מה האפליקציה עושה</a></li>
+    <li><a href="#architecture"><span class="n">02</span>ארכיטקטורה ומחלקות</a></li>
+    <li><a href="#pipeline"><span class="n">03</span>המסלול של זריקה אחת</a></li>
+    <li class="group">הקוד, נושא אחר נושא</li>
+    <li><a href="#oop"><span class="n">04</span>תכנות מונחה עצמים</a></li>
+    <li><a href="#activities"><span class="n">05</span>Activities ו-Intent</a></li>
+    <li><a href="#security"><span class="n">06</span>הרשמה, התחברות והצפנה</a></li>
+    <li><a href="#prefs"><span class="n">07</span>SharedPreferences</a></li>
+    <li><a href="#sqlite"><span class="n">08</span>SQLite</a></li>
+    <li><a href="#media"><span class="n">09</span>הרשאות, גלריה ומצלמה</a></li>
+    <li><a href="#threads"><span class="n">10</span>Thread ו-Handler</a></li>
+    <li><a href="#mlkit"><span class="n">11</span>ML Kit</a></li>
+    <li><a href="#math"><span class="n">12</span>המתמטיקה: atan2 וציון</a></li>
+    <li><a href="#release"><span class="n">13</span>מציאת רגע השחרור</a></li>
+    <li><a href="#customview"><span class="n">14</span>View מותאם אישית</a></li>
+    <li><a href="#recycler"><span class="n">15</span>RecyclerView</a></li>
+    <li><a href="#ui"><span class="n">16</span>עיצוב ומשאבים</a></li>
+    <li class="group">הבחינה</li>
+    <li><a href="#demo"><span class="n">17</span>הדגמה חיה</a></li>
+    <li><a href="#limits"><span class="n">18</span>מגבלות ותשובות כנות</a></li>
+    <li><a href="#quiz"><span class="n">19</span>תרגול שאלות</a></li>
+    <li><a href="#glossary"><span class="n">20</span>מילון מונחים</a></li>
+  </ol>
+</nav>
 
-<div class="wrap">
-  <header class="hero">
-    <h1>🏀 מדריך הבגרות</h1>
-    <div class="sub">Basketball Shot Analyzer · פרויקט גמר 5 יח"ל · 11 שלבים · כל הקוד, כל המושגים, וההכנה לבחינה</div>
-  </header>
+<main>
+<nav class="sitenav" aria-label="עמודי האתר">
+  <a href="./" aria-current="page">מדריך הפרויקט</a>
+  <a href="android-concepts.html">מושגי Android Studio</a>
+</nav>
+<header class="hero">
+  <div class="eyebrow">פרויקט גמר · מדעי המחשב 5 יח"ל · Android / Java</div>
+  <h1>להבין כל שורה בפרויקט<span class="en">Basketball Shot Analyzer</span></h1>
+  <p>המדריך עובר על האפליקציה מהמסך הראשון ועד הנוסחה האחרונה. כל קטע קוד כאן נלקח ישירות מהקבצים בריפו. בסוף כל פרק יש שאלות שבוחן עשוי לשאול, ובסוף המדריך תרגול של כל השאלות יחד.</p>
+  <div class="facts">
+    <div><b>16</b><span>מחלקות Java</span></div>
+    <div><b>4</b><span>מסכים</span></div>
+    <div><b>2</b><span>טבלאות SQLite</span></div>
+    <div><b id="qcount">0</b><span>שאלות לתרגול</span></div>
+  </div>
+</header>
 
-  <div class="progress-shell">
-    <div class="progress-top">
-      <span id="progress-label">0 מתוך 0 הושלמו</span>
-      <span id="progress-pct">0%</span>
-    </div>
-    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+<!-- 01 -->
+<section class="ch" id="overview">
+  <div class="ch-head"><span class="ch-num">01</span><h2>מה האפליקציה עושה</h2></div>
+  <p class="lead">המשתמש מצלם או בוחר סרטון של זריקת קפיצה. האפליקציה מוצאת בסרטון את רגע שחרור הכדור, מודדת שלוש זוויות של הגוף, נותנת ציון מ-0 עד 100 ומשוב בעברית, ושומרת את התוצאה בהיסטוריה של המשתמש.</p>
+
+  <h3>ארבעת המסכים</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>מסך</th><th>מחלקה</th><th>מה רואים ועושים</th></tr></thead>
+    <tbody>
+      <tr><td>התחברות</td><td><code>AuthActivity</code></td><td>מסך הפתיחה. שם משתמש, סיסמה, "הישאר מחובר", וקישור להרשמה.</td></tr>
+      <tr><td>הרשמה</td><td><code>RegisterActivity</code></td><td>שם משתמש, סיסמה ואימות סיסמה. אחרי הרשמה עוברים ישר למסך הראשי.</td></tr>
+      <tr><td>ראשי</td><td><code>MainActivity</code></td><td>בחירת סרטון מהגלריה או צילום, פס התקדמות, ותוצאה: תמונה עם שלד, ציון, זוויות ומשוב. כפתורי "פריים אחורה/קדימה" לתיקון רגע השחרור.</td></tr>
+      <tr><td>היסטוריה</td><td><code>HistoryActivity</code></td><td>סה"כ, ממוצע ושיא, ממוצע לפי חודש, ורשימת כל הזריקות עם עריכת הערה ומחיקה.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>מה נמדד בכל זריקה</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>מדד</th><th>איך מחושב</th><th>משקל בציון</th></tr></thead>
+    <tbody>
+      <tr><td>זווית שחרור</td><td>זווית האמה (מרפק ← שורש כף היד) מול הקו האופקי, ברגע השחרור. משווים ל-48.5°.</td><td>60%</td></tr>
+      <tr><td>יציבות הגוף</td><td>נטיית הגו (ירך ← כתף) מהקו האנכי. עד 10° בלי קנס.</td><td>20%</td></tr>
+      <tr><td>המשך תנועה (follow-through)</td><td>זווית המרפק בסוף התנועה. צריכה להיות לפחות 160°, כלומר יד כמעט ישרה.</td><td>20%</td></tr>
+    </tbody>
+  </table></div>
+  <p>זווית המרפק ברגע השחרור מוצגת על המסך ונשמרת במסד, אבל לא נכנסת לציון.</p>
+
+  <div class="qa" data-topic="app"></div>
+</section>
+
+<!-- 02 -->
+<section class="ch" id="architecture">
+  <div class="ch-head"><span class="ch-num">02</span><h2>ארכיטקטורה ומחלקות</h2></div>
+  <p class="lead">הקוד מחולק לשכבות לפי אחריות. כל שכבה יודעת רק מה שהיא צריכה, וכך קל להסביר, לבדוק ולשנות כל חלק בנפרד.</p>
+
+  <div class="layers">
+    <div class="layer"><div class="nm">activities</div><div class="cls"><span>AuthActivity</span><span>RegisterActivity</span><span>MainActivity</span><span>HistoryActivity</span></div><div class="why">המסכים. מקבלים לחיצות, מציגים תוצאות, ומעבירים את העבודה לשכבות האחרות.</div></div>
+    <div class="layer"><div class="nm">ui</div><div class="cls"><span>PoseOverlayView</span><span>ShotAdapter</span><span>ScoreColors</span></div><div class="why">רכיבי תצוגה שבנינו בעצמנו: ציור השלד, שורות הרשימה, וצבע אחיד לציון.</div></div>
+    <div class="layer"><div class="nm">util</div><div class="cls"><span>ShotAnalyzer</span><span>ShotMathUtils</span><span>AuthUtils</span><span>SessionManager</span></div><div class="why">הלוגיקה: ניתוח הסרטון, הנוסחאות, הצפנת סיסמאות וניהול ההתחברות.</div></div>
+    <div class="layer"><div class="nm">db</div><div class="cls"><span>DatabaseHelper</span></div><div class="why">הגישה היחידה למסד הנתונים. אף מחלקה אחרת לא כותבת SQL.</div></div>
+    <div class="layer"><div class="nm">model</div><div class="cls"><span>User</span><span>ShotData</span><span>MonthlyStat</span><span>UserSummary</span></div><div class="why">מחלקות נתונים פשוטות: שדות פרטיים, בנאים ו-getters. עוברות בין השכבות.</div></div>
   </div>
 
-  <div class="card-grid" id="cards"></div>
+  <h3>כל המחלקות</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>מחלקה</th><th>אחריות</th></tr></thead>
+    <tbody>
+      <tr><td><code>User</code></td><td>משתמש: id, שם, hash של הסיסמה ו-salt.</td></tr>
+      <tr><td><code>ShotData</code></td><td>זריקה: זוויות, ציון (מוגבל ל-0–100 ב-setter), משוב, הערה וזמן.</td></tr>
+      <tr><td><code>MonthlyStat</code></td><td>שורה אחת מתוצאת ה-GROUP BY: חודש, ממוצע וכמות.</td></tr>
+      <tr><td><code>UserSummary</code></td><td>תוצאת ה-JOIN: שם, סה"כ זריקות, ממוצע ושיא.</td></tr>
+      <tr><td><code>DatabaseHelper</code></td><td>יצירת הטבלאות, CRUD לשתיהן (כולל עדכון תוצאה אחרי תיקון ידני), סטטיסטיקה.</td></tr>
+      <tr><td><code>ShotMathUtils</code></td><td>נוסחאות טהורות: זוויות עם <code>Math.atan2</code>, ציון ומשוב.</td></tr>
+      <tr><td><code>ShotAnalyzer</code></td><td>חילוץ פריימים, ML Kit, מציאת הזריקה ורגע השחרור, תיקון ידני פריים-פריים, הרכבת התוצאה.</td></tr>
+      <tr><td><code>AuthUtils</code></td><td>בדיקת קלט, יצירת salt, SHA-256 ואימות סיסמה.</td></tr>
+      <tr><td><code>SessionManager</code></td><td>שמירת המשתמש המחובר ב-SharedPreferences.</td></tr>
+      <tr><td><code>PoseOverlayView</code></td><td>View מותאם: מצייר את הפריים, השלד ותוויות הזווית, ותומך בזום.</td></tr>
+      <tr><td><code>ShotAdapter</code></td><td>מחבר את רשימת הזריקות ל-RecyclerView.</td></tr>
+      <tr><td><code>ScoreColors</code></td><td>צבע לציון: טוב מ-80, בינוני מ-60, אחרת חלש.</td></tr>
+      <tr><td><code>AuthActivity</code></td><td>מסך התחברות ומסך הפתיחה (LAUNCHER).</td></tr>
+      <tr><td><code>RegisterActivity</code></td><td>מסך הרשמה.</td></tr>
+      <tr><td><code>MainActivity</code></td><td>הרשאות, גלריה ומצלמה, הרצת הניתוח ברקע, הצגת התוצאה ותיקון ידני של רגע השחרור.</td></tr>
+      <tr><td><code>HistoryActivity</code></td><td>רשימה, סטטיסטיקה, עריכה ומחיקה.</td></tr>
+    </tbody>
+  </table></div>
 
-  <footer class="site-footer">
-    ההתקדמות נשמרת בדפדפן הזה בלבד. קטעי הקוד במדריך נלקחו ישירות מהקוד של האפליקציה בריפו.
-  </footer>
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"הפרדתי בין תצוגה ללוגיקה. ה-Activities רק מציגות ומגיבות ללחיצות. החישובים נמצאים ב-ShotMathUtils, שהיא Java טהורה בלי תלות באנדרואיד, ולכן אפשר לבדוק אותה לבד. כל ה-SQL נמצא במקום אחד, ב-DatabaseHelper."</p></div>
+
+  <div class="qa" data-topic="arch"></div>
+</section>
+
+<!-- 03 -->
+<section class="ch" id="pipeline">
+  <div class="ch-head"><span class="ch-num">03</span><h2>המסלול של זריקה אחת</h2></div>
+  <p class="lead">מה קורה מהרגע שהמשתמש לוחץ "בחירת סרטון" ועד שהציון מופיע. הסדר כאן הוא הסדר האמיתי בקוד.</p>
+  <ol class="steps">
+    <li><div><div class="th">UI thread · MainActivity</div><b>בדיקת הרשאה.</b> <code>requestVideoPermission()</code> בודק את <code>READ_MEDIA_VIDEO</code> (אנדרואיד 13+) או <code>READ_EXTERNAL_STORAGE</code>. אם אין הרשאה, מוצג חלון בקשה.</div></li>
+    <li><div><div class="th">UI thread</div><b>בחירת סרטון.</b> <code>galleryLauncher</code> פותח את בוחר הקבצים עם <code>"video/*"</code> ומחזיר <code>Uri</code>.</div></li>
+    <li><div><div class="th">UI → רקע</div><b>מעבר לרקע.</b> <code>startAnalysis()</code> מציג את פס ההתקדמות ומעביר את העבודה ל-<code>executor.execute(...)</code>.</div></li>
+    <li><div><div class="th">thread ברקע · ShotAnalyzer</div><b>חיפוש גס.</b> <code>coarseSamples()</code> מחלץ פריים כל 250ms ומריץ עליו ML Kit. <code>highestHandIndex()</code> מוצא איפה היד הכי גבוהה ביחס לגוף, ו-<code>plateauStartIndex()</code> חוזר אחורה לרגע שבו היד רק עלתה.</div></li>
+    <li><div><div class="th">thread ברקע</div><b>חיפוש מדויק.</b> <code>findRelease()</code> עובר פריים-פריים (כל 33ms) סביב השיא, ובוחר את הפריים הראשון שבו המרפק כמעט ישר: זה רגע השחרור.</div></li>
+    <li><div><div class="th">thread ברקע · ShotMathUtils</div><b>חישוב.</b> <code>fillScore()</code> מחשב זווית מרפק, זווית שחרור, נטיית גוף, המשך תנועה, ציון ומשוב.</div></li>
+    <li><div><div class="th">thread ברקע · DatabaseHelper</div><b>שמירה.</b> <code>saveShot()</code> שומר <code>ShotData</code> חדש בטבלת <code>shots</code>.</div></li>
+    <li><div><div class="th">רקע → UI thread</div><b>חזרה למסך.</b> <code>mainHandler.post(...)</code> מעביר את התוצאה ל-thread הראשי.</div></li>
+    <li><div><div class="th">UI thread · PoseOverlayView</div><b>הצגה.</b> <code>showResult()</code> מעדכן טקסטים ופס ציון, ו-<code>poseOverlay.setResult()</code> קורא ל-<code>invalidate()</code>, שגורם ל-<code>onDraw()</code> לצייר את השלד.</div></li>
+      <li><div><div class="th">UI → רקע → UI</div><b>תיקון ידני (לא חובה).</b> "פריים אחורה" / "פריים קדימה" מריצים את <code>analyzer.stepFrame()</code> ברקע על הפריים השכן, מעדכנים את הזריקה במסד עם <code>updateShotResult()</code>, ומציגים את התוצאה החדשה.</div></li>
+  </ol>
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"כל מה שאיטי, כלומר חילוץ פריימים, ML Kit וכתיבה למסד, קורה ב-thread ברקע. רק העדכון של המסך חוזר ל-thread הראשי דרך Handler."</p></div>
+</section>
+
+<!-- 04 -->
+<section class="ch" id="oop">
+  <div class="ch-head"><span class="ch-num">04</span><h2>תכנות מונחה עצמים בפרויקט</h2></div>
+  <p class="lead">בבחינה ישאלו איפה בפרויקט מופיעים עקרונות ה-OOP. הנה כל אחד מהם, עם הדוגמה מהקוד.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>עיקרון</th><th>איפה בפרויקט</th></tr></thead>
+    <tbody>
+      <tr><td>הכמסה (Encapsulation)</td><td>כל השדות במחלקות ה-model הם <code>private</code>, והגישה דרך getters ו-setters. <code>setScore</code> לא מאפשר ציון מחוץ ל-0–100.</td></tr>
+      <tr><td>ירושה (Inheritance)</td><td><code>DatabaseHelper extends SQLiteOpenHelper</code>, <code>PoseOverlayView extends View</code>, כל המסכים <code>extends AppCompatActivity</code>, <code>ShotAdapter extends RecyclerView.Adapter</code>.</td></tr>
+      <tr><td>דריסה (Override)</td><td><code>onCreate</code>, <code>onDraw</code>, <code>onTouchEvent</code>, <code>onBindViewHolder</code>, <code>onUpgrade</code> ועוד.</td></tr>
+      <tr><td>ממשק (Interface)</td><td><code>ShotAdapter.OnShotActionListener</code>, ש-<code>HistoryActivity</code> מממשת.</td></tr>
+      <tr><td>העמסה (Overloading)</td><td>שני בנאים ב-<code>User</code> ושניים ב-<code>ShotData</code>: אחד לאובייקט חדש ואחד לאובייקט שנקרא מהמסד.</td></tr>
+      <tr><td>מחלקה פנימית סטטית</td><td><code>ShotAnalyzer.Result</code> ו-<code>ShotAdapter.ShotViewHolder</code>.</td></tr>
+      <tr><td>מחלקות עזר סטטיות</td><td><code>ShotMathUtils</code>, <code>AuthUtils</code>, <code>ScoreColors</code>: <code>final</code>, בנאי <code>private</code>, רק מתודות סטטיות.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>הכמסה: ה-setter שומר על הנתונים</h3>
+  <figure class="code"><figcaption dir="ltr">model/ShotData.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** קובע ציון ומגביל אותו לטווח 0-100 (הגנה מפני ערכים לא חוקיים). */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">void</span> setScore(<span class="tk">int</span> score) {</span><span class="ln">    <span class="tk">this</span>.score = Math.max(<span class="tn">0</span>, Math.min(<span class="tn">100</span>, score));</span><span class="ln">}</span></code></pre></figure>
+  <p>גם הבנאי קורא ל-<code>setScore</code> ולא כותב לשדה ישירות. כך אי אפשר ליצור זריקה עם ציון 120 בשום דרך.</p>
+
+  <h3>העמסת בנאים ו-<code>this(...)</code></h3>
+  <figure class="code"><figcaption dir="ltr">model/ShotData.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** בנאי לזריקה חדשה (לפני שמירה) - הזמן הוא עכשיו וההערה ריקה. */</span></span><span class="ln"><span class="tk">public</span> ShotData(<span class="tk">long</span> userId, <span class="tk">double</span> elbowAngle, <span class="tk">double</span> releaseAngle, <span class="tk">int</span> score, String feedback) {</span><span class="ln">    <span class="tk">this</span>(-<span class="tn">1</span>, userId, elbowAngle, releaseAngle, score, feedback, <span class="ts">""</span>, System.currentTimeMillis());</span><span class="ln">}</span></code></pre></figure>
+  <p>הבנאי הקצר מיועד לזריקה חדשה, שעדיין אין לה id. הוא קורא לבנאי המלא עם <code>this(...)</code>, ונותן <code>-1</code> כ-id, הערה ריקה והזמן הנוכחי.</p>
+
+  <h3>ממשק: ה-Adapter לא מכיר את המסד</h3>
+  <figure class="code"><figcaption dir="ltr">ui/ShotAdapter.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** ממשק שדרכו ה-Adapter מודיע ל-Activity על לחיצות (ה-Adapter עצמו לא ניגש למסד). */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">interface</span> OnShotActionListener {</span><span class="ln">    <span class="tk">void</span> onEditNote(ShotData shot);</span><span class="ln">    <span class="tk">void</span> onDelete(ShotData shot);</span><span class="ln">}</span></code></pre></figure>
+  <p>ה-Adapter רק מודיע "לחצו על מחיקה בזריקה הזו". מה לעשות עם זה מחליטה <code>HistoryActivity</code>, שמממשת את הממשק. כך ה-Adapter נשאר אחראי על תצוגה בלבד.</p>
+
+  <div class="qa" data-topic="oop"></div>
+</section>
+
+<!-- 05 -->
+<section class="ch" id="activities">
+  <div class="ch-head"><span class="ch-num">05</span><h2>Activities, Intent ומחזור חיים</h2></div>
+  <p class="lead">כל מסך הוא Activity. מעבר בין מסכים נעשה עם Intent, ומערכת אנדרואיד קוראת למתודות של מחזור החיים (<code>onCreate</code>, <code>onDestroy</code>) בזמן הנכון.</p>
+
+  <h3>מסך הפתיחה מחליט לאן ללכת</h3>
+  <figure class="code"><figcaption dir="ltr">AuthActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">protected</span> <span class="tk">void</span> onCreate(Bundle savedInstanceState) {</span><span class="ln">    <span class="tk">super</span>.onCreate(savedInstanceState);</span><span class="ln">    session = <span class="tk">new</span> SessionManager(<span class="tk">this</span>);</span><span class="ln">    <span class="tk">if</span> (session.shouldAutoLogin()) {</span><span class="ln">        openMainScreen();</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    setContentView(R.layout.activity_auth);</span><span class="ln">    dbHelper = <span class="tk">new</span> DatabaseHelper(<span class="tk">this</span>);</span><span class="ln">    layoutUsername = findViewById(R.id.layoutUsername);</span><span class="ln">    layoutPassword = findViewById(R.id.layoutPassword);</span><span class="ln">    editUsername = findViewById(R.id.editUsername);</span><span class="ln">    editPassword = findViewById(R.id.editPassword);</span><span class="ln">    checkRemember = findViewById(R.id.checkRemember);</span><span class="ln">    findViewById(R.id.btnLogin).setOnClickListener(v -&gt; login());</span><span class="ln">    findViewById(R.id.btnGoToRegister).setOnClickListener(v -&gt;</span><span class="ln">            startActivity(<span class="tk">new</span> Intent(<span class="tk">this</span>, RegisterActivity.<span class="tk">class</span>)));</span><span class="ln">}</span></code></pre></figure>
+  <p>ב-Manifest מוגדר ש-<code>AuthActivity</code> הוא ה-LAUNCHER. אם המשתמש ביקש בעבר להישאר מחובר, עוברים ישר למסך הראשי. <code>return</code> מונע את טעינת מסך ההתחברות.</p>
+
+  <h3>ניקוי ערימת המסכים אחרי הרשמה</h3>
+  <figure class="code"><figcaption dir="ltr">RegisterActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * עובר למסך הראשי ומנקה את כל המסכים הקודמים (גם את מסך ההתחברות),</span></span><span class="ln"><span class="tc"> * כדי שלחיצה על "חזרה" לא תחזיר להרשמה.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> openMainScreen() {</span><span class="ln">    Intent intent = <span class="tk">new</span> Intent(<span class="tk">this</span>, MainActivity.<span class="tk">class</span>);</span><span class="ln">    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);</span><span class="ln">    startActivity(intent);</span><span class="ln">    finish();</span><span class="ln">}</span></code></pre></figure>
+  <p>בלי הדגלים, לחיצה על "חזרה" מהמסך הראשי הייתה מחזירה לטופס ההרשמה. <code>CLEAR_TASK</code> מוחק את כל המסכים הקודמים, ומסך הבית נשאר לבד.</p>
+
+  <h3>ניקוי משאבים ב-<code>onDestroy</code></h3>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** כשהמסך נסגר: עוצרים את ה-thread ברקע ומשחררים את ML Kit. */</span></span><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">protected</span> <span class="tk">void</span> onDestroy() {</span><span class="ln">    <span class="tk">super</span>.onDestroy();</span><span class="ln">    executor.shutdownNow();</span><span class="ln">    analyzer.close();</span><span class="ln">}</span></code></pre></figure>
+
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"Intent מפורש, כמו new Intent(this, MainActivity.class), פותח מסך שלי. Intent מרומז, כמו ACTION_VIDEO_CAPTURE, מבקש מהמערכת למצוא אפליקציה שיודעת לצלם."</p></div>
+  <div class="qa" data-topic="activity"></div>
+</section>
+
+<!-- 06 -->
+<section class="ch" id="security">
+  <div class="ch-head"><span class="ch-num">06</span><h2>הרשמה, התחברות והצפנת סיסמאות</h2></div>
+  <p class="lead">הסיסמה עצמה לא נשמרת בשום מקום. נשמר רק hash שלה, כלומר תוצאה של פונקציה חד-כיוונית, יחד עם salt אקראי.</p>
+
+  <h3>בדיקת קלט</h3>
+  <figure class="code"><figcaption dir="ltr">util/AuthUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** שם משתמש תקין: לפחות 3 תווים, רק אותיות אנגליות, ספרות וקו תחתון. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">boolean</span> isValidUsername(String username) {</span><span class="ln">    <span class="tk">return</span> username != <span class="tk">null</span> &amp;&amp; username.length() &gt;= MIN_USERNAME_LENGTH</span><span class="ln">            &amp;&amp; username.matches(<span class="ts">"[A-Za-z0-9_]+"</span>);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/AuthUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** סיסמה תקינה: לפחות 6 תווים, ולפחות ספרה אחת. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">boolean</span> isValidPassword(String password) {</span><span class="ln">    <span class="tk">return</span> password != <span class="tk">null</span> &amp;&amp; password.length() &gt;= MIN_PASSWORD_LENGTH</span><span class="ln">            &amp;&amp; password.matches(<span class="ts">".*[0-9].*"</span>);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">RegisterActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** בודק את כל השדות ומציג שגיאה מתחת לכל שדה בעייתי. מחזיר true אם הכול תקין. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">boolean</span> validateInput(String username, String password, String confirm) {</span><span class="ln">    <span class="tk">boolean</span> usernameOk = AuthUtils.isValidUsername(username);</span><span class="ln">    <span class="tk">boolean</span> passwordOk = AuthUtils.isValidPassword(password);</span><span class="ln">    <span class="tk">boolean</span> matchOk = password.equals(confirm);</span><span class="ln">    layoutUsername.setError(usernameOk ? <span class="tk">null</span> : getString(R.string.error_username));</span><span class="ln">    layoutPassword.setError(passwordOk ? <span class="tk">null</span> : getString(R.string.error_password));</span><span class="ln">    layoutConfirmPassword.setError(matchOk ? <span class="tk">null</span> : getString(R.string.error_password_mismatch));</span><span class="ln">    <span class="tk">return</span> usernameOk &amp;&amp; passwordOk &amp;&amp; matchOk;</span><span class="ln">}</span></code></pre></figure>
+  <p><code>setError</code> של <code>TextInputLayout</code> מציג הודעה ידידותית מתחת לשדה הבעייתי. כשהשדה תקין מעבירים <code>null</code>, וההודעה נעלמת.</p>
+
+  <h3>salt ו-hash</h3>
+  <figure class="code"><figcaption dir="ltr">util/AuthUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * יוצר salt אקראי: מחרוזת שמצורפת לסיסמה לפני ה-hash.</span></span><span class="ln"><span class="tc"> * כך לשני משתמשים עם אותה סיסמה יהיה hash שונה.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> String generateSalt() {</span><span class="ln">    byte[] bytes = <span class="tk">new</span> byte[SALT_BYTES];</span><span class="ln">    <span class="tk">new</span> SecureRandom().nextBytes(bytes);</span><span class="ln">    <span class="tk">return</span> toHex(bytes);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/AuthUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מחשב SHA-256 של (salt + סיסמה) ומחזיר אותו כמחרוזת הקסדצימלית. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> String hashPassword(String password, String salt) {</span><span class="ln">    <span class="tk">try</span> {</span><span class="ln">        MessageDigest digest = MessageDigest.getInstance(<span class="ts">"SHA-256"</span>);</span><span class="ln">        byte[] hash = digest.digest((salt + password).getBytes(StandardCharsets.UTF_8));</span><span class="ln">        <span class="tk">return</span> toHex(hash);</span><span class="ln">    } <span class="tk">catch</span> (NoSuchAlgorithmException e) {</span><span class="ln">        <span class="tk">throw</span> <span class="tk">new</span> IllegalStateException(<span class="ts">"SHA-256 not available"</span>, e);</span><span class="ln">    }</span><span class="ln">}</span></code></pre></figure>
+  <ol class="steps">
+    <li><div><b>בהרשמה:</b> יוצרים salt אקראי של 16 בתים עם <code>SecureRandom</code>, מחשבים <code>SHA-256(salt + סיסמה)</code>, ושומרים במסד את ה-hash ואת ה-salt.</div></li>
+    <li><div><b>בהתחברות:</b> שולפים את המשתמש לפי שם, מחשבים שוב hash עם הסיסמה שהוקלדה וה-salt השמור, ומשווים ל-hash שבמסד.</div></li>
+  </ol>
+  <figure class="code"><figcaption dir="ltr">AuthActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** התחברות: מחפש את המשתמש ובודק שה-hash של הסיסמה שהוקלדה תואם לשמור. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> login() {</span><span class="ln">    String username = getText(editUsername);</span><span class="ln">    String password = getText(editPassword);</span><span class="ln">    <span class="tk">if</span> (!validateInput(username, password)) {</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    User user = dbHelper.getUserByUsername(username);</span><span class="ln">    <span class="tk">if</span> (user == <span class="tk">null</span> || !AuthUtils.verifyPassword(password, user.getSalt(), user.getPasswordHash())) {</span><span class="ln">        layoutPassword.setError(getString(R.string.error_wrong_credentials));</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    completeLogin(user.getId(), username);</span><span class="ln">}</span></code></pre></figure>
+
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"גם אם מישהו גונב את קובץ המסד, הוא לא רואה סיסמאות. בזכות ה-salt, לשני משתמשים עם אותה סיסמה יש hash שונה, ולכן אי אפשר להשתמש בטבלאות מוכנות של hash-ים נפוצים."</p></div>
+  <div class="qa" data-topic="security"></div>
+</section>
+
+<!-- 07 -->
+<section class="ch" id="prefs">
+  <div class="ch-head"><span class="ch-num">07</span><h2>SharedPreferences: "הישאר מחובר"</h2></div>
+  <p class="lead">SharedPreferences הוא קובץ קטן של זוגות מפתח-ערך, שנשמר בתיקייה הפרטית של האפליקציה. כאן נשמר מי המשתמש המחובר, והאם הוא ביקש להישאר מחובר.</p>
+  <figure class="code"><figcaption dir="ltr">util/SessionManager.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** שומר את המשתמש שהתחבר. apply() כותב לקובץ ברקע. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">void</span> login(<span class="tk">long</span> userId, String username, <span class="tk">boolean</span> rememberMe) {</span><span class="ln">    prefs.edit()</span><span class="ln">            .putLong(KEY_USER_ID, userId)</span><span class="ln">            .putString(KEY_USERNAME, username)</span><span class="ln">            .putBoolean(KEY_REMEMBER, rememberMe)</span><span class="ln">            .apply();</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/SessionManager.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** האם לדלג על מסך ההתחברות (המשתמש ביקש להישאר מחובר). */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">boolean</span> shouldAutoLogin() {</span><span class="ln">    <span class="tk">return</span> prefs.getBoolean(KEY_REMEMBER, <span class="tk">false</span>) &amp;&amp; getUserId() != -<span class="tn">1</span>;</span><span class="ln">}</span></code></pre></figure>
+  <p>המפתחות הם <code>user_id</code>, <code>username</code> ו-<code>remember_me</code> בקובץ <code>session</code>. גם כשלא מסמנים "הישאר מחובר" נשמרים ה-id והשם, כי המסך הראשי וההיסטוריה צריכים לדעת מי מחובר. רק הדגל <code>remember_me</code> קובע אם לדלג על ההתחברות בפתיחה הבאה. בהתנתקות <code>clear()</code> מוחק הכול.</p>
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"SharedPreferences מתאים לכמה ערכים קטנים, כמו הגדרות או מצב התחברות. לנתונים עם מבנה וקשרים, כמו זריקות, משתמשים ב-SQLite."</p></div>
+  <div class="qa" data-topic="prefs"></div>
+</section>
+
+<!-- 08 -->
+<section class="ch" id="sqlite">
+  <div class="ch-head"><span class="ch-num">08</span><h2>SQLite: שתי טבלאות, CRUD, GROUP BY ו-JOIN</h2></div>
+  <p class="lead"><code>DatabaseHelper</code> יורשת מ-<code>SQLiteOpenHelper</code>, שיוצרת את המסד בפעם הראשונה (<code>onCreate</code>) ומשדרגת אותו כשמשנים גרסה (<code>onUpgrade</code>).</p>
+
+  <h3>הטבלאות</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>טבלה</th><th>עמודות</th><th>הערות</th></tr></thead>
+    <tbody>
+      <tr><td><code>users</code></td><td dir="ltr" style="text-align:right"><code>id</code> · <code>username</code> · <code>password_hash</code> · <code>salt</code></td><td>username הוא UNIQUE</td></tr>
+      <tr><td><code>shots</code></td><td dir="ltr" style="text-align:right"><code>id</code> · <code>user_id</code> · <code>elbow_angle</code> · <code>release_angle</code> · <code>score</code> · <code>feedback</code> · <code>note</code> · <code>timestamp</code></td><td>user_id הוא מפתח זר ל-users.id, עם ON DELETE CASCADE</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="code"><figcaption dir="ltr">db/DatabaseHelper.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מפעיל אכיפת מפתחות זרים (ב-SQLite היא כבויה כברירת מחדל). */</span></span><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> <span class="tk">void</span> onConfigure(SQLiteDatabase db) {</span><span class="ln">    db.setForeignKeyConstraintsEnabled(<span class="tk">true</span>);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">db/DatabaseHelper.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** נקרא פעם אחת כשהמסד נוצר - יוצר את שתי הטבלאות. */</span></span><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> <span class="tk">void</span> onCreate(SQLiteDatabase db) {</span><span class="ln">    db.execSQL(<span class="ts">"CREATE TABLE "</span> + TABLE_USERS + <span class="ts">" ("</span></span><span class="ln">            + COL_ID + <span class="ts">" INTEGER PRIMARY KEY AUTOINCREMENT, "</span></span><span class="ln">            + COL_USERNAME + <span class="ts">" TEXT NOT NULL UNIQUE, "</span></span><span class="ln">            + COL_PASSWORD_HASH + <span class="ts">" TEXT NOT NULL, "</span></span><span class="ln">            + COL_SALT + <span class="ts">" TEXT NOT NULL)"</span>);</span><span class="ln">    db.execSQL(<span class="ts">"CREATE TABLE "</span> + TABLE_SHOTS + <span class="ts">" ("</span></span><span class="ln">            + COL_ID + <span class="ts">" INTEGER PRIMARY KEY AUTOINCREMENT, "</span></span><span class="ln">            + COL_USER_ID + <span class="ts">" INTEGER NOT NULL, "</span></span><span class="ln">            + COL_ELBOW + <span class="ts">" REAL, "</span></span><span class="ln">            + COL_RELEASE + <span class="ts">" REAL, "</span></span><span class="ln">            + COL_SCORE + <span class="ts">" INTEGER, "</span></span><span class="ln">            + COL_FEEDBACK + <span class="ts">" TEXT, "</span></span><span class="ln">            + COL_NOTE + <span class="ts">" TEXT, "</span></span><span class="ln">            + COL_TIMESTAMP + <span class="ts">" INTEGER, "</span></span><span class="ln">            + <span class="ts">"FOREIGN KEY("</span> + COL_USER_ID + <span class="ts">") REFERENCES "</span> + TABLE_USERS + <span class="ts">"("</span> + COL_ID + <span class="ts">")"</span></span><span class="ln">            + <span class="ts">" ON DELETE CASCADE)"</span>);</span><span class="ln">}</span></code></pre></figure>
+
+  <h3>CRUD</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>פעולה</th><th>users</th><th>shots</th></tr></thead>
+    <tbody>
+      <tr><td>Create</td><td><code>insertUser</code></td><td><code>insertShot</code></td></tr>
+      <tr><td>Read</td><td><code>getUserByUsername</code></td><td><code>getShotsForUser</code></td></tr>
+      <tr><td>Update</td><td><code>updateUserPassword</code></td><td><code>updateShotNote</code>, <code>updateShotResult</code></td></tr>
+      <tr><td>Delete</td><td><code>deleteUser</code></td><td><code>deleteShot</code></td></tr>
+    </tbody>
+  </table></div>
+  <figure class="code"><figcaption dir="ltr">db/DatabaseHelper.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** Create: מוסיף משתמש. מחזיר את ה-id החדש, או -1 אם שם המשתמש תפוס. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">long</span> insertUser(User user) {</span><span class="ln">    ContentValues values = <span class="tk">new</span> ContentValues();</span><span class="ln">    values.put(COL_USERNAME, user.getUsername());</span><span class="ln">    values.put(COL_PASSWORD_HASH, user.getPasswordHash());</span><span class="ln">    values.put(COL_SALT, user.getSalt());</span><span class="ln">    <span class="tk">return</span> getWritableDatabase().insert(TABLE_USERS, <span class="tk">null</span>, values);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">db/DatabaseHelper.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** Read: מחזיר את כל הזריקות של משתמש, מהחדשה לישנה. */</span></span><span class="ln"><span class="tk">public</span> List&lt;ShotData&gt; getShotsForUser(<span class="tk">long</span> userId) {</span><span class="ln">    List&lt;ShotData&gt; shots = <span class="tk">new</span> ArrayList&lt;&gt;();</span><span class="ln">    Cursor c = getReadableDatabase().query(TABLE_SHOTS, <span class="tk">null</span>,</span><span class="ln">            COL_USER_ID + <span class="ts">" = ?"</span>, <span class="tk">new</span> String[]{String.valueOf(userId)},</span><span class="ln">            <span class="tk">null</span>, <span class="tk">null</span>, COL_TIMESTAMP + <span class="ts">" DESC"</span>);</span><span class="ln">    <span class="tk">while</span> (c.moveToNext()) {</span><span class="ln">        shots.add(<span class="tk">new</span> ShotData(</span><span class="ln">                c.getLong(c.getColumnIndexOrThrow(COL_ID)),</span><span class="ln">                c.getLong(c.getColumnIndexOrThrow(COL_USER_ID)),</span><span class="ln">                c.getDouble(c.getColumnIndexOrThrow(COL_ELBOW)),</span><span class="ln">                c.getDouble(c.getColumnIndexOrThrow(COL_RELEASE)),</span><span class="ln">                c.getInt(c.getColumnIndexOrThrow(COL_SCORE)),</span><span class="ln">                c.getString(c.getColumnIndexOrThrow(COL_FEEDBACK)),</span><span class="ln">                c.getString(c.getColumnIndexOrThrow(COL_NOTE)),</span><span class="ln">                c.getLong(c.getColumnIndexOrThrow(COL_TIMESTAMP))));</span><span class="ln">    }</span><span class="ln">    c.close();</span><span class="ln">    <span class="tk">return</span> shots;</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">db/DatabaseHelper.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** Update: מעדכן את ההערה של זריקה. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">boolean</span> updateShotNote(<span class="tk">long</span> shotId, String note) {</span><span class="ln">    ContentValues values = <span class="tk">new</span> ContentValues();</span><span class="ln">    values.put(COL_NOTE, note);</span><span class="ln">    <span class="tk">return</span> getWritableDatabase().update(TABLE_SHOTS, values,</span><span class="ln">            COL_ID + <span class="ts">" = ?"</span>, <span class="tk">new</span> String[]{String.valueOf(shotId)}) &gt; <span class="tn">0</span>;</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">db/DatabaseHelper.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** Update: מעדכן את תוצאת הניתוח של זריקה (אחרי תיקון ידני של רגע השחרור). */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">boolean</span> updateShotResult(<span class="tk">long</span> shotId, <span class="tk">double</span> elbowAngle, <span class="tk">double</span> releaseAngle,</span><span class="ln">                                <span class="tk">int</span> score, String feedback) {</span><span class="ln">    ContentValues values = <span class="tk">new</span> ContentValues();</span><span class="ln">    values.put(COL_ELBOW, elbowAngle);</span><span class="ln">    values.put(COL_RELEASE, releaseAngle);</span><span class="ln">    values.put(COL_SCORE, Math.max(<span class="tn">0</span>, Math.min(<span class="tn">100</span>, score)));</span><span class="ln">    values.put(COL_FEEDBACK, feedback);</span><span class="ln">    <span class="tk">return</span> getWritableDatabase().update(TABLE_SHOTS, values,</span><span class="ln">            COL_ID + <span class="ts">" = ?"</span>, <span class="tk">new</span> String[]{String.valueOf(shotId)}) &gt; <span class="tn">0</span>;</span><span class="ln">}</span></code></pre></figure>
+  <p><code>updateShotResult</code> נקראת כשהמשתמש מזיז את רגע השחרור פריים אחורה או קדימה: הזריקה כבר נשמרה בניתוח הראשון, ועכשיו מעדכנים את הזוויות, הציון והמשוב שלה במקום ליצור שורה חדשה.</p>
+
+  <h3>GROUP BY: ממוצע לפי חודש</h3>
+  <figure class="code"><figcaption dir="ltr">db/DatabaseHelper.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * GROUP BY: ממוצע ציון ומספר זריקות לכל חודש.</span></span><span class="ln"><span class="tc"> * strftime ממיר את זמן הזריקה (מילישניות) למחרוזת חודש yyyy-MM.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> List&lt;MonthlyStat&gt; getMonthlyStats(<span class="tk">long</span> userId) {</span><span class="ln">    String sql = <span class="ts">"SELECT strftime('%Y-%m', "</span> + COL_TIMESTAMP + <span class="ts">" / 1000, 'unixepoch', 'localtime') AS month, "</span></span><span class="ln">            + <span class="ts">"AVG("</span> + COL_SCORE + <span class="ts">"), COUNT(*) FROM "</span> + TABLE_SHOTS</span><span class="ln">            + <span class="ts">" WHERE "</span> + COL_USER_ID + <span class="ts">" = ? GROUP BY month ORDER BY month DESC"</span>;</span><span class="ln">    List&lt;MonthlyStat&gt; stats = <span class="tk">new</span> ArrayList&lt;&gt;();</span><span class="ln">    Cursor c = getReadableDatabase().rawQuery(sql, <span class="tk">new</span> String[]{String.valueOf(userId)});</span><span class="ln">    <span class="tk">while</span> (c.moveToNext()) {</span><span class="ln">        stats.add(<span class="tk">new</span> MonthlyStat(c.getString(<span class="tn">0</span>), c.getDouble(<span class="tn">1</span>), c.getInt(<span class="tn">2</span>)));</span><span class="ln">    }</span><span class="ln">    c.close();</span><span class="ln">    <span class="tk">return</span> stats;</span><span class="ln">}</span></code></pre></figure>
+  <p>הזמן נשמר במילישניות, ולכן מחלקים ב-1000 כדי לקבל שניות. <code>strftime('%Y-%m', …)</code> הופך את הזמן למחרוזת כמו <code>2026-10</code>, ו-<code>GROUP BY month</code> מאחד את כל הזריקות של אותו חודש לשורה אחת, עם <code>AVG</code> ו-<code>COUNT</code>.</p>
+
+  <h3>JOIN: סיכום משתמש</h3>
+  <figure class="code"><figcaption dir="ltr">db/DatabaseHelper.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * JOIN: מחבר את טבלת המשתמשים לטבלת הזריקות ומחזיר סיכום של המשתמש.</span></span><span class="ln"><span class="tc"> * LEFT JOIN מבטיח שנקבל שורה גם למשתמש בלי זריקות בכלל (ואז המספרים 0).</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> UserSummary getUserSummary(<span class="tk">long</span> userId) {</span><span class="ln">    String sql = <span class="ts">"SELECT u."</span> + COL_USERNAME + <span class="ts">", COUNT(s."</span> + COL_ID + <span class="ts">"), "</span></span><span class="ln">            + <span class="ts">"IFNULL(AVG(s."</span> + COL_SCORE + <span class="ts">"), 0), IFNULL(MAX(s."</span> + COL_SCORE + <span class="ts">"), 0) "</span></span><span class="ln">            + <span class="ts">"FROM "</span> + TABLE_USERS + <span class="ts">" u LEFT JOIN "</span> + TABLE_SHOTS + <span class="ts">" s "</span></span><span class="ln">            + <span class="ts">"ON u."</span> + COL_ID + <span class="ts">" = s."</span> + COL_USER_ID</span><span class="ln">            + <span class="ts">" WHERE u."</span> + COL_ID + <span class="ts">" = ? GROUP BY u."</span> + COL_ID;</span><span class="ln">    Cursor c = getReadableDatabase().rawQuery(sql, <span class="tk">new</span> String[]{String.valueOf(userId)});</span><span class="ln">    UserSummary summary = <span class="tk">null</span>;</span><span class="ln">    <span class="tk">if</span> (c.moveToFirst()) {</span><span class="ln">        summary = <span class="tk">new</span> UserSummary(c.getString(<span class="tn">0</span>), c.getInt(<span class="tn">1</span>), c.getDouble(<span class="tn">2</span>), c.getInt(<span class="tn">3</span>));</span><span class="ln">    }</span><span class="ln">    c.close();</span><span class="ln">    <span class="tk">return</span> summary;</span><span class="ln">}</span></code></pre></figure>
+  <p><code>LEFT JOIN</code> מחזיר שורה גם למשתמש שעדיין אין לו זריקות. אצלו <code>AVG</code> ו-<code>MAX</code> יוצאים <code>NULL</code>, ו-<code>IFNULL</code> מחליף אותם ב-0.</p>
+
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"אני משתמש ב-? במקום לשרשר ערכים לתוך ה-SQL. ככה SQLite מתייחס לקלט כנתון ולא כקוד, וזה מונע SQL Injection."</p></div>
+  <div class="qa" data-topic="sqlite"></div>
+</section>
+
+<!-- 09 -->
+<section class="ch" id="media">
+  <div class="ch-head"><span class="ch-num">09</span><h2>הרשאות, גלריה, מצלמה וחילוץ פריימים</h2></div>
+  <p class="lead">כדי לקרוא סרטונים צריך הרשאה שהמשתמש מאשר בזמן ריצה. את הסרטון בוחרים מהגלריה או מצלמים באפליקציית המצלמה, ואז שולפים ממנו תמונות בודדות.</p>
+
+  <h3>ההרשאות ב-Manifest</h3>
+  <figure class="code"><figcaption dir="ltr">AndroidManifest.xml</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">&lt;!-- הרשאה לקריאת סרטונים: אנדרואיד 13 ומעלה --&gt;</span></span><span class="ln"><span class="tk">&lt;uses</span>-permission android:name=<span class="ts">"android.permission.READ_MEDIA_VIDEO"</span> <span class="tk">/&gt;</span></span><span class="ln"><span class="tc">&lt;!-- הרשאה לקריאת קבצים: אנדרואיד 12 ומטה --&gt;</span></span><span class="ln"><span class="tk">&lt;uses</span>-permission</span><span class="ln">    android:name=<span class="ts">"android.permission.READ_EXTERNAL_STORAGE"</span></span><span class="ln">    android:maxSdkVersion=<span class="ts">"32"</span> <span class="tk">/&gt;</span></span></code></pre></figure>
+  <p>מאנדרואיד 13 (API 33) ההרשאה נקראת <code>READ_MEDIA_VIDEO</code>. בגרסאות קודמות משתמשים ב-<code>READ_EXTERNAL_STORAGE</code>, ולכן היא מוגבלת עם <code>maxSdkVersion="32"</code>.</p>
+
+  <h3>בקשה בזמן ריצה</h3>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** בודק הרשאה לקריאת סרטונים; ההרשאה הנדרשת שונה מאנדרואיד 13 (API 33) ומעלה. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> requestVideoPermission() {</span><span class="ln">    String permission = Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU</span><span class="ln">            ? Manifest.permission.READ_MEDIA_VIDEO</span><span class="ln">            : Manifest.permission.READ_EXTERNAL_STORAGE;</span><span class="ln">    <span class="tk">if</span> (ContextCompat.checkSelfPermission(<span class="tk">this</span>, permission) == PackageManager.PERMISSION_GRANTED) {</span><span class="ln">        openGallery();</span><span class="ln">    } <span class="tk">else</span> {</span><span class="ln">        permissionLauncher.launch(permission);</span><span class="ln">    }</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** בקשת הרשאה בזמן ריצה. אם אושרה - פותחים את הגלריה. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">final</span> ActivityResultLauncher&lt;String&gt; permissionLauncher =</span><span class="ln">        registerForActivityResult(<span class="tk">new</span> ActivityResultContracts.RequestPermission(), granted -&gt; {</span><span class="ln">            <span class="tk">if</span> (granted) {</span><span class="ln">                openGallery();</span><span class="ln">            } <span class="tk">else</span> {</span><span class="ln">                showError(R.string.error_permission);</span><span class="ln">            }</span><span class="ln">        });</span></code></pre></figure>
+
+  <h3>גלריה ומצלמה עם ActivityResultLauncher</h3>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** בחירת סרטון מהגלריה. מחזיר Uri של הסרטון (או null אם בוטל). */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">final</span> ActivityResultLauncher&lt;String&gt; galleryLauncher =</span><span class="ln">        registerForActivityResult(<span class="tk">new</span> ActivityResultContracts.GetContent(), <span class="tk">this</span>::startAnalysis);</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** צילום סרטון באפליקציית המצלמה של המכשיר. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">final</span> ActivityResultLauncher&lt;Intent&gt; cameraLauncher =</span><span class="ln">        registerForActivityResult(<span class="tk">new</span> ActivityResultContracts.StartActivityForResult(), result -&gt; {</span><span class="ln">            <span class="tk">if</span> (result.getResultCode() == RESULT_OK &amp;&amp; result.getData() != <span class="tk">null</span>) {</span><span class="ln">                startAnalysis(result.getData().getData());</span><span class="ln">            }</span><span class="ln">        });</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">private</span> <span class="tk">void</span> openCamera() {</span><span class="ln">    <span class="tk">try</span> {</span><span class="ln">        cameraLauncher.launch(<span class="tk">new</span> Intent(MediaStore.ACTION_VIDEO_CAPTURE));</span><span class="ln">    } <span class="tk">catch</span> (ActivityNotFoundException e) {</span><span class="ln">        showError(R.string.error_no_camera);</span><span class="ln">    }</span><span class="ln">}</span></code></pre></figure>
+  <p>הצילום נעשה באפליקציית המצלמה של המכשיר, דרך Intent מרומז. לכן לא צריך הרשאת <code>CAMERA</code>. אם אין במכשיר אפליקציית מצלמה, נתפס <code>ActivityNotFoundException</code> ומוצגת הודעה.</p>
+
+  <h3>חילוץ פריים בזמן נתון</h3>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מחלץ את הפריים בזמן הנתון (מילישניות) ומריץ עליו זיהוי תנוחה. */</span></span><span class="ln"><span class="tk">private</span> Result analyzeAt(MediaMetadataRetriever retriever, <span class="tk">long</span> timeMs, Boolean rightHand)</span><span class="ln">        <span class="tk">throws</span> Exception {</span><span class="ln">    Bitmap frame = retriever.getFrameAtTime(timeMs * <span class="tn">1000</span>, MediaMetadataRetriever.OPTION_CLOSEST);</span><span class="ln">    <span class="tk">if</span> (frame == <span class="tk">null</span>) {</span><span class="ln">        <span class="tk">return</span> <span class="tk">null</span>;</span><span class="ln">    }</span><span class="ln">    Result result = analyzeFrame(scaleDown(frame), rightHand);</span><span class="ln">    <span class="tk">if</span> (result != <span class="tk">null</span>) {</span><span class="ln">        result.timeMs = timeMs;</span><span class="ln">    }</span><span class="ln">    <span class="tk">return</span> result;</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מקטין את הפריים לרוחב מקסימלי, תוך שמירה על יחס גובה-רוחב. */</span></span><span class="ln"><span class="tk">private</span> Bitmap scaleDown(Bitmap frame) {</span><span class="ln">    <span class="tk">if</span> (frame.getWidth() &lt;= MAX_FRAME_WIDTH) {</span><span class="ln">        <span class="tk">return</span> frame;</span><span class="ln">    }</span><span class="ln">    <span class="tk">int</span> height = frame.getHeight() * MAX_FRAME_WIDTH / frame.getWidth();</span><span class="ln">    <span class="tk">return</span> Bitmap.createScaledBitmap(frame, MAX_FRAME_WIDTH, height, <span class="tk">true</span>);</span><span class="ln">}</span></code></pre></figure>
+  <p><code>getFrameAtTime</code> מקבל זמן במיקרו-שניות, ולכן מכפילים ב-1000. <code>OPTION_CLOSEST</code> מחזיר את הפריים הקרוב ביותר לזמן המבוקש. את הפריים מקטינים לרוחב 640 פיקסלים, כי תמונה קטנה מזוהה מהר יותר ותופסת פחות זיכרון.</p>
+
+  <div class="qa" data-topic="media"></div>
+</section>
+
+<!-- 10 -->
+<section class="ch" id="threads">
+  <div class="ch-head"><span class="ch-num">10</span><h2>Thread ו-Handler</h2></div>
+  <p class="lead">ל-thread הראשי (UI thread) יש שני תפקידים: לצייר את המסך ולהגיב לנגיעות. אם מריצים עליו עבודה ארוכה, המסך קופא, ואחרי כ-5 שניות אנדרואיד מציגה הודעת "האפליקציה לא מגיבה" (ANR).</p>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">private</span> <span class="tk">final</span> ExecutorService executor = Executors.newSingleThreadExecutor();</span><span class="ln"><span class="tk">private</span> <span class="tk">final</span> Handler mainHandler = <span class="tk">new</span> Handler(Looper.getMainLooper());</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מפעיל את הניתוח ב-thread ברקע. לעולם לא מריצים אותו על ה-thread הראשי! */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> startAnalysis(Uri videoUri) {</span><span class="ln">    <span class="tk">if</span> (videoUri == <span class="tk">null</span>) {</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    currentUri = videoUri;</span><span class="ln">    layoutProgress.setVisibility(View.VISIBLE);</span><span class="ln">    cardResult.setVisibility(View.GONE);</span><span class="ln">    executor.execute(() -&gt; {</span><span class="ln">        <span class="tk">try</span> {</span><span class="ln">            ShotAnalyzer.Result result = analyzer.analyze(<span class="tk">this</span>, videoUri);</span><span class="ln">            <span class="tk">if</span> (result != <span class="tk">null</span>) {</span><span class="ln">                currentShotId = saveShot(result);</span><span class="ln">            }</span><span class="ln">            mainHandler.post(() -&gt; showResult(result));</span><span class="ln">        } <span class="tk">catch</span> (Exception e) {</span><span class="ln">            mainHandler.post(() -&gt; showError(R.string.error_analysis));</span><span class="ln">        }</span><span class="ln">    });</span><span class="ln">}</span></code></pre></figure>
+  <ol class="steps">
+    <li><div><b><code>Executors.newSingleThreadExecutor()</code></b> יוצר thread עובד אחד. משימות שנשלחות אליו רצות אחת אחרי השנייה.</div></li>
+    <li><div><b><code>executor.execute(...)</code></b> מריץ את ה-lambda ב-thread הזה, ושם קורים חילוץ הפריימים, ML Kit והשמירה במסד.</div></li>
+    <li><div><b><code>new Handler(Looper.getMainLooper())</code></b> מחובר לתור ההודעות של ה-thread הראשי.</div></li>
+    <li><div><b><code>mainHandler.post(...)</code></b> שם את <code>showResult</code> בתור הזה, כך שהוא רץ על ה-thread הראשי. רק ה-thread הראשי רשאי לגעת ב-Views. אחרת נזרקת <code>CalledFromWrongThreadException</code>.</div></li>
+  </ol>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מציג את התוצאה על המסך (רץ ב-thread הראשי, דרך ה-Handler). */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> showResult(ShotAnalyzer.Result result) {</span><span class="ln">    <span class="tk">if</span> (isFinishing() || isDestroyed()) {</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    layoutProgress.setVisibility(View.GONE);</span><span class="ln">    <span class="tk">if</span> (result == <span class="tk">null</span>) {</span><span class="ln">        showError(R.string.error_no_pose);</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    currentResult = result;</span><span class="ln">    poseOverlay.setResult(result);</span><span class="ln">    textFrameTime.setText(getString(R.string.frame_time, result.timeMs / <span class="tn">1000.0</span>));</span><span class="ln">    setFrameButtonsEnabled(<span class="tk">true</span>);</span><span class="ln">    showScore(result.score);</span><span class="ln">    String angles = getString(R.string.result_angles, result.releaseAngle,</span><span class="ln">            ShotMathUtils.IDEAL_RELEASE_ANGLE, result.elbowAngle);</span><span class="ln">    String body = Double.isNaN(result.torsoLean)</span><span class="ln">            ? getString(R.string.result_follow_only, result.followThroughAngle)</span><span class="ln">            : getString(R.string.result_body, result.torsoLean, result.followThroughAngle);</span><span class="ln">    textAngles.setText(angles + <span class="ts">"\n"</span> + body);</span><span class="ln">    textFeedback.setText(result.feedback);</span><span class="ln">    cardResult.setVisibility(View.VISIBLE);</span><span class="ln">}</span></code></pre></figure>
+  <p>הבדיקה <code>isFinishing() || isDestroyed()</code> מגינה על מצב שבו המשתמש יצא מהמסך באמצע ניתוח: התוצאה מגיעה, אבל אין יותר מסך לעדכן.</p>
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"ExecutorService מריץ את העבודה הכבדה ברקע, ו-Handler מחזיר את התוצאה ל-thread הראשי, כי רק הוא מותר לעדכן את המסך."</p></div>
+  <div class="qa" data-topic="thread"></div>
+</section>
+
+<!-- 11 -->
+<section class="ch" id="mlkit">
+  <div class="ch-head"><span class="ch-num">11</span><h2>ML Kit: זיהוי תנוחת גוף</h2></div>
+  <p class="lead">ML Kit Pose Detection היא ספרייה של Google שמריצה מודל למידת מכונה על המכשיר עצמו, בלי אינטרנט. היא מקבלת תמונה ומחזירה 33 נקודות גוף (landmarks): כתפיים, מרפקים, שורשי כף היד, ירכיים, ברכיים ועוד.</p>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">public</span> ShotAnalyzer() {</span><span class="ln">    PoseDetectorOptions options = <span class="tk">new</span> PoseDetectorOptions.Builder()</span><span class="ln">            .setDetectorMode(PoseDetectorOptions.SINGLE_IMAGE_MODE)</span><span class="ln">            .build();</span><span class="ln">    detector = PoseDetection.getClient(options);</span><span class="ln">}</span></code></pre></figure>
+  <p><code>SINGLE_IMAGE_MODE</code> מנתח כל תמונה בנפרד, בדיוק גבוה יותר. <code>STREAM_MODE</code> מיועד למצלמה חיה ועוקב אחרי האדם בין פריימים. אצלנו כל פריים נשלף בנפרד, ולכן מצב תמונה בודדת מתאים יותר.</p>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * מריץ זיהוי תנוחה על פריים אחד ומחזיר את נקודות יד הזריקה (או null).</span></span><span class="ln"><span class="tc"> * rightHand = איזו יד לבדוק; null = לבחור לבד (היד ששורש כף היד שלה גבוה יותר).</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">private</span> Result analyzeFrame(Bitmap frame, Boolean rightHand) <span class="tk">throws</span> Exception {</span><span class="ln">    <span class="tc">// Tasks.await מחכה לתוצאה של ML Kit באותו thread (מותר רק ברקע)</span></span><span class="ln">    Pose pose = Tasks.await(detector.process(InputImage.fromBitmap(frame, <span class="tn">0</span>)));</span><span class="ln">    PoseLandmark right = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST);</span><span class="ln">    PoseLandmark left = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);</span><span class="ln">    <span class="tk">boolean</span> useRight;</span><span class="ln">    <span class="tk">if</span> (rightHand != <span class="tk">null</span>) {</span><span class="ln">        useRight = rightHand; <span class="tc">// בחיפוש המדויק נשארים עם אותה יד שנמצאה בשיא</span></span><span class="ln">    } <span class="tk">else</span> {</span><span class="ln">        useRight = !isVisible(left)</span><span class="ln">                || (isVisible(right) &amp;&amp; right.getPosition().y &lt; left.getPosition().y);</span><span class="ln">    }</span><span class="ln">    PoseLandmark shoulder = pose.getPoseLandmark(useRight ? PoseLandmark.RIGHT_SHOULDER : PoseLandmark.LEFT_SHOULDER);</span><span class="ln">    PoseLandmark elbow = pose.getPoseLandmark(useRight ? PoseLandmark.RIGHT_ELBOW : PoseLandmark.LEFT_ELBOW);</span><span class="ln">    PoseLandmark wrist = useRight ? right : left;</span><span class="ln">    PoseLandmark hip = pose.getPoseLandmark(useRight ? PoseLandmark.RIGHT_HIP : PoseLandmark.LEFT_HIP);</span><span class="ln">    <span class="tc">// כל הנקודות חייבות להיות מזוהות ובתוך התמונה. כך פוסלים פריימים שבהם רק חלק מהגוף נראה</span></span><span class="ln">    <span class="tc">// (למשל כשהשחקן עומד צמוד למצלמה) - שם ML Kit "מנחש" נקודות מחוץ לתמונה.</span></span><span class="ln">    <span class="tk">if</span> (!isInFrame(wrist, frame) || !isInFrame(shoulder, frame)</span><span class="ln">            || !isInFrame(elbow, frame) || !isInFrame(hip, frame)) {</span><span class="ln">        <span class="tk">return</span> <span class="tk">null</span>;</span><span class="ln">    }</span><span class="ln">    <span class="tc">// בדיקת היגיון: ML Kit מחזיר גוף אחד לתמונה, ולפעמים "רואה" אדם במקום שאין -</span></span><span class="ln">    <span class="tc">// למשל ברשת של הסל כשהכדור בתוכה. גוף אמיתי עומד: כתף מעל ירך מעל ברך, ועם רגליים באורך סביר.</span></span><span class="ln">    PoseLandmark knee = pose.getPoseLandmark(useRight ? PoseLandmark.RIGHT_KNEE : PoseLandmark.LEFT_KNEE);</span><span class="ln">    <span class="tk">if</span> (!isInFrame(knee, frame) || !isUprightBody(shoulder.getPosition(), hip.getPosition(), knee.getPosition())) {</span><span class="ln">        <span class="tk">return</span> <span class="tk">null</span>;</span><span class="ln">    }</span><span class="ln">    Result result = <span class="tk">new</span> Result();</span><span class="ln">    result.frame = frame;</span><span class="ln">    result.rightHand = useRight;</span><span class="ln">    result.landmarks = pose.getAllPoseLandmarks();</span><span class="ln">    result.shoulder = shoulder.getPosition();</span><span class="ln">    result.elbow = elbow.getPosition();</span><span class="ln">    result.wrist = wrist.getPosition();</span><span class="ln">    result.hip = hip.getPosition();</span><span class="ln">    <span class="tk">return</span> result;</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** נקודה מזוהה בביטחון מספיק וגם נמצאת בתוך גבולות התמונה. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">boolean</span> isInFrame(PoseLandmark landmark, Bitmap frame) {</span><span class="ln">    <span class="tk">if</span> (!isVisible(landmark)) {</span><span class="ln">        <span class="tk">return</span> <span class="tk">false</span>;</span><span class="ln">    }</span><span class="ln">    PointF p = landmark.getPosition();</span><span class="ln">    <span class="tk">return</span> p.x &gt;= <span class="tn">0</span> &amp;&amp; p.y &gt;= <span class="tn">0</span> &amp;&amp; p.x &lt; frame.getWidth() &amp;&amp; p.y &lt; frame.getHeight();</span><span class="ln">}</span></code></pre></figure>
+
+  <h3>בדיקת היגיון: האם זה בכלל אדם?</h3>
+  <p>ML Kit מחזיר גוף אחד בכל תמונה, וכשאין גוף ברור הוא לפעמים "רואה" אדם במקום שאין. בסרטון בדיקה שצולם בחוץ, כשהכדור נכנס לרשת, ML Kit זיהה את <b>הרשת של הסל עם הכדור</b> כגוף: הכדור נראה לו כמו ראש, והחוטים כמו ידיים. ה"יד" של הגוף המזויף הייתה הכי גבוהה בכל הסרטון, ולכן האפליקציה בחרה את הפריים הזה.</p>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * האם הנקודות נראות כמו גוף של אדם עומד: הכתף מעל הירך, הירך מעל הברך</span></span><span class="ln"><span class="tc"> * (בתמונה y גדל כלפי מטה), והירך (ירך-ברך) באורך של לפחות חצי מהגו (כתף-ירך).</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">boolean</span> isUprightBody(PointF shoulder, PointF hip, PointF knee) {</span><span class="ln">    <span class="tk">double</span> torso = Math.hypot(shoulder.x - hip.x, shoulder.y - hip.y);</span><span class="ln">    <span class="tk">double</span> thigh = Math.hypot(hip.x - knee.x, hip.y - knee.y);</span><span class="ln">    <span class="tk">return</span> shoulder.y &lt; hip.y &amp;&amp; hip.y &lt; knee.y &amp;&amp; thigh &gt;= MIN_THIGH_TO_TORSO * torso;</span><span class="ln">}</span></code></pre></figure>
+  <p>גוף של אדם עומד מקיים שלושה תנאים: הכתף מעל הירך, הירך מעל הברך, ואורך הירך (ירך-ברך) הוא לפחות חצי מאורך הגו (<code>MIN_THIGH_TO_TORSO</code>). פריים שלא עומד בהם נפסל. הבדיקה נוספה בלי לפגוע בתוצאות: הסרטון הקודם נתן בדיוק אותם רגעי שחרור גם אחריה.</p>
+  <ul class="plain">
+    <li><code>detector.process(...)</code> לא מחזיר תוצאה מיד אלא <code>Task</code>, כלומר הבטחה לתוצאה בעתיד. <code>Tasks.await</code> מחכה לה. מותר לקרוא לו רק ב-thread ברקע. על ה-thread הראשי הוא זורק חריגה.</li>
+    <li>לכל נקודה יש <code>getPosition()</code> (x, y בפיקסלים של התמונה) ו-<code>getInFrameLikelihood()</code>: ההסתברות שהנקודה באמת נראית בתמונה. מתחת ל-0.5 מתעלמים ממנה.</li>
+    <li>יד הזריקה היא היד ששורש כף היד שלה גבוה יותר, כלומר בעלת y קטן יותר. בחיפוש המדויק נשארים עם היד שנבחרה בשיא.</li>
+    <li>פריים נחשב רק אם הכתף, המרפק, שורש כף היד והירך מזוהים <b>וגם נמצאים בתוך התמונה</b> (<code>isInFrame</code>). כשרק חלק מהגוף נראה, למשל כשהשחקן עומד צמוד למצלמה, ML Kit "מנחש" נקודות מחוץ לתמונה, ופריים כזה נפסל.</li>
+  </ul>
+  <div class="say"><div class="lbl">מה להגיד לבוחן</div><p>"ML Kit היא הטכנולוגיה החדשה בפרויקט. היא נותנת לי קואורדינטות של מפרקים, ואת כל השאר עשיתי בעצמי: בחירת הפריים, חישוב הזוויות והציון."</p></div>
+  <div class="qa" data-topic="mlkit"></div>
+</section>
+
+<!-- 12 -->
+<section class="ch" id="math">
+  <div class="ch-head"><span class="ch-num">12</span><h2>המתמטיקה: atan2, זוויות וציון</h2></div>
+  <p class="lead"><code>Math.atan2(dy, dx)</code> מחזיר את הכיוון של וקטור, ברדיאנים בין ‎-π ל-π. בניגוד ל-<code>atan(dy/dx)</code>, הוא מבחין בין כל ארבעת הרביעים ולא נכשל כש-dx=0.</p>
+  <p><b>חשוב:</b> בתמונה ציר ה-Y גדל כלפי מטה. נקודה גבוהה יותר בתמונה היא בעלת y קטן יותר.</p>
+
+  <h3>זווית בנקודה (המרפק)</h3>
+  <figure class="code"><figcaption dir="ltr">util/ShotMathUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * מחשב את הזווית בנקודה B שנוצרת בין הקטעים BA ו-BC (למשל כתף-מרפק-שורש כף יד).</span></span><span class="ln"><span class="tc"> * Math.atan2(dy, dx) מחזיר את כיוון הווקטור ברדיאנים (בין -π ל-π).</span></span><span class="ln"><span class="tc"> * ההפרש בין שני הכיוונים הוא הזווית ביניהם. ממירים למעלות ומחזירים ערך בין 0 ל-180.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">double</span> angleAtPoint(<span class="tk">double</span> ax, <span class="tk">double</span> ay, <span class="tk">double</span> bx, <span class="tk">double</span> by,</span><span class="ln">                                  <span class="tk">double</span> cx, <span class="tk">double</span> cy) {</span><span class="ln">    <span class="tk">double</span> angleToA = Math.atan2(ay - by, ax - bx);</span><span class="ln">    <span class="tk">double</span> angleToC = Math.atan2(cy - by, cx - bx);</span><span class="ln">    <span class="tk">double</span> degrees = Math.abs(Math.toDegrees(angleToA - angleToC));</span><span class="ln">    <span class="tk">return</span> degrees &gt; <span class="tn">180</span> ? <span class="tn">360</span> - degrees : degrees;</span><span class="ln">}</span></code></pre></figure>
+
+  <div class="lab" id="angleLab">
+    <p class="lab-title">מעבדת זווית</p>
+    <p class="lab-sub">גרור את הנקודות. החישוב משתמש באותה נוסחה כמו <code>angleAtPoint</code> ו-<code>releaseAngle</code>, בקואורדינטות של תמונה (y למטה).</p>
+    <div class="lab-grid">
+      <svg id="angleSvg" direction="ltr" style="direction:ltr" viewBox="0 0 360 280" role="img" aria-label="שלוש נקודות: כתף, מרפק ושורש כף היד">
+        <line id="hRef" stroke="var(--rule)" stroke-dasharray="5 5" stroke-width="1.5"/>
+        <line id="segBA" stroke="var(--muted)" stroke-width="4" stroke-linecap="round"/>
+        <line id="segBC" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/>
+        <g id="ptA" class="pt"><circle r="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/><text text-anchor="middle" dy="5" font-size="13" font-weight="700" fill="var(--ink)">A</text></g>
+        <g id="ptB" class="pt"><circle r="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/><text text-anchor="middle" dy="5" font-size="13" font-weight="700" fill="var(--ink)">B</text></g>
+        <g id="ptC" class="pt"><circle r="14" fill="var(--paper)" stroke="var(--accent)" stroke-width="2"/><text text-anchor="middle" dy="5" font-size="13" font-weight="700" fill="var(--accent)">C</text></g>
+        <text x="10" y="270" font-size="11" fill="var(--muted)">A = כתף · B = מרפק · C = שורש כף היד</text>
+      </svg>
+      <div class="readout" id="angleReadout" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <h3>זווית השחרור ונטיית הגוף</h3>
+  <figure class="code"><figcaption dir="ltr">util/ShotMathUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * זווית השחרור: הזווית בין האמה (מרפק אל שורש כף היד) לבין הקו האופקי.</span></span><span class="ln"><span class="tc"> * הופכים את סימן dy כי ב-Y של התמונה "למעלה" הוא ערך קטן יותר.</span></span><span class="ln"><span class="tc"> * Math.abs על dx כדי שהתוצאה לא תלויה בכיוון שאליו השחקן פונה (ימין/שמאל).</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">double</span> releaseAngle(<span class="tk">double</span> elbowX, <span class="tk">double</span> elbowY, <span class="tk">double</span> wristX, <span class="tk">double</span> wristY) {</span><span class="ln">    <span class="tk">double</span> dx = Math.abs(wristX - elbowX);</span><span class="ln">    <span class="tk">double</span> dy = elbowY - wristY;</span><span class="ln">    <span class="tk">return</span> Math.toDegrees(Math.atan2(dy, dx));</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/ShotMathUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * נטיית הגוף: הזווית בין קו הגו (ירך אל כתף) לבין הקו האנכי. 0 = גוף זקוף לגמרי.</span></span><span class="ln"><span class="tc"> * כאן atan2(dx, dy) ולא atan2(dy, dx), כי מודדים מול האנך ולא מול האופק.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">double</span> torsoLean(<span class="tk">double</span> shoulderX, <span class="tk">double</span> shoulderY, <span class="tk">double</span> hipX, <span class="tk">double</span> hipY) {</span><span class="ln">    <span class="tk">double</span> dx = Math.abs(shoulderX - hipX);</span><span class="ln">    <span class="tk">double</span> dy = hipY - shoulderY; <span class="tc">// הירך מתחת לכתף, לכן dy חיובי</span></span><span class="ln">    <span class="tk">return</span> Math.toDegrees(Math.atan2(dx, dy));</span><span class="ln">}</span></code></pre></figure>
+  <p>ב-<code>releaseAngle</code> מודדים מול הקו האופקי, ולכן <code>atan2(dy, dx)</code>. ב-<code>torsoLean</code> מודדים מול הקו האנכי, ולכן מחליפים את הסדר: <code>atan2(dx, dy)</code>. גוף זקוף לגמרי נותן 0°.</p>
+
+  <h3>הציון</h3>
+  <figure class="code"><figcaption dir="ltr">util/ShotMathUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * ציון משוקלל: 60% זווית שחרור + 20% יציבות גוף + 20% המשך תנועה.</span></span><span class="ln"><span class="tc"> * בכל רכיב מורידים 2 נקודות על כל מעלה מעבר לטווח המותר.</span></span><span class="ln"><span class="tc"> * torsoLean = NaN אם הירך לא זוהתה - אז לא מורידים נקודות על יציבות.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">int</span> calculateTotalScore(<span class="tk">double</span> releaseAngle, <span class="tk">double</span> torsoLean, <span class="tk">double</span> followThroughAngle) {</span><span class="ln">    <span class="tk">int</span> stability = Double.isNaN(torsoLean) ? <span class="tn">100</span> : partScore(torsoLean - MAX_TORSO_LEAN);</span><span class="ln">    <span class="tk">int</span> follow = partScore(MIN_FOLLOW_THROUGH - followThroughAngle);</span><span class="ln">    <span class="tk">double</span> total = RELEASE_WEIGHT * calculateScore(releaseAngle)</span><span class="ln">            + STABILITY_WEIGHT * stability + FOLLOW_WEIGHT * follow;</span><span class="ln">    <span class="tk">return</span> (<span class="tk">int</span>) Math.round(total);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/ShotMathUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** ציון של רכיב אחד: 100 פחות 2 נקודות לכל מעלת חריגה (חריגה שלילית = אין קנס), בטווח 0-100. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">static</span> <span class="tk">int</span> partScore(<span class="tk">double</span> degreesOver) {</span><span class="ln">    <span class="tk">long</span> score = Math.round(<span class="tn">100</span> - Math.max(<span class="tn">0</span>, degreesOver) * POINTS_PER_DEGREE);</span><span class="ln">    <span class="tk">return</span> (<span class="tk">int</span>) Math.max(<span class="tn">0</span>, Math.min(<span class="tn">100</span>, score));</span><span class="ln">}</span></code></pre></figure>
+  <p>כל רכיב מתחיל ב-100, ויורדות ממנו 2 נקודות על כל מעלה של חריגה. בזווית השחרור החריגה היא המרחק מ-48.5° לכל כיוון. בנטיית הגוף, כל מה שמעל 10°. במרפק בסוף התנועה, כל מה שמתחת ל-160°. הציון הסופי הוא ממוצע משוקלל 60/20/20, מעוגל.</p>
+
+  <div class="lab" id="scoreLab">
+    <p class="lab-title">מחשבון ציון</p>
+    <p class="lab-sub">אותה נוסחה כמו <code>calculateTotalScore</code> ו-<code>generateFeedback</code>. נסה ערכים ובדוק את עצמך.</p>
+    <div class="lab-grid">
+      <div>
+        <div class="ctl"><label for="inRel">זווית שחרור <output id="outRel"></output></label><input id="inRel" type="range" min="20" max="80" step="0.5" value="55"></div>
+        <div class="ctl"><label for="inLean">נטיית גוף <output id="outLean"></output></label><input id="inLean" type="range" min="0" max="30" step="0.5" value="12"></div>
+        <label class="chk"><input id="inNoHip" type="checkbox"> הירך לא זוהתה (NaN)</label>
+        <div class="ctl" style="margin-top:14px"><label for="inFollow">מרפק בסוף התנועה <output id="outFollow"></output></label><input id="inFollow" type="range" min="100" max="180" step="1" value="150"></div>
+      </div>
+      <div class="scorebox" aria-live="polite">
+        <div class="score-total" id="scoreTotal"></div>
+        <div class="bar" id="scoreBarWrap"><i id="scoreBar"></i></div>
+        <div class="parts" id="scoreParts"></div>
+        <div class="fb" id="scoreFb"></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>המשוב</h3>
+  <figure class="code"><figcaption dir="ltr">util/ShotMathUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** יוצר משוב טקסטואלי בעברית לפי זווית השחרור, נטיית הגוף והמשך התנועה. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> String generateFeedback(<span class="tk">double</span> releaseAngle, <span class="tk">double</span> torsoLean, <span class="tk">double</span> followThroughAngle) {</span><span class="ln">    <span class="tk">double</span> deviation = deviationFromIdeal(releaseAngle);</span><span class="ln">    StringBuilder feedback = <span class="tk">new</span> StringBuilder();</span><span class="ln">    <span class="tk">if</span> (deviation &lt; -GOOD_RANGE) {</span><span class="ln">        feedback.append(<span class="ts">"זווית השחרור נמוכה מדי - נסה לשחרר את הכדור בקשת גבוהה יותר."</span>);</span><span class="ln">    } <span class="tk">else</span> <span class="tk">if</span> (deviation &gt; GOOD_RANGE) {</span><span class="ln">        feedback.append(<span class="ts">"זווית השחרור גבוהה מדי - כוון יותר קדימה אל הסל."</span>);</span><span class="ln">    } <span class="tk">else</span> {</span><span class="ln">        feedback.append(<span class="ts">"זווית שחרור מצוינת! המשך כך."</span>);</span><span class="ln">    }</span><span class="ln">    <span class="tk">if</span> (torsoLean &gt; MAX_TORSO_LEAN) {</span><span class="ln">        feedback.append(<span class="ts">"\nהגוף נוטה בזמן הזריקה - נסה לקפוץ ישר למעלה ולנחות באותה נקודה."</span>);</span><span class="ln">    }</span><span class="ln">    <span class="tk">if</span> (followThroughAngle &lt; MIN_FOLLOW_THROUGH) {</span><span class="ln">        feedback.append(<span class="ts">"\nהיד לא נשארה ישרה אחרי השחרור - סיים את התנועה עם יד מושטת אל הסל."</span>);</span><span class="ln">    }</span><span class="ln">    <span class="tk">return</span> feedback.toString();</span><span class="ln">}</span></code></pre></figure>
+  <div class="qa" data-topic="math"></div>
+</section>
+
+<!-- 13 -->
+<section class="ch" id="release">
+  <div class="ch-head"><span class="ch-num">13</span><h2>מציאת רגע השחרור</h2></div>
+  <p class="lead">ML Kit לא רואה את הכדור, ולכן את רגע השחרור מסיקים מתנועת היד. החיפוש נעשה בשני שלבים, כדי לא להריץ זיהוי על כל פריים בסרטון.</p>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * מנתח סרטון ומחזיר את התוצאה ברגע שהכדור עוזב את היד,</span></span><span class="ln"><span class="tc"> * או null אם לא זוהה שחקן באף פריים.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> Result analyze(Context context, Uri videoUri) <span class="tk">throws</span> Exception {</span><span class="ln">    MediaMetadataRetriever retriever = <span class="tk">new</span> MediaMetadataRetriever();</span><span class="ln">    <span class="tk">try</span> {</span><span class="ln">        retriever.setDataSource(context, videoUri);</span><span class="ln">        <span class="tk">long</span> durationMs = Math.min(getDurationMs(retriever), MAX_DURATION_MS);</span><span class="ln">        List&lt;Result&gt; samples = coarseSamples(retriever, durationMs);</span><span class="ln">        <span class="tk">int</span> top = highestHandIndex(samples);</span><span class="ln">        <span class="tk">if</span> (top == -<span class="tn">1</span>) {</span><span class="ln">            <span class="tk">return</span> <span class="tk">null</span>;</span><span class="ln">        }</span><span class="ln">        Result start = samples.get(plateauStartIndex(samples, top));</span><span class="ln">        Result release = findRelease(retriever, start, durationMs);</span><span class="ln">        fillScore(release, elbowAngle(samples.get(top)));</span><span class="ln">        <span class="tk">return</span> release;</span><span class="ln">    } <span class="tk">finally</span> {</span><span class="ln">        retriever.release();</span><span class="ln">    }</span><span class="ln">}</span></code></pre></figure>
+
+  <h3>שלב 1: חיפוש גס - איפה הזריקה בסרטון</h3>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * שלב 1 (חיפוש גס): דוגם פריים כל COARSE_STEP_MS לאורך הסרטון.</span></span><span class="ln"><span class="tc"> * מכל דגימה שומרים רק את נקודות הגוף, לא את התמונה, כדי לא למלא את הזיכרון בסרטון ארוך.</span></span><span class="ln"><span class="tc"> * במקום שבו לא זוהה שחקן נשמר null.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">private</span> List&lt;Result&gt; coarseSamples(MediaMetadataRetriever retriever, <span class="tk">long</span> durationMs) <span class="tk">throws</span> Exception {</span><span class="ln">    List&lt;Result&gt; samples = <span class="tk">new</span> ArrayList&lt;&gt;();</span><span class="ln">    <span class="tk">for</span> (<span class="tk">long</span> t = <span class="tn">0</span>; t &lt;= durationMs; t += COARSE_STEP_MS) {</span><span class="ln">        Result r = analyzeAt(retriever, t, <span class="tk">null</span>);</span><span class="ln">        <span class="tk">if</span> (r != <span class="tk">null</span>) {</span><span class="ln">            r.frame = <span class="tk">null</span>;</span><span class="ln">        }</span><span class="ln">        samples.add(r);</span><span class="ln">    }</span><span class="ln">    <span class="tk">return</span> samples;</span><span class="ln">}</span></code></pre></figure>
+  <p>דוגמים פריים כל 250ms לאורך כל הסרטון. מכל דגימה שומרים רק את נקודות הגוף ומוחקים את התמונה (<code>r.frame = null</code>), אחרת סרטון של דקה היה תופס מאות מגה-בייט.</p>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * גובה שורש כף היד מעל הכתף, ביחידות של "אורך גו" (המרחק כתף-ירך). חיובי = היד מעל הכתף.</span></span><span class="ln"><span class="tc"> * מודדים יחסית לכתף, כדי שהקפיצה של כל הגוף לא תיחשב כתנועת יד,</span></span><span class="ln"><span class="tc"> * ומחלקים באורך הגו, כדי שצילום מקרוב (גוף גדול בתמונה) לא "ינצח" זריקה שצולמה מרחוק.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">double</span> handHeight(Result r) {</span><span class="ln">    <span class="tk">double</span> torso = Math.hypot(r.shoulder.x - r.hip.x, r.shoulder.y - r.hip.y);</span><span class="ln">    <span class="tk">return</span> torso &gt; <span class="tn">0</span> ? (r.shoulder.y - r.wrist.y) / torso : <span class="tn">0</span>;</span><span class="ln">}</span></code></pre></figure>
+  <p>הגובה נמדד <b>יחסית לכתף</b>, כי כל הגוף קופץ, ו<b>ביחידות של אורך הגו</b> ולא בפיקסלים. בלי החלוקה הזו, רגע שבו השחקן עומד צמוד למצלמה (ענק בתמונה) "ניצח" את הזריקה האמיתית שצולמה מרחוק. זה בדיוק מה שקרה בסרטון הבדיקה.</p>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** האינדקס של הדגימה שבה היד הכי גבוהה (סוף התנועה, אחרי השחרור), או -1 אם אין אף זיהוי. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">int</span> highestHandIndex(List&lt;Result&gt; samples) {</span><span class="ln">    <span class="tk">int</span> best = -<span class="tn">1</span>;</span><span class="ln">    <span class="tk">for</span> (<span class="tk">int</span> i = <span class="tn">0</span>; i &lt; samples.size(); i++) {</span><span class="ln">        Result r = samples.get(i);</span><span class="ln">        <span class="tk">if</span> (r != <span class="tk">null</span> &amp;&amp; (best == -<span class="tn">1</span> || handHeight(r) &gt; handHeight(samples.get(best)))) {</span><span class="ln">            best = i;</span><span class="ln">        }</span><span class="ln">    }</span><span class="ln">    <span class="tk">return</span> best;</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * הרבה שחקנים מחזיקים את היד למעלה אחרי הזריקה (follow-through), ולכן השיא יכול להגיע</span></span><span class="ln"><span class="tc"> * שנייה אחרי שהכדור כבר עזב. הולכים אחורה מהשיא כל עוד היד עדיין בגובה של לפחות 90% ממנו,</span></span><span class="ln"><span class="tc"> * ומחזירים את הדגימה הראשונה של "היד למעלה". נעצרים בדגימה נמוכה - שם מתחילה זריקה אחרת.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">int</span> plateauStartIndex(List&lt;Result&gt; samples, <span class="tk">int</span> top) {</span><span class="ln">    <span class="tk">double</span> peakHeight = handHeight(samples.get(top));</span><span class="ln">    <span class="tk">int</span> start = top;</span><span class="ln">    <span class="tk">for</span> (<span class="tk">int</span> i = top - <span class="tn">1</span>; i &gt;= <span class="tn">0</span>; i--) {</span><span class="ln">        Result r = samples.get(i);</span><span class="ln">        <span class="tk">if</span> (r == <span class="tk">null</span>) {</span><span class="ln">            continue;</span><span class="ln">        }</span><span class="ln">        <span class="tk">if</span> (handHeight(r) &lt; PLATEAU_RATIO * peakHeight) {</span><span class="ln">            break;</span><span class="ln">        }</span><span class="ln">        start = i;</span><span class="ln">    }</span><span class="ln">    <span class="tk">return</span> start;</span><span class="ln">}</span></code></pre></figure>
+  <p>אחרי זריקה טובה מחזיקים את היד למעלה (follow-through), לפעמים יותר משנייה, ולכן הרגע שבו היד הכי גבוהה מגיע הרבה אחרי שהכדור עזב. הולכים אחורה מהשיא כל עוד היד עדיין בגובה של לפחות 90% ממנו, ומשם מתחילים לחפש את השחרור. נעצרים בדגימה נמוכה, כדי לא לעבור לזריקה קודמת באותו סרטון.</p>
+
+  <h3>שלב 2: חיפוש מדויק של השחרור</h3>
+  <p>בזריקת קפיצה הכדור עוזב את היד <b>כשהמרפק מסיים להתיישר</b>. אחרי הרגע הזה היד נשארת ישרה (follow-through), ורק כף היד "מצליפה". לכן מחפשים את הפריים הראשון שבו המרפק כמעט ישר.</p>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * שלב 2 (חיפוש מדויק): סורק פריים-פריים מ-0.7 שניות לפני השיא ועד 0.25 שניות אחריו.</span></span><span class="ln"><span class="tc"> * הכדור עוזב את היד כשהמרפק מסיים להתיישר, ולכן לכל פריים שומרים את זווית המרפק,</span></span><span class="ln"><span class="tc"> * ו-ShotMathUtils.releaseIndex בוחר את הפריים הראשון שבו היד כמעט ישרה.</span></span><span class="ln"><span class="tc"> * בודקים רק פריימים שבהם היד מעל הכתף, כדי לא לבלבל עם הרמת הכדור מהמותן.</span></span><span class="ln"><span class="tc"> * שומרים רק זמן וזווית (לא את התמונות, כדי לחסוך זיכרון), ובסוף שולפים שוב רק את פריים השחרור.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">private</span> Result findRelease(MediaMetadataRetriever retriever, Result peak, <span class="tk">long</span> durationMs)</span><span class="ln">        <span class="tk">throws</span> Exception {</span><span class="ln">    List&lt;Long&gt; times = <span class="tk">new</span> ArrayList&lt;&gt;();</span><span class="ln">    List&lt;Double&gt; angles = <span class="tk">new</span> ArrayList&lt;&gt;();</span><span class="ln">    <span class="tk">long</span> end = Math.min(durationMs, peak.timeMs + AFTER_PEAK_MS);</span><span class="ln">    <span class="tk">for</span> (<span class="tk">long</span> t = Math.max(<span class="tn">0</span>, peak.timeMs - RELEASE_WINDOW_MS); t &lt;= end; t += FINE_STEP_MS) {</span><span class="ln">        Result frame = analyzeAt(retriever, t, peak.rightHand);</span><span class="ln">        <span class="tk">if</span> (frame != <span class="tk">null</span> &amp;&amp; handHeight(frame) &gt; <span class="tn">0</span>) {</span><span class="ln">            times.add(t);</span><span class="ln">            angles.add(elbowAngle(frame));</span><span class="ln">        }</span><span class="ln">    }</span><span class="ln">    <span class="tk">if</span> (times.isEmpty()) {</span><span class="ln">        Result fallback = analyzeAt(retriever, peak.timeMs, peak.rightHand); <span class="tc">// הדגימה בלי תמונה</span></span><span class="ln">        <span class="tk">return</span> fallback != <span class="tk">null</span> ? fallback : peak;</span><span class="ln">    }</span><span class="ln">    <span class="tk">double</span>[] elbowAngles = <span class="tk">new</span> <span class="tk">double</span>[angles.size()];</span><span class="ln">    <span class="tk">for</span> (<span class="tk">int</span> i = <span class="tn">0</span>; i &lt; elbowAngles.length; i++) {</span><span class="ln">        elbowAngles[i] = angles.get(i);</span><span class="ln">    }</span><span class="ln">    <span class="tk">int</span> index = ShotMathUtils.releaseIndex(elbowAngles);</span><span class="ln">    Result release = analyzeAt(retriever, times.get(index), peak.rightHand);</span><span class="ln">    <span class="tk">return</span> release != <span class="tk">null</span> ? release : analyzeAt(retriever, peak.timeMs, peak.rightHand);</span><span class="ln">}</span></code></pre></figure>
+  <p>סורקים פריים-פריים, כל 33ms, מ-0.7 שניות לפני תחילת "היד למעלה" ועד 0.25 שניות אחריה. החיפוש הגס דוגם רק כל 250ms, ולכן הרגע האמיתי יכול ליפול קצת לפני הדגימה או אחריה. לכל פריים שבו היד מעל הכתף שומרים רק את הזמן ואת זווית המרפק, בלי התמונה, כדי לחסוך זיכרון. בסוף שולפים שוב רק את פריים השחרור.</p>
+  <figure class="code"><figcaption dir="ltr">util/ShotMathUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * מוצא את רגע השחרור מתוך זוויות המרפק של פריימים עוקבים (לפי סדר הזמן).</span></span><span class="ln"><span class="tc"> * בזריקת קפיצה הכדור עוזב את היד כשהמרפק מסיים להתיישר; אחרי זה היד נשארת ישרה.</span></span><span class="ln"><span class="tc"> * 1. מחליקים: כל זווית מוחלפת בחציון של שלושה פריימים שכנים. חציון מסיר פריים בודד</span></span><span class="ln"><span class="tc"> *    שבו ML Kit טעה, ובניגוד לממוצע לא "מאחר" כשהזווית עולה בהדרגה.</span></span><span class="ln"><span class="tc"> * 2. מוצאים את היישור המקסימלי.</span></span><span class="ln"><span class="tc"> * 3. מחזירים את האינדקס הראשון שבו הזווית המוחלקת הגיעה עד RELEASE_EXTENSION_MARGIN מהמקסימום.</span></span><span class="ln"><span class="tc"> * לדוגמה: 90, 110, 135, 158, 170, 172, 171 → מקסימום 171, סף 163 → אינדקס 4.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">int</span> releaseIndex(<span class="tk">double</span>[] elbowAngles) {</span><span class="ln">    <span class="tk">int</span> n = elbowAngles.length;</span><span class="ln">    <span class="tk">double</span>[] smooth = <span class="tk">new</span> <span class="tk">double</span>[n];</span><span class="ln">    <span class="tk">double</span> max = <span class="tn">0</span>;</span><span class="ln">    <span class="tk">for</span> (<span class="tk">int</span> i = <span class="tn">0</span>; i &lt; n; i++) {</span><span class="ln">        <span class="tk">if</span> (n &lt; <span class="tn">3</span>) {</span><span class="ln">            smooth[i] = elbowAngles[i];</span><span class="ln">        } <span class="tk">else</span> {</span><span class="ln">            <span class="tk">int</span> center = Math.max(<span class="tn">1</span>, Math.min(n - <span class="tn">2</span>, i)); <span class="tc">// בקצוות משתמשים בשלושת הקרובים</span></span><span class="ln">            smooth[i] = medianOfThree(elbowAngles[center - <span class="tn">1</span>], elbowAngles[center], elbowAngles[center + <span class="tn">1</span>]);</span><span class="ln">        }</span><span class="ln">        max = Math.max(max, smooth[i]);</span><span class="ln">    }</span><span class="ln">    <span class="tk">for</span> (<span class="tk">int</span> i = <span class="tn">0</span>; i &lt; n; i++) {</span><span class="ln">        <span class="tk">if</span> (smooth[i] &gt;= max - RELEASE_EXTENSION_MARGIN) {</span><span class="ln">            <span class="tk">return</span> i;</span><span class="ln">        }</span><span class="ln">    }</span><span class="ln">    <span class="tk">return</span> n - <span class="tn">1</span>;</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">util/ShotMathUtils.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** החציון של שלושה מספרים: הערך האמצעי אחרי מיון. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">static</span> <span class="tk">double</span> medianOfThree(<span class="tk">double</span> a, <span class="tk">double</span> b, <span class="tk">double</span> c) {</span><span class="ln">    <span class="tk">return</span> Math.max(Math.min(a, b), Math.min(Math.max(a, b), c));</span><span class="ln">}</span></code></pre></figure>
+  <ol class="steps">
+    <li><div><b>החלקה בחציון.</b> כל זווית מוחלפת בחציון שלה ושל שתי השכנות. חציון מסיר פריים בודד שבו ML Kit טעה. בניגוד לממוצע, הוא לא "מאחר" כשהזווית עולה בהדרגה.</div></li>
+    <li><div><b>יישור מקסימלי.</b> מוצאים את הזווית המוחלקת הגבוהה ביותר.</div></li>
+    <li><div><b>הפריים הראשון שמתקרב.</b> מחזירים את האינדקס הראשון שבו הזווית המוחלקת הגיעה עד 8° מהמקסימום (<code>RELEASE_EXTENSION_MARGIN</code>).</div></li>
+  </ol>
+
+  <div class="lab">
+    <p class="lab-title">נתונים אמיתיים: זווית המרפק בזריקה מהסרטון שלך</p>
+    <p class="lab-sub">הזוויות שמדד MediaPipe Pose (אותה משפחת מודלים כמו ML Kit) בזריקה השנייה בסרטון הבדיקה. מצולם מלפנים, ולכן כשהאמה מסתירה את הזרוע הזווית נראית קרובה ל-0°, ואז קופצת כשהיד מתיישרת. הקו המקווקו הוא רגע השחרור האמיתי שסומן ידנית, והנקודה האדומה היא מה ש-<code>releaseIndex</code> בחר.</p>
+    <svg id="releaseSvg" direction="ltr" style="direction:ltr" viewBox="0 0 640 300" role="img" aria-label="גרף זווית המרפק לאורך הזמן, עם קו סף ונקודת השחרור"></svg>
+    <div class="readout" id="releaseReadout" style="margin-top:10px"></div>
+  </div>
+
+  <h3>בדיקה על סרטון אמיתי</h3>
+  <p>הקוד נבדק על סרטון אמיתי של 27 שניות: הליכה עד המצלמה, שתי זריקות, והרמת הטלפון בסוף. האלגוריתם הורץ בסביבת בדיקה שמעתיקה את <code>ShotAnalyzer</code> שלב אחר שלב, ורגע השחרור האמיתי סומן בעין, פריים אחרי פריים, לפי הרגע שבו הכדור נפרד מהאצבעות.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>מקרה</th><th>רגע אמיתי</th><th>לפני התיקונים</th><th>אחרי</th></tr></thead>
+    <tbody>
+      <tr><td>הסרטון המלא</td><td>19.685 שנ' (זריקה 2)</td><td>1.0 שנ' (רגליים מקרוב)</td><td><b>19.685 שנ'</b>, מדויק</td></tr>
+      <tr><td>זריקה 1</td><td>2.54–2.57 שנ'</td><td>3.04 שנ' (חצי שנייה מאוחר)</td><td><b>2.60 שנ'</b>, פריים אחד מאוחר</td></tr>
+    </tbody>
+  </table></div>
+  <p>בסרטון של 30 פריימים בשנייה פריים אחד הוא 33 מילישניות, וזה בערך הגבול: גם בעין קשה להחליט אם הכדור עוד נוגע באצבעות או כבר לא.</p>
+
+  <h3>תיקון ידני: פריים אחורה / קדימה</h3>
+  <p>זיהוי אוטומטי בלי לראות את הכדור יכול לטעות, ולכן מתחת לתמונה יש כפתורים להזזת רגע השחרור. כל לחיצה מנתחת מחדש את הפריים השכן ומעדכנת זוויות, ציון, משוב והיסטוריה.</p>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * תיקון ידני של רגע השחרור: עובר פריים אחד אחורה (direction = -1) או קדימה (+1)</span></span><span class="ln"><span class="tc"> * מהפריים הנוכחי, עם אותה יד, ומחשב לו מחדש זוויות, ציון ומשוב.</span></span><span class="ln"><span class="tc"> * אם בפריים הזה ML Kit לא זיהה את היד, ממשיכים לפריים הבא באותו כיוון (עד MAX_STEP_TRIES).</span></span><span class="ln"><span class="tc"> * ה-follow-through נשאר מהניתוח המקורי, כי הוא נמדד בסוף התנועה ולא ברגע השחרור.</span></span><span class="ln"><span class="tc"> * מחזיר null אם לא נמצא פריים מתאים. איטית, ולכן רק מ-thread ברקע.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">public</span> Result stepFrame(Context context, Uri videoUri, Result current, <span class="tk">int</span> direction) <span class="tk">throws</span> Exception {</span><span class="ln">    MediaMetadataRetriever retriever = <span class="tk">new</span> MediaMetadataRetriever();</span><span class="ln">    <span class="tk">try</span> {</span><span class="ln">        retriever.setDataSource(context, videoUri);</span><span class="ln">        <span class="tk">long</span> durationMs = getDurationMs(retriever);</span><span class="ln">        <span class="tk">for</span> (<span class="tk">int</span> k = <span class="tn">1</span>; k &lt;= MAX_STEP_TRIES; k++) {</span><span class="ln">            <span class="tk">long</span> t = current.timeMs + direction * k * FINE_STEP_MS;</span><span class="ln">            <span class="tk">if</span> (t &lt; <span class="tn">0</span> || t &gt; durationMs) {</span><span class="ln">                break;</span><span class="ln">            }</span><span class="ln">            Result r = analyzeAt(retriever, t, current.rightHand);</span><span class="ln">            <span class="tk">if</span> (r != <span class="tk">null</span>) {</span><span class="ln">                fillScore(r, current.followThroughAngle);</span><span class="ln">                <span class="tk">return</span> r;</span><span class="ln">            }</span><span class="ln">        }</span><span class="ln">        <span class="tk">return</span> <span class="tk">null</span>;</span><span class="ln">    } <span class="tk">finally</span> {</span><span class="ln">        retriever.release();</span><span class="ln">    }</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">MainActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/**</span></span><span class="ln"><span class="tc"> * תיקון ידני של רגע השחרור: פריים אחד אחורה (-1) או קדימה (+1).</span></span><span class="ln"><span class="tc"> * הניתוח מחדש רץ ברקע; התוצאה מוצגת ומעדכנת את הזריקה שכבר נשמרה במסד.</span></span><span class="ln"><span class="tc"> */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> stepFrame(<span class="tk">int</span> direction) {</span><span class="ln">    ShotAnalyzer.Result from = currentResult;</span><span class="ln">    <span class="tk">if</span> (from == <span class="tk">null</span> || currentUri == <span class="tk">null</span>) {</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    setFrameButtonsEnabled(<span class="tk">false</span>);</span><span class="ln">    executor.execute(() -&gt; {</span><span class="ln">        <span class="tk">try</span> {</span><span class="ln">            ShotAnalyzer.Result r = analyzer.stepFrame(<span class="tk">this</span>, currentUri, from, direction);</span><span class="ln">            <span class="tk">if</span> (r != <span class="tk">null</span> &amp;&amp; currentShotId != -<span class="tn">1</span>) {</span><span class="ln">                dbHelper.updateShotResult(currentShotId, r.elbowAngle, r.releaseAngle, r.score, r.feedback);</span><span class="ln">            }</span><span class="ln">            mainHandler.post(() -&gt; {</span><span class="ln">                <span class="tk">if</span> (r == <span class="tk">null</span>) {</span><span class="ln">                    setFrameButtonsEnabled(<span class="tk">true</span>);</span><span class="ln">                    showError(R.string.error_no_pose_frame);</span><span class="ln">                } <span class="tk">else</span> {</span><span class="ln">                    showResult(r);</span><span class="ln">                }</span><span class="ln">            });</span><span class="ln">        } <span class="tk">catch</span> (Exception e) {</span><span class="ln">            mainHandler.post(() -&gt; {</span><span class="ln">                setFrameButtonsEnabled(<span class="tk">true</span>);</span><span class="ln">                showError(R.string.error_analysis);</span><span class="ln">            });</span><span class="ln">        }</span><span class="ln">    });</span><span class="ln">}</span></code></pre></figure>
+  <p>גם כאן העבודה הכבדה רצה ב-thread ברקע וחוזרת עם Handler, בדיוק כמו בניתוח הראשון. בזמן הריצה הכפתורים מושבתים, כדי שלחיצה כפולה לא תריץ שני ניתוחים.</p>
+
+  <h3>הרכבת התוצאה</h3>
+  <figure class="code"><figcaption dir="ltr">util/ShotAnalyzer.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מחשב זוויות, ציון ומשוב בעזרת ShotMathUtils. followThrough = זווית המרפק בסוף התנועה. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> fillScore(Result r, <span class="tk">double</span> followThrough) {</span><span class="ln">    r.elbowAngle = elbowAngle(r);</span><span class="ln">    r.releaseAngle = ShotMathUtils.releaseAngle(r.elbow.x, r.elbow.y, r.wrist.x, r.wrist.y);</span><span class="ln">    r.torsoLean = r.hip == <span class="tk">null</span> ? Double.NaN</span><span class="ln">            : ShotMathUtils.torsoLean(r.shoulder.x, r.shoulder.y, r.hip.x, r.hip.y);</span><span class="ln">    r.followThroughAngle = followThrough;</span><span class="ln">    r.score = ShotMathUtils.calculateTotalScore(r.releaseAngle, r.torsoLean, r.followThroughAngle);</span><span class="ln">    r.feedback = ShotMathUtils.generateFeedback(r.releaseAngle, r.torsoLean, r.followThroughAngle);</span><span class="ln">}</span></code></pre></figure>
+  <p>זווית השחרור ונטיית הגוף נמדדות בפריים של השחרור. ה-follow-through נמדד בדגימה שבה היד הכי גבוהה, כלומר סוף התנועה.</p>
+  <div class="qa" data-topic="release"></div>
+</section>
+
+<!-- 14 -->
+<section class="ch" id="customview">
+  <div class="ch-head"><span class="ch-num">14</span><h2>View מותאם אישית: PoseOverlayView</h2></div>
+  <p class="lead"><code>PoseOverlayView</code> יורשת מ-<code>View</code> ודורסת את <code>onDraw(Canvas)</code>. אנדרואיד קוראת ל-<code>onDraw</code> בכל פעם שצריך לצייר את הרכיב, ואנחנו מציירים בה את הפריים, העצמות, הנקודות ותוויות הזווית.</p>
+  <figure class="code"><figcaption dir="ltr">ui/PoseOverlayView.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">protected</span> <span class="tk">void</span> onDraw(Canvas canvas) {</span><span class="ln">    <span class="tk">super</span>.onDraw(canvas);</span><span class="ln">    <span class="tk">if</span> (result == <span class="tk">null</span>) {</span><span class="ln">        <span class="tk">return</span>;</span><span class="ln">    }</span><span class="ln">    canvas.save();</span><span class="ln">    canvas.concat(zoomMatrix); <span class="tc">// כל מה שמצויר מכאן והלאה מוגדל ומוזז לפי הזום</span></span><span class="ln">    drawFrame(canvas);</span><span class="ln">    <span class="tk">for</span> (<span class="tk">int</span>[] bone : BONES) {</span><span class="ln">        drawBone(canvas, bone[<span class="tn">0</span>], bone[<span class="tn">1</span>]);</span><span class="ln">    }</span><span class="ln">    drawLine(canvas, result.shoulder, result.elbow, armPaint);</span><span class="ln">    drawLine(canvas, result.elbow, result.wrist, armPaint);</span><span class="ln">    <span class="tk">for</span> (PoseLandmark landmark : result.landmarks) {</span><span class="ln">        canvas.drawCircle(toViewX(landmark.getPosition().x), toViewY(landmark.getPosition().y), <span class="tn">5f</span>, pointPaint);</span><span class="ln">    }</span><span class="ln">    drawLabel(canvas, getContext().getString(R.string.label_elbow, result.elbowAngle), result.elbow);</span><span class="ln">    drawLabel(canvas, getContext().getString(R.string.label_release, result.releaseAngle), result.wrist);</span><span class="ln">    canvas.restore();</span><span class="ln">}</span></code></pre></figure>
+  <ul class="plain">
+    <li><b>Canvas</b> אומר <i>מה</i> לצייר: <code>drawLine</code>, <code>drawCircle</code>, <code>drawText</code>, <code>drawBitmap</code>.</li>
+    <li><b>Paint</b> אומר <i>איך</i>: צבע, עובי קו, גודל גופן. ארבעת ה-Paint נוצרים פעם אחת בבנאי ולא בתוך <code>onDraw</code>, כי <code>onDraw</code> רצה הרבה פעמים, ויצירת אובייקטים בה גורמת לגמגום.</li>
+    <li><b>invalidate()</b> מסמן שהרכיב צריך ציור מחדש. אף פעם לא קוראים ל-<code>onDraw</code> ישירות.</li>
+  </ul>
+
+  <h3>התאמה מקואורדינטות התמונה למסך</h3>
+  <figure class="code"><figcaption dir="ltr">ui/PoseOverlayView.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מצייר את התמונה במרכז ה-View בגודל המקסימלי שנכנס, ושומר את יחס ההגדלה. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> drawFrame(Canvas canvas) {</span><span class="ln">    <span class="tk">float</span> bw = result.frame.getWidth();</span><span class="ln">    <span class="tk">float</span> bh = result.frame.getHeight();</span><span class="ln">    scale = Math.min(getWidth() / bw, getHeight() / bh);</span><span class="ln">    offsetX = (getWidth() - bw * scale) / <span class="tn">2f</span>;</span><span class="ln">    offsetY = (getHeight() - bh * scale) / <span class="tn">2f</span>;</span><span class="ln">    RectF dest = <span class="tk">new</span> RectF(offsetX, offsetY, offsetX + bw * scale, offsetY + bh * scale);</span><span class="ln">    canvas.drawBitmap(result.frame, <span class="tk">null</span>, dest, <span class="tk">null</span>);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">ui/PoseOverlayView.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">private</span> <span class="tk">float</span> toViewX(<span class="tk">float</span> imageX) { <span class="tk">return</span> imageX * scale + offsetX; }</span><span class="ln"><span class="tk">private</span> <span class="tk">float</span> toViewY(<span class="tk">float</span> imageY) { <span class="tk">return</span> imageY * scale + offsetY; }</span></code></pre></figure>
+  <p>הפריים מוקטן או מוגדל כדי להיכנס לרכיב בלי לעוות אותו (לכן <code>min</code>), וממורכז. כל נקודה של ML Kit עוברת את אותה המרה: <code>x × scale + offsetX</code>.</p>
+
+  <h3>זום בצביטה</h3>
+  <figure class="code"><figcaption dir="ltr">ui/PoseOverlayView.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מעביר כל נגיעה למזהי המחוות (צביטה / גרירה / הקשה כפולה). */</span></span><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> <span class="tk">boolean</span> onTouchEvent(MotionEvent event) {</span><span class="ln">    <span class="tk">if</span> (result == <span class="tk">null</span>) {</span><span class="ln">        <span class="tk">return</span> <span class="tk">false</span>;</span><span class="ln">    }</span><span class="ln">    <span class="tc">// בזמן זום - לא לתת ל-ScrollView של המסך "לגנוב" את הנגיעה ולגלול</span></span><span class="ln">    getParent().requestDisallowInterceptTouchEvent(event.getPointerCount() &gt; <span class="tn">1</span> || zoom &gt; <span class="tn">1f</span>);</span><span class="ln">    scaleDetector.onTouchEvent(event);</span><span class="ln">    gestureDetector.onTouchEvent(event);</span><span class="ln">    <span class="tk">return</span> <span class="tk">true</span>;</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">ui/PoseOverlayView.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מגדיל/מקטין סביב הנקודה שבין האצבעות, בטווח 1 עד MAX_ZOOM. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> zoomBy(<span class="tk">float</span> factor, <span class="tk">float</span> focusX, <span class="tk">float</span> focusY) {</span><span class="ln">    <span class="tk">float</span> newZoom = Math.max(<span class="tn">1f</span>, Math.min(MAX_ZOOM, zoom * factor));</span><span class="ln">    zoomMatrix.postScale(newZoom / zoom, newZoom / zoom, focusX, focusY);</span><span class="ln">    zoom = newZoom;</span><span class="ln">    <span class="tk">if</span> (zoom == <span class="tn">1f</span>) {</span><span class="ln">        zoomMatrix.reset(); <span class="tc">// חזרנו לגודל רגיל - מבטלים גם את ההזזה</span></span><span class="ln">    }</span><span class="ln">    invalidate();</span><span class="ln">}</span></code></pre></figure>
+  <p><code>ScaleGestureDetector</code> מזהה צביטה, ו-<code>GestureDetector</code> מזהה גרירה והקשה כפולה. ההגדלה נשמרת ב-<code>Matrix</code>, וב-<code>onDraw</code> מוחלת על כל הציור עם <code>canvas.concat</code>, בין <code>save()</code> ל-<code>restore()</code>.</p>
+  <div class="qa" data-topic="view"></div>
+</section>
+
+<!-- 15 -->
+<section class="ch" id="recycler">
+  <div class="ch-head"><span class="ch-num">15</span><h2>RecyclerView: רשימת הזריקות</h2></div>
+  <p class="lead">RecyclerView יוצר רק את השורות שנכנסות במסך. כשגוללים, שורה שיצאה מהמסך ממוחזרת ומקבלת נתונים של זריקה אחרת. כך גם רשימה של אלפי זריקות לא צורכת הרבה זיכרון.</p>
+  <ol class="steps">
+    <li><div><b>LayoutManager</b> קובע איך השורות מסודרות. <code>LinearLayoutManager</code> יוצר רשימה אנכית.</div></li>
+    <li><div><b>onCreateViewHolder</b> יוצר שורה חדשה מ-<code>item_shot.xml</code>. נקרא רק כמה פעמים.</div></li>
+    <li><div><b>onBindViewHolder</b> ממלא שורה קיימת בנתונים של הזריקה במיקום <code>position</code>. נקרא בכל גלילה.</div></li>
+    <li><div><b>getItemCount</b> אומר כמה שורות יש.</div></li>
+  </ol>
+  <figure class="code"><figcaption dir="ltr">ui/ShotAdapter.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** יוצר שורה חדשה מקובץ item_shot.xml (נקרא רק כמה פעמים). */</span></span><span class="ln"><span class="ta">@NonNull</span></span><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> ShotViewHolder onCreateViewHolder(<span class="ta">@NonNull</span> ViewGroup parent, <span class="tk">int</span> viewType) {</span><span class="ln">    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_shot, parent, <span class="tk">false</span>);</span><span class="ln">    <span class="tk">return</span> <span class="tk">new</span> ShotViewHolder(view);</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">ui/ShotAdapter.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** ממלא שורה קיימת בנתונים של הזריקה במקום position (נקרא בכל גלילה). */</span></span><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> <span class="tk">void</span> onBindViewHolder(<span class="ta">@NonNull</span> ShotViewHolder holder, <span class="tk">int</span> position) {</span><span class="ln">    ShotData shot = shots.get(position);</span><span class="ln">    View item = holder.itemView;</span><span class="ln">    <span class="tk">int</span> scoreColor = ScoreColors.forScore(item.getContext(), shot.getScore());</span><span class="ln">    holder.textScore.setText(String.valueOf(shot.getScore()));</span><span class="ln">    holder.textScore.setTextColor(scoreColor);</span><span class="ln">    holder.textDate.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)</span><span class="ln">            .format(<span class="tk">new</span> Date(shot.getTimestamp())));</span><span class="ln">    holder.textAngles.setText(item.getContext().getString(R.string.item_angles,</span><span class="ln">            shot.getReleaseAngle(), shot.getElbowAngle()));</span><span class="ln">    holder.textFeedback.setText(shot.getFeedback());</span><span class="ln">    <span class="tk">boolean</span> hasNote = shot.getNote() != <span class="tk">null</span> &amp;&amp; !shot.getNote().isEmpty();</span><span class="ln">    holder.textNote.setVisibility(hasNote ? View.VISIBLE : View.GONE);</span><span class="ln">    holder.textNote.setText(item.getContext().getString(R.string.item_note, shot.getNote()));</span><span class="ln">    holder.btnEditNote.setOnClickListener(v -&gt; listener.onEditNote(shot));</span><span class="ln">    holder.btnDelete.setOnClickListener(v -&gt; listener.onDelete(shot));</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">ui/ShotAdapter.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** ViewHolder: שומר הפניות לרכיבי השורה כדי לא לחפש אותם (findViewById) בכל גלילה. */</span></span><span class="ln"><span class="tk">static</span> <span class="tk">class</span> ShotViewHolder <span class="tk">extends</span> RecyclerView.ViewHolder {</span><span class="ln">    <span class="tk">final</span> TextView textScore, textDate, textAngles, textFeedback, textNote;</span><span class="ln">    <span class="tk">final</span> View btnEditNote, btnDelete;</span><span class="ln"></span><span class="ln">    ShotViewHolder(<span class="ta">@NonNull</span> View itemView) {</span><span class="ln">        <span class="tk">super</span>(itemView);</span><span class="ln">        textScore = itemView.findViewById(R.id.textItemScore);</span><span class="ln">        textDate = itemView.findViewById(R.id.textItemDate);</span><span class="ln">        textAngles = itemView.findViewById(R.id.textItemAngles);</span><span class="ln">        textFeedback = itemView.findViewById(R.id.textItemFeedback);</span><span class="ln">        textNote = itemView.findViewById(R.id.textItemNote);</span><span class="ln">        btnEditNote = itemView.findViewById(R.id.btnEditNote);</span><span class="ln">        btnDelete = itemView.findViewById(R.id.btnDelete);</span><span class="ln">    }</span><span class="ln">}</span></code></pre></figure>
+
+  <h3>עריכה ומחיקה</h3>
+  <figure class="code"><figcaption dir="ltr">HistoryActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** קורא מחדש את הזריקות והסטטיסטיקה מהמסד ומעדכן את המסך. */</span></span><span class="ln"><span class="tk">private</span> <span class="tk">void</span> refresh() {</span><span class="ln">    shots.clear();</span><span class="ln">    shots.addAll(dbHelper.getShotsForUser(userId));</span><span class="ln">    adapter.notifyDataSetChanged();</span><span class="ln">    findViewById(R.id.textEmpty).setVisibility(shots.isEmpty() ? View.VISIBLE : View.GONE);</span><span class="ln">    showStatistics();</span><span class="ln">}</span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">HistoryActivity.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** Delete: מבקש אישור ורק אז מוחק את הזריקה מהמסד. */</span></span><span class="ln"><span class="ta">@Override</span></span><span class="ln"><span class="tk">public</span> <span class="tk">void</span> onDelete(ShotData shot) {</span><span class="ln">    <span class="tk">new</span> MaterialAlertDialogBuilder(<span class="tk">this</span>)</span><span class="ln">            .setTitle(R.string.dialog_delete_title)</span><span class="ln">            .setMessage(R.string.dialog_delete_message)</span><span class="ln">            .setPositiveButton(R.string.btn_delete, (dialog, which) -&gt; {</span><span class="ln">                dbHelper.deleteShot(shot.getId());</span><span class="ln">                refresh();</span><span class="ln">                Snackbar.make(findViewById(android.R.id.content), R.string.shot_deleted,</span><span class="ln">                        Snackbar.LENGTH_SHORT).show();</span><span class="ln">            })</span><span class="ln">            .setNegativeButton(R.string.btn_cancel, <span class="tk">null</span>)</span><span class="ln">            .show();</span><span class="ln">}</span></code></pre></figure>
+  <p>הלחיצה עוברת מה-Adapter ל-<code>HistoryActivity</code> דרך הממשק. ה-Activity מציגה דיאלוג אישור, מעדכנת את המסד, ואז <code>refresh()</code> טוען מחדש את הרשימה והסטטיסטיקה וקורא ל-<code>notifyDataSetChanged()</code>.</p>
+  <div class="qa" data-topic="recycler"></div>
+</section>
+
+<!-- 16 -->
+<section class="ch" id="ui">
+  <div class="ch-head"><span class="ch-num">16</span><h2>עיצוב ומשאבים</h2></div>
+  <p class="lead">כל הטקסטים נמצאים ב-<code>strings.xml</code>, כל הצבעים ב-<code>colors.xml</code>, וכל הסגנונות ב-<code>themes.xml</code>. ה-layouts רק מפנים אליהם.</p>
+  <figure class="code"><figcaption dir="ltr">res/values/strings.xml</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">&lt;string</span> name=<span class="ts">"result_angles"</span><span class="tk">&gt;</span>זווית שחרור: %1$.1f° (אידיאלי %2$.1f°) · מרפק: %3$.1f°<span class="tk">&lt;/string</span><span class="tk">&gt;</span></span><span class="ln"><span class="tk">&lt;string</span> name=<span class="ts">"result_body"</span><span class="tk">&gt;</span>נטיית גוף: %1$.1f° · מרפק בסוף התנועה: %2$.1f°<span class="tk">&lt;/string</span><span class="tk">&gt;</span></span><span class="ln"><span class="tk">&lt;string</span> name=<span class="ts">"result_follow_only"</span><span class="tk">&gt;</span>מרפק בסוף התנועה: %1$.1f° (הירך לא זוהתה)<span class="tk">&lt;/string</span><span class="tk">&gt;</span></span><span class="ln"><span class="tk">&lt;string</span> name=<span class="ts">"zoom_hint"</span><span class="tk">&gt;</span>צבוט עם שתי אצבעות כדי להגדיל · הקשה כפולה לאיפוס<span class="tk">&lt;/string</span><span class="tk">&gt;</span></span></code></pre></figure>
+  <p><code>%1$.1f</code> פירושו: הארגומנט הראשון, כמספר עשרוני עם ספרה אחת אחרי הנקודה. <code>%1$d</code> הוא מספר שלם, ו-<code>%1$s</code> הוא מחרוזת. ממלאים את הערכים עם <code>getString(R.string.result_angles, …)</code>.</p>
+  <figure class="code"><figcaption dir="ltr">res/values/themes.xml</figcaption><pre dir="ltr"><code><span class="ln"><span class="tk">&lt;style</span> name=<span class="ts">"Widget.App.Button"</span> parent=<span class="ts">"Widget.Material3.Button"</span><span class="tk">&gt;</span></span><span class="ln">    <span class="tk">&lt;item</span> name=<span class="ts">"android:minHeight"</span><span class="tk">&gt;</span>52dp<span class="tk">&lt;/item</span><span class="tk">&gt;</span></span><span class="ln">    <span class="tk">&lt;item</span> name=<span class="ts">"cornerRadius"</span><span class="tk">&gt;</span>2dp<span class="tk">&lt;/item</span><span class="tk">&gt;</span></span><span class="ln">    <span class="tk">&lt;item</span> name=<span class="ts">"android:fontFamily"</span><span class="tk">&gt;</span>sans-serif-medium<span class="tk">&lt;/item</span><span class="tk">&gt;</span></span><span class="ln">    <span class="tk">&lt;item</span> name=<span class="ts">"android:textSize"</span><span class="tk">&gt;</span>14sp<span class="tk">&lt;/item</span><span class="tk">&gt;</span></span><span class="ln">    <span class="tk">&lt;item</span> name=<span class="ts">"android:letterSpacing"</span><span class="tk">&gt;</span>0.06<span class="tk">&lt;/item</span><span class="tk">&gt;</span></span><span class="ln"><span class="tk">&lt;/style</span><span class="tk">&gt;</span></span></code></pre></figure>
+  <figure class="code"><figcaption dir="ltr">ui/ScoreColors.java</figcaption><pre dir="ltr"><code><span class="ln"><span class="tc">/** מחזיר את הצבע (כמספר int של אנדרואיד) שמתאים לציון. */</span></span><span class="ln"><span class="tk">public</span> <span class="tk">static</span> <span class="tk">int</span> forScore(Context context, <span class="tk">int</span> score) {</span><span class="ln">    <span class="tk">int</span> colorRes;</span><span class="ln">    <span class="tk">if</span> (score &gt;= GOOD_SCORE) {</span><span class="ln">        colorRes = R.color.score_good;</span><span class="ln">    } <span class="tk">else</span> <span class="tk">if</span> (score &gt;= MEDIUM_SCORE) {</span><span class="ln">        colorRes = R.color.score_medium;</span><span class="ln">    } <span class="tk">else</span> {</span><span class="ln">        colorRes = R.color.score_bad;</span><span class="ln">    }</span><span class="ln">    <span class="tk">return</span> ContextCompat.getColor(context, colorRes);</span><span class="ln">}</span></code></pre></figure>
+  <ul class="plain">
+    <li><b>Material Design 3:</b> ערכת הנושא <code>Theme.Material3.Light.NoActionBar</code>, עם רכיבים כמו <code>MaterialButton</code>, <code>TextInputLayout</code>, <code>MaterialToolbar</code>, <code>Snackbar</code> ו-<code>MaterialAlertDialogBuilder</code>.</li>
+    <li><b>עברית מימין לשמאל:</b> <code>supportsRtl="true"</code> ב-Manifest, ו-<code>marginStart</code>/<code>End</code> במקום Left/Right. חץ החזרה מוגדר <code>autoMirrored</code>, ולכן מתהפך לבד.</li>
+    <li><b>הודעות שגיאה ידידותיות:</b> מתחת לשדה (<code>setError</code>) או ב-<code>Snackbar</code> בתחתית המסך, עם הסבר מה לעשות.</li>
+  </ul>
+  <div class="qa" data-topic="ui"></div>
+</section>
+
+<!-- 17 -->
+<section class="ch" id="demo">
+  <div class="ch-head"><span class="ch-num">17</span><h2>הדגמה חיה מול הבוחן</h2></div>
+  <p class="lead">סדר מומלץ להדגמה. כל שלב מראה נושא אחר מהמחוון, כך שהבוחן רואה את כולם בכמה דקות.</p>
+  <ol class="steps">
+    <li><div><div class="th">Activities · Intent</div><b>פתיחה.</b> פותחים את האפליקציה במסך ההתחברות ולוחצים "אין לך חשבון? להרשמה".</div></li>
+    <li><div><div class="th">בדיקת קלט</div><b>שגיאות.</b> מנסים להירשם עם סיסמה קצרה, ואחר כך עם שתי סיסמאות שונות. מראים את הודעות השגיאה מתחת לשדות.</div></li>
+    <li><div><div class="th">SQLite · hash</div><b>הרשמה.</b> נרשמים כמו שצריך ומסמנים "הישאר מחובר". מסבירים שבמסד נשמרים hash ו-salt, לא הסיסמה.</div></li>
+    <li><div><div class="th">הרשאות · גלריה</div><b>בחירת סרטון.</b> "בחירת סרטון" ← מאשרים הרשאה ← בוחרים סרטון קצר.</div></li>
+    <li><div><div class="th">Thread · Handler</div><b>ניתוח.</b> מראים שפס ההתקדמות זז והמסך לא קופא, ומסבירים שהניתוח רץ ברקע.</div></li>
+    <li><div><div class="th">ML Kit · View מותאם</div><b>תוצאה.</b> מראים את השלד על התמונה, מגדילים בצביטה, ומסבירים את הציון והמשוב.</div></li>
+    <li><div><div class="th">Thread · SQLite Update</div><b>תיקון ידני.</b> לוחצים "פריים אחורה" ו"פריים קדימה", מראים שהציון מתעדכן, ומסבירים שזה רץ ברקע ומעדכן את הזריקה במסד.</div></li>
+    <li><div><div class="th">RecyclerView · GROUP BY · JOIN</div><b>היסטוריה.</b> מראים סה"כ, ממוצע ושיא, ממוצע לפי חודש, עורכים הערה ומוחקים זריקה עם אישור.</div></li>
+    <li><div><div class="th">SharedPreferences</div><b>הישאר מחובר.</b> סוגרים את האפליקציה לגמרי ופותחים שוב: נכנסים ישר למסך הראשי. אחר כך "התנתקות" מחזירה להתחברות.</div></li>
+  </ol>
+
+  <h3>רשימת בדיקה לפני הבחינה</h3>
+  <ul class="check">
+    <li>הטלפון טעון, ומצב מפתחים ו-USB debugging מופעלים.</li>
+    <li>בסרטון השחקן תופס לפחות חצי מגובה המסך, ובלי שמש או פנס ישירות מאחוריו.</li>
+    <li>בגלריה יש 2–3 סרטונים קצרים (2–5 שניות, זריקה אחת בכל סרטון, בלי ההליכה אל המצלמה), מצולמים מהצד, כשכל הגוף בתמונה ובתאורה טובה.</li>
+    <li>בדקת את הסרטונים האלה באפליקציה יום לפני, והם נותנים תוצאה.</li>
+    <li>יש משתמש רשום עם כמה זריקות, כדי שההיסטוריה והסטטיסטיקה לא יהיו ריקות.</li>
+    <li>Android Studio פתוח עם הפרויקט, והבנייה האחרונה עברה.</li>
+    <li>אתה יודע לפתוח מהר את <code>ShotMathUtils</code>, <code>DatabaseHelper</code>, <code>MainActivity</code> ו-<code>PoseOverlayView</code>.</li>
+    <li>יש גיבוי: צילום מסך או סרטון קצר של האפליקציה עובדת, למקרה שמשהו בציוד לא יעבוד.</li>
+  </ul>
+</section>
+
+<!-- 18 -->
+<section class="ch" id="limits">
+  <div class="ch-head"><span class="ch-num">18</span><h2>מגבלות ותשובות כנות</h2></div>
+  <p class="lead">בוחן טוב ישאל מה לא מושלם. תשובה כנה עם הסבר נשמעת הרבה יותר טוב מהתחמקות.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>מגבלה</th><th>למה</th><th>איך היה אפשר לשפר</th></tr></thead>
+    <tbody>
+      <tr><td>רגע השחרור מדויק עד פריים אחד</td><td>בסרטון של 30 פריימים בשנייה אי אפשר להיות מדויק יותר מ-33ms, וגם בעין קשה להחליט.</td><td>צילום ב-60 פריימים בשנייה. בינתיים יש כפתורי תיקון ידני.</td></tr>
+      <tr><td>בסרטון עם כמה זריקות נבחרת אחת</td><td>האפליקציה מנתחת את הזריקה שבה היד הגיעה הכי גבוה ביחס לגוף.</td><td>זיהוי של כל הזריקות והצגת רשימה.</td></tr>
+      <tr><td>ML Kit יכול לזהות "אדם" שאינו אדם</td><td>הוא מחזיר גוף אחד בתמונה, ולפעמים מנחש, למשל על רשת הסל כשהכדור בתוכה.</td><td>בדיקת היגיון של מבנה הגוף כבר קיימת (<code>isUprightBody</code>). שיפור נוסף: צילום מקרוב, כשהשחקן תופס חלק גדול מהתמונה.</td></tr>
+      <tr><td>זווית השחרור היא קירוב</td><td>ML Kit מזהה גוף ולא כדור, ולכן מודדים את כיוון האמה ולא את מסלול הכדור.</td><td>זיהוי כדור, למשל עם ML Kit Object Detection או מודל ייעודי, ומדידת המסלול שלו.</td></tr>
+      <tr><td>תמונה דו-ממדית ממצלמה אחת</td><td>אם מצלמים לא מהצד, הזוויות שנמדדות בתמונה שונות מהזוויות האמיתיות.</td><td>הנחיה ברורה למשתמש (יש כזו במסך), או שימוש בקואורדינטת z ש-ML Kit מחזיר.</td></tr>
+      <tr><td>הניתוח לוקח זמן</td><td>כל פריים עובר חילוץ וזיהוי. בסרטון של דקה יש כ-240 פריימים בחיפוש הגס.</td><td>STREAM_MODE, הקטנה נוספת של התמונה, או חיתוך הסרטון לפני הניתוח.</td></tr>
+      <tr><td>SHA-256 מהיר מדי לסיסמאות</td><td>פונקציית hash מהירה מאפשרת לנחש הרבה סיסמאות בשנייה.</td><td>פונקציה איטית שנועדה לסיסמאות, כמו PBKDF2 או bcrypt.</td></tr>
+      <tr><td>המסד מקומי בלבד</td><td>הנתונים נשמרים רק בטלפון.</td><td>סנכרון לשרת או לענן.</td></tr>
+      <tr><td>הערכים 48.5°, 10° ו-160° קבועים</td><td>אותם ערכים לכל שחקן ולכל מרחק מהסל.</td><td>התאמה לפי מרחק או לפי שחקן. הקבועים מוגדרים במקום אחד, ולכן קל לשנות.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>שימוש ב-AI</h3>
+  <p>חלק מהקוד נכתב בעזרת Claude Code, ולפי דרישת בית הספר בראש כל מחלקה כזו מופיעה ההערה <code>// AI-GENERATED (Claude Code) - reviewed and understood by the student</code>. ההערה הזו היא התחייבות: אתה צריך להבין כל שורה. המדריך הזה נועד בדיוק לזה. עבור על כל פרק, ובתרגול סמן רק שאלות שאתה באמת יודע לענות עליהן בלי להסתכל.</p>
+  <div class="qa" data-topic="ai"></div>
+</section>
+
+<!-- 19 -->
+<section class="ch" id="quiz">
+  <div class="ch-head"><span class="ch-num">19</span><h2>תרגול שאלות</h2></div>
+  <p class="lead">כל השאלות מכל הפרקים במקום אחד. נסה לענות בקול לפני שאתה פותח את התשובה, כמו בבחינה.</p>
+  <div class="quiz">
+    <div class="quiz-top">
+      <label>נושא <select id="quizTopic"></select></label>
+      <span id="quizCount"></span>
+    </div>
+    <div class="tag" id="quizTag"></div>
+    <div class="q" id="quizQ"></div>
+    <div class="a" id="quizA" hidden></div>
+    <div class="btns">
+      <button class="b primary" id="quizShow" type="button">הצג תשובה</button>
+      <button class="b" id="quizNext" type="button">השאלה הבאה</button>
+      <button class="b" id="quizShuffle" type="button">ערבב</button>
+      <label class="known"><input type="checkbox" id="quizKnown"> אני יודע את זה</label>
+    </div>
+  </div>
+  <p class="note">הסימון "אני יודע את זה" נשמר רק בדפדפן הזה. בבחירת "שאלות שעוד לא סימנתי" רואים רק את מה שנשאר ללמוד.</p>
+</section>
+
+<!-- 20 -->
+<section class="ch" id="glossary">
+  <div class="ch-head"><span class="ch-num">20</span><h2>מילון מונחים</h2></div>
+  <dl class="gloss" id="glossList"></dl>
+</section>
+
+<footer>המדריך נבנה מהקוד שבענף main של AtiA9/Basketball-shot-analyzer. אם הקוד משתנה, קטעי הקוד כאן צריכים להיבנות מחדש.</footer>
+</main>
 </div>
-<script src="nav.js?v=1"></script>
-<script src="effects.js?v=1"></script>
+
 <script>
-renderTopNav(null);
-const CHECKLIST = {"s1": ["אני מסביר במשפט אחד מה האפליקציה עושה", "אני מכיר את 4 המסכים ואת 3 המדדים של הציון", "אני מסביר למה הקוד מחולק לשכבות", "אני מתאר את 10 השלבים של ניתוח זריקה"], "s2": ["אני מראה בקוד הכמסה, ירושה, ממשק והעמסה", "אני מסביר Intent מפורש ומרומז", "אני מסביר את finish ודגלי CLEAR_TASK", "אני מסביר למה יש קוד ב-onDestroy"], "s3": ["אני מסביר למה לא שומרים סיסמה כטקסט", "אני מסביר מה זה salt ולמה צריך אותו", "אני מתאר איך בודקים סיסמה בהתחברות", "אני מסביר מה נשמר ב-SharedPreferences ולמה"], "s4": ["אני מתאר את שתי הטבלאות ואת המפתח הזר", "אני מראה איפה כל פעולת CRUD", "אני מסביר את שאילתת GROUP BY", "אני מסביר את ה-LEFT JOIN", "אני מסביר למה משתמשים ב-?"], "s5": ["אני מסביר הרשאות בזמן ריצה", "אני מסביר ActivityResultLauncher", "אני מסביר למה הניתוח לא על ה-thread הראשי", "אני מסביר את התפקיד של Handler"], "s6": ["אני מסביר מה ML Kit מחזיר", "אני מסביר את isInFrame ו-isUprightBody", "אני מחשב זווית עם atan2 בעל-פה", "אני מחשב ציון לדוגמה בעל-פה"], "s7": ["אני מסביר את שלושת שלבי החיפוש", "אני מסביר למה מחלקים באורך הגו", "אני מסביר למה חוזרים לתחילת \"היד למעלה\"", "אני מסביר את releaseIndex ואת החציון", "אני מסביר את כפתורי התיקון הידני"], "s8": ["אני מסביר onDraw, Canvas ו-Paint", "אני מסביר איך עובד הזום", "אני מסביר Adapter ו-ViewHolder", "אני מסביר למה הטקסטים ב-strings.xml"], "s9": ["עברתי על תסריט ההדגמה", "הכנתי סרטונים קצרים שעובדים", "אני יודע לענות על כל המגבלות בכנות"], "s10": ["עברתי על כל השאלות", "סימנתי \"אני יודע את זה\" על כל השאלות"], "s11": ["עברתי על כל המושגים שמסומנים \"בפרויקט שלך\"", "עברתי על שאר המושגים", "אני יודע לענות על השאלה של כל מושג"]};
-const STORAGE_KEY = "bagrut-guide-progress-v1";
-function loadState() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) { return {}; }
-}
-function saveState(state) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
-let state = loadState();
-function itemKey(id, i) { return id + "-" + i; }
-function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-function render() {
-  const container = document.getElementById("cards");
-  container.innerHTML = "";
-  let totalItems = 0, totalDone = 0;
-  PAGES.forEach(page => {
-    const items = CHECKLIST[page.id] || [];
-    const done = items.filter((_, i) => state[itemKey(page.id, i)]).length;
-    totalItems += items.length;
-    totalDone += done;
-    const pct = items.length ? Math.round((done / items.length) * 100) : 0;
-    const wrap = document.createElement("div");
-    wrap.className = "stage-card-wrap";
-    const checklistHtml = items.length ? `
-      <details class="stage-checklist">
-        <summary>מה אני צריך לדעת (${done}/${items.length})</summary>
-        <ul>
-          ${items.map((label, i) => `
-            <li><label>
-              <input type="checkbox" data-page="${page.id}" data-i="${i}" ${state[itemKey(page.id, i)] ? "checked" : ""}>
-              <span>${escapeHtml(label)}</span>
-            </label></li>`).join("")}
-        </ul>
-      </details>` : "";
-    wrap.innerHTML = `
-      <a class="stage-card" href="${page.href}">
-        <span class="num">${page.label}</span>
-        <span class="name">${page.title}</span>
-        <div class="weeks">${page.weeks} · ${pct}% (${done}/${items.length})</div>
-      </a>
-      ${checklistHtml}`;
-    container.appendChild(wrap);
+(function () {
+  "use strict";
+
+  var TOPICS = {
+    app: "האפליקציה", arch: "ארכיטקטורה", oop: "OOP", activity: "Activities ו-Intent",
+    security: "הצפנה וקלט", prefs: "SharedPreferences", sqlite: "SQLite", media: "הרשאות ומדיה",
+    thread: "Thread ו-Handler", mlkit: "ML Kit", math: "מתמטיקה וציון", release: "רגע השחרור",
+    view: "View מותאם", recycler: "RecyclerView", ui: "עיצוב ומשאבים", ai: "שימוש ב-AI"
+  };
+
+  // [topic, question, answer-html]
+  var Q = [
+    ["app", "תאר את האפליקציה במשפט אחד.", "אפליקציית אנדרואיד שמקבלת סרטון של זריקת קפיצה, מזהה בו נקודות גוף עם ML Kit, מוצאת את רגע השחרור, מחשבת זווית שחרור, נטיית גוף ויישור היד בסוף התנועה, נותנת ציון 0–100 ומשוב בעברית, ושומרת היסטוריה לכל משתמש ב-SQLite."],
+    ["app", "למה דווקא 48.5 מעלות?", "זה ערך המטרה לזווית השחרור. זריקות מטווח בינוני יוצאות בדרך כלל בזווית של בערך 45–55 מעלות, ו-48.5 נמצא בתוך הטווח. הערך מוגדר כקבוע <code>IDEAL_RELEASE_ANGLE</code> ב-<code>ShotMathUtils</code>, כך שאפשר לשנות אותו במקום אחד."],
+    ["app", "איך הציון מורכב?", "60% מזווית השחרור, 20% מיציבות הגוף (נטייה עד 10° בלי קנס), ו-20% מהמשך התנועה (מרפק של לפחות 160° בסוף). בכל רכיב יורדות 2 נקודות לכל מעלה של חריגה, והתוצאה מוגבלת ל-0–100."],
+    ["app", "מה צריך כדי שהניתוח יצליח?", "סרטון שמצולם מהצד, שבו כל הגוף נראה, בתאורה טובה ועם שחקן אחד. אם ML Kit לא מזהה כתף, מרפק ושורש כף יד באף פריים, מוצגת הודעה שלא זוהה שחקן."],
+
+    ["arch", "למה חילקת את הקוד לשכבות model, db, util ו-ui?", "הפרדת אחריות. לכל שכבה תפקיד אחד: model מחזיק נתונים, db ניגש למסד, util מכיל לוגיקה, ו-ui וה-Activities מציגים. ככה אפשר לשנות חלק אחד בלי לשבור אחר. למשל, אפשר להחליף את המסד בלי לגעת במסכים."],
+    ["arch", "איפה נמצאים החישובים ולמה לא ב-Activity?", "ב-<code>ShotMathUtils</code> וב-<code>ShotAnalyzer</code> בתיקיית util. Activity אחראית על המסך. אם החישובים היו בה, אי אפשר היה לבדוק אותם בנפרד או להשתמש בהם ממקום אחר."],
+    ["arch", "מה ההבדל בין ShotAnalyzer ל-ShotMathUtils?", "<code>ShotAnalyzer</code> עובד עם אנדרואיד וגוגל: סרטון, Bitmap ו-ML Kit, והוא איטי ורץ ברקע. <code>ShotMathUtils</code> הוא Java טהור: מקבל מספרים ומחזיר מספרים וטקסט, בלי תלות באנדרואיד."],
+    ["arch", "למה כל ה-SQL נמצא רק ב-DatabaseHelper?", "כדי שיהיה מקום אחד שאחראי על המסד. מסכים קוראים למתודות כמו <code>getShotsForUser</code> ולא יודעים איך הטבלה בנויה."],
+
+    ["oop", "איפה יש ירושה בפרויקט?", "<code>DatabaseHelper extends SQLiteOpenHelper</code>, <code>PoseOverlayView extends View</code>, כל ה-Activities <code>extends AppCompatActivity</code>, <code>ShotAdapter extends RecyclerView.Adapter</code>, ו-<code>ShotViewHolder extends RecyclerView.ViewHolder</code>."],
+    ["oop", "איפה יש ממשק (interface) ולמה?", "<code>ShotAdapter.OnShotActionListener</code>, עם <code>onEditNote</code> ו-<code>onDelete</code>. <code>HistoryActivity</code> מממשת אותו. כך ה-Adapter מודיע על לחיצה בלי להכיר את המסד או את ה-Activity."],
+    ["oop", "איפה יש העמסת בנאים?", "ב-<code>User</code> וב-<code>ShotData</code>. בנאי קצר לאובייקט חדש (בלי id), ובנאי מלא לאובייקט שנקרא מהמסד. הקצר קורא למלא עם <code>this(...)</code>."],
+    ["oop", "מה זה הכמסה ואיפה היא בפרויקט?", "הסתרת השדות (<code>private</code>) וגישה דרך מתודות. ב-<code>ShotData.setScore</code> המחלקה מגבילה את הציון ל-0–100, כך שאי אפשר להכניס ערך לא חוקי."],
+    ["oop", "למה ל-ShotMathUtils יש בנאי private?", "זו מחלקת עזר עם מתודות סטטיסטיות בלבד. אין סיבה ליצור ממנה אובייקט, והבנאי הפרטי מונע את זה. היא גם <code>final</code>, כדי שאי אפשר יהיה לרשת ממנה."],
+    ["oop", "מה זה ShotAnalyzer.Result ולמה הוא static?", "מחלקה פנימית שמקבצת את כל תוצאות הניתוח: פריים, נקודות, זוויות, ציון ומשוב. היא static כי היא לא צריכה גישה לאובייקט של <code>ShotAnalyzer</code> שיצר אותה."],
+    ["oop", "מה עושה @Override?", "מסמן שהמתודה דורסת מתודה ממחלקת האב או מממשת מתודה מממשק. אם השם או הפרמטרים לא תואמים, הקומפיילר מתריע."],
+
+    ["activity", "מה קורה כשפותחים את האפליקציה?", "<code>AuthActivity</code> מוגדרת כ-LAUNCHER ב-Manifest. ב-<code>onCreate</code> היא בודקת <code>session.shouldAutoLogin()</code>. אם המשתמש ביקש להישאר מחובר, עוברים ישר ל-<code>MainActivity</code> וסוגרים את מסך ההתחברות. אחרת מוצג טופס ההתחברות."],
+    ["activity", "מה זה Intent? תן דוגמה למפורש ולמרומז.", "הודעה שמבקשת מהמערכת להפעיל רכיב. מפורש: <code>new Intent(this, MainActivity.class)</code>, מסך מסוים שלי. מרומז: <code>MediaStore.ACTION_VIDEO_CAPTURE</code>, \"מישהו שיודע לצלם וידאו\", והמערכת מוצאת את אפליקציית המצלמה."],
+    ["activity", "למה קוראים ל-finish() אחרי מעבר למסך הראשי?", "כדי להוציא את מסך ההתחברות מערימת המסכים. בלי זה, לחיצה על \"חזרה\" במסך הראשי הייתה מחזירה להתחברות."],
+    ["activity", "מה עושים הדגלים NEW_TASK ו-CLEAR_TASK ב-RegisterActivity?", "מוחקים את כל המסכים הקודמים, כלומר גם את ההתחברות וגם את ההרשמה. המסך הראשי נפתח כמסך היחיד, ו\"חזרה\" יוצאת מהאפליקציה."],
+    ["activity", "למה ב-onDestroy יש קוד?", "כדי לשחרר משאבים: <code>executor.shutdownNow()</code> עוצר את ה-thread ברקע, ו-<code>analyzer.close()</code> משחרר את ML Kit."],
+    ["activity", "מה זה AndroidManifest.xml?", "קובץ שמתאר את האפליקציה למערכת: אילו מסכים יש, מי מסך הפתיחה, אילו הרשאות נדרשות, האייקון וערכת הנושא. Activity שלא רשומה בו לא תיפתח."],
+
+    ["security", "למה לא שומרים את הסיסמה כמו שהיא?", "אם מישהו משיג את קובץ המסד, הוא יראה את כל הסיסמאות, ואנשים משתמשים באותה סיסמה בכמה אתרים. hash הוא חד-כיווני: אי אפשר לשחזר ממנו את הסיסמה."],
+    ["security", "מה זה salt ולמה צריך אותו?", "מחרוזת אקראית (16 בתים מ-<code>SecureRandom</code>) שמצרפים לסיסמה לפני ה-hash. בזכותה לשני משתמשים עם אותה סיסמה יש hash שונה, ואי אפשר להשתמש בטבלאות מוכנות של hash-ים לסיסמאות נפוצות. ה-salt נשמר במסד ליד ה-hash."],
+    ["security", "איך בודקים סיסמה בהתחברות?", "שולפים את המשתמש לפי שם, מחשבים <code>hashPassword(הסיסמה שהוקלדה, user.getSalt())</code>, ומשווים ל-hash השמור. אם שווים, הסיסמה נכונה."],
+    ["security", "איזה אלגוריתם בחרת ומה החולשה שלו?", "SHA-256 עם salt. החולשה: הוא מהיר, ולכן תוקף יכול לנסות הרבה ניחושים בשנייה. במערכת אמיתית הייתי משתמש ב-PBKDF2 או bcrypt, שהם איטיים בכוונה. לפרויקט, SHA-256 עם salt ברור ומדגים את הרעיון."],
+    ["security", "אילו בדיקות קלט יש?", "שם משתמש: לפחות 3 תווים, רק אותיות באנגלית, ספרות וקו תחתון. סיסמה: לפחות 6 תווים ולפחות ספרה אחת. בהרשמה: שתי הסיסמאות זהות, ושם המשתמש לא תפוס. כל שגיאה מוצגת מתחת לשדה שלה."],
+    ["security", "למה SecureRandom ולא Random?", "<code>Random</code> צפוי: מי שיודע את נקודת ההתחלה יכול לחשב את המספרים. <code>SecureRandom</code> מייצר מספרים שאי אפשר לנחש, כמו שצריך בהצפנה."],
+    ["security", "איך יודעים שהשם תפוס?", "לעמודה <code>username</code> יש אילוץ <code>UNIQUE</code>. אם מנסים להכניס שם קיים, <code>insert</code> מחזיר ‎-1, ואז מוצגת השגיאה \"שם המשתמש כבר תפוס\"."],
+
+    ["prefs", "מה נשמר ב-SharedPreferences?", "בקובץ <code>session</code>, במצב <code>MODE_PRIVATE</code>: מזהה המשתמש, שם המשתמש, והאם הוא ביקש להישאר מחובר. הסיסמה לא נשמרת שם."],
+    ["prefs", "מה ההבדל בין apply() ל-commit()?", "<code>apply()</code> כותב לקובץ ברקע ולא מחזיר ערך. <code>commit()</code> כותב מיד, חוסם עד שמסתיים, ומחזיר הצלחה או כישלון. השתמשתי ב-apply כדי לא לחסום את המסך."],
+    ["prefs", "מה קורה אם לא מסמנים \"הישאר מחובר\"?", "ההתחברות עדיין נשמרת עם <code>remember_me=false</code>, כי המסכים צריכים לדעת מי מחובר. בפתיחה הבאה <code>shouldAutoLogin()</code> מחזיר false, ומוצג מסך ההתחברות."],
+    ["prefs", "למה לא לשמור את הזריקות ב-SharedPreferences?", "הוא מתאים לכמה ערכים פשוטים. לזריקות יש מבנה, קשר למשתמש, ושאילתות כמו ממוצע לפי חודש, ולזה צריך מסד נתונים."],
+
+    ["sqlite", "מה התפקיד של SQLiteOpenHelper?", "מחלקת אב שמנהלת את קובץ המסד: קוראת ל-<code>onCreate</code> כשהמסד לא קיים, ל-<code>onUpgrade</code> כשמעלים את מספר הגרסה, ונותנת <code>getWritableDatabase()</code> ו-<code>getReadableDatabase()</code>."],
+    ["sqlite", "תאר את הטבלאות והקשר ביניהן.", "<code>users</code>: id, username (UNIQUE), password_hash, salt. <code>shots</code>: id, user_id, זוויות, ציון, משוב, הערה וזמן. <code>user_id</code> הוא מפתח זר ל-<code>users.id</code>: קשר של אחד-לרבים, כי למשתמש יש הרבה זריקות."],
+    ["sqlite", "למה צריך onConfigure?", "ב-SQLite אכיפת מפתחות זרים כבויה כברירת מחדל. <code>setForeignKeyConstraintsEnabled(true)</code> מפעיל אותה, ובלי זה <code>ON DELETE CASCADE</code> לא היה עובד."],
+    ["sqlite", "מה זה ON DELETE CASCADE?", "כשמוחקים משתמש, כל הזריקות שלו נמחקות אוטומטית. כך לא נשארות זריקות \"יתומות\" בלי משתמש."],
+    ["sqlite", "הסבר את שאילתת ה-GROUP BY.", "<code>strftime('%Y-%m', timestamp / 1000, 'unixepoch', 'localtime')</code> הופך את הזמן לחודש כמו 2026-10. מחלקים ב-1000 כי הזמן שמור במילישניות. <code>GROUP BY month</code> מאחד את כל הזריקות של אותו חודש, ו-<code>AVG(score)</code> ו-<code>COUNT(*)</code> נותנים ממוצע וכמות."],
+    ["sqlite", "הסבר את ה-JOIN ולמה דווקא LEFT JOIN.", "מחברים את <code>users</code> ל-<code>shots</code> לפי <code>u.id = s.user_id</code>, ומחשבים <code>COUNT</code>, <code>AVG</code> ו-<code>MAX</code>. LEFT JOIN מחזיר שורה גם למשתמש בלי זריקות. אז AVG ו-MAX הם NULL, ו-<code>IFNULL</code> הופך אותם ל-0."],
+    ["sqlite", "למה משתמשים ב-? ולא משרשרים את הערך?", "שאילתה עם פרמטרים: SQLite מתייחס לערך כנתון ולא כחלק מהפקודה. זה מונע SQL Injection, וגם מטפל בגרשיים ובתווים מיוחדים."],
+    ["sqlite", "מה זה Cursor ולמה סוגרים אותו?", "מצביע על שורות התוצאה של שאילתה. מזיזים אותו עם <code>moveToNext()</code> וקוראים עמודות עם <code>getInt</code>, <code>getString</code> וכו'. סוגרים עם <code>close()</code> כדי לשחרר את הזיכרון והחיבור."],
+    ["sqlite", "מה זה ContentValues?", "מפה של שם עמודה ← ערך, שמעבירים ל-<code>insert</code> ול-<code>update</code>, במקום לכתוב את פקודת ה-SQL בעצמנו."],
+    ["sqlite", "איפה ה-CRUD המלא?", "users: <code>insertUser</code>, <code>getUserByUsername</code>, <code>updateUserPassword</code>, <code>deleteUser</code>. shots: <code>insertShot</code>, <code>getShotsForUser</code>, <code>updateShotNote</code>, <code>updateShotResult</code>, <code>deleteShot</code>. בממשק משתמשים בפועל בהוספה, קריאה, עריכת הערה ומחיקה של זריקות, ובהוספה וקריאה של משתמשים."],
+
+    ["media", "למה מבקשים הרשאה בזמן ריצה ולא רק ב-Manifest?", "מאנדרואיד 6 הרשאות \"מסוכנות\", כמו גישה לקבצים, צריכות אישור של המשתמש בזמן ריצה. ה-Manifest רק מצהיר שהאפליקציה עשויה לבקש אותן."],
+    ["media", "למה יש שתי הרשאות שונות לקריאת וידאו?", "מאנדרואיד 13 (API 33) ההרשאה נקראת <code>READ_MEDIA_VIDEO</code>. לפני כן <code>READ_EXTERNAL_STORAGE</code>. הקוד בודק את <code>Build.VERSION.SDK_INT</code> ומבקש את המתאימה."],
+    ["media", "מה זה ActivityResultLauncher?", "הדרך המודרנית לפתוח מסך ולקבל ממנו תוצאה (במקום <code>startActivityForResult</code>). רושמים אותו כשדה עם <code>registerForActivityResult</code>, ואז <code>launch(...)</code> פותח, והתוצאה מגיעה ל-callback."],
+    ["media", "למה לא ביקשת הרשאת CAMERA?", "כי האפליקציה לא משתמשת במצלמה בעצמה. היא מבקשת מאפליקציית המצלמה לצלם, דרך Intent מרומז. אם הייתי מצהיר על CAMERA בלי שאושרה, פתיחת המצלמה דרך Intent הייתה נכשלת עם SecurityException."],
+    ["media", "איך מחלצים פריים מסרטון?", "<code>MediaMetadataRetriever</code>: <code>setDataSource(context, uri)</code>, אורך עם <code>extractMetadata(METADATA_KEY_DURATION)</code>, ו-<code>getFrameAtTime(זמן במיקרו-שניות, OPTION_CLOSEST)</code>. בסוף <code>release()</code> בתוך <code>finally</code>."],
+    ["media", "למה מקטינים כל פריים ל-640 פיקסלים?", "תמונה קטנה יותר מזוהה מהר יותר ותופסת פחות זיכרון, ולזיהוי מפרקים זו רזולוציה מספיקה."],
+
+    ["thread", "למה הניתוח לא רץ על ה-thread הראשי?", "ה-thread הראשי מצייר את המסך ומגיב לנגיעות. ניתוח של עשרות פריימים לוקח שניות, והמסך היה קופא. אחרי כ-5 שניות אנדרואיד מציגה הודעת ANR. בנוסף, <code>Tasks.await</code> של ML Kit זורק חריגה אם קוראים לו על ה-thread הראשי."],
+    ["thread", "מה זה ExecutorService?", "מנגנון שמנהל threads ומריץ עליהם משימות. <code>newSingleThreadExecutor()</code> יוצר thread עובד אחד, ומשימות רצות בו לפי הסדר."],
+    ["thread", "מה זה Handler ו-Looper?", "ל-thread הראשי יש תור הודעות ו-Looper שמריץ אותן. <code>new Handler(Looper.getMainLooper())</code> מחובר לתור הזה, ו-<code>post(...)</code> מכניס אליו קוד שירוץ על ה-thread הראשי."],
+    ["thread", "למה צריך לחזור ל-thread הראשי כדי לעדכן את המסך?", "רכיבי המסך לא בנויים לגישה מכמה threads בבת אחת. אנדרואיד מתירה לגעת בהם רק מה-thread הראשי, ואחרת נזרקת <code>CalledFromWrongThreadException</code>."],
+    ["thread", "מה קורה אם יוצאים מהמסך באמצע ניתוח?", "<code>onDestroy</code> קורא ל-<code>shutdownNow()</code> ול-<code>analyzer.close()</code>. אם תוצאה בכל זאת מגיעה, <code>showResult</code> בודק <code>isFinishing() || isDestroyed()</code> ולא נוגע במסך."],
+    ["thread", "איפה עוד משתמשים ב-ExecutorService חוץ מהניתוח הראשון?", "בכפתורי \"פריים אחורה / קדימה\". גם שם צריך לחלץ פריים ולהריץ ML Kit, ולכן <code>stepFrame</code> רץ באותו executor ברקע, מעדכן את המסד, וחוזר ל-thread הראשי עם <code>mainHandler.post</code>. בזמן הריצה הכפתורים מושבתים."],
+    ["thread", "באיזה thread נשמרת הזריקה במסד?", "ברקע, ב-<code>saveShot</code>, לפני שחוזרים ל-thread הראשי. כתיבה למסד היא פעולת דיסק, ועדיף לא לבצע אותה על ה-thread הראשי."],
+
+    ["mlkit", "מה זה ML Kit Pose Detection?", "ספרייה של Google שמריצה מודל למידת מכונה על המכשיר, בלי אינטרנט. היא מחזירה 33 נקודות גוף, ולכל נקודה מיקום וסבירות שהיא נראית בתמונה."],
+    ["mlkit", "מה ההבדל בין SINGLE_IMAGE_MODE ל-STREAM_MODE?", "SINGLE_IMAGE_MODE מנתח כל תמונה בנפרד, בדיוק גבוה. STREAM_MODE מיועד למצלמה חיה, עוקב אחרי האדם בין פריימים ומהיר יותר. אצלנו כל פריים נשלף בנפרד, ולכן מצב תמונה בודדת."],
+    ["mlkit", "מה זה getInFrameLikelihood ולמה הסף 0.5?", "ההסתברות (0 עד 1) שהנקודה באמת נראית בתמונה ולא הוערכה. מתחת ל-0.5 הנקודה כנראה מוסתרת, ואז לא משתמשים בה."],
+    ["mlkit", "איך יודעים איזו יד זורקת?", "בחיפוש הגס: היד ששורש כף היד שלה גבוה יותר בתמונה (y קטן יותר). בחיפוש המדויק נשארים עם אותה יד שנמצאה בשיא, כדי לא להתבלבל באמצע."],
+    ["mlkit", "מה קורה אם ML Kit מזהה \"אדם\" שהוא לא אדם?", "זה קרה בסרטון בדיקה: ML Kit זיהה את רשת הסל עם הכדור כגוף, כי הוא מחזיר גוף אחד בכל תמונה וכשאין אחד ברור הוא מנחש. לכן <code>isUprightBody</code> בודקת שהגוף בנוי כמו אדם עומד: כתף מעל ירך מעל ברך, וירך באורך של לפחות חצי מהגו. פריים שלא עומד בזה נפסל."],
+    ["mlkit", "למה דווקא הברך ולא הקרסול?", "הברך מספיקה כדי לוודא שזה גוף עומד, והיא כמעט תמיד בתמונה. אם הייתי דורש קרסול, כל סרטון שבו כפות הרגליים קצת חתוכות היה נכשל."],
+    ["mlkit", "מה זה Task ו-Tasks.await?", "<code>detector.process()</code> עובד בצורה אסינכרונית ומחזיר Task, כלומר תוצאה שתגיע בעתיד. <code>Tasks.await</code> מחכה לה באותו thread. מותר רק ב-thread ברקע."],
+
+    ["math", "מה עושה Math.atan2(dy, dx)?", "מחזיר את הזווית של הווקטור (dx, dy) מול ציר ה-x החיובי, ברדיאנים בין ‎-π ל-π. בניגוד ל-<code>atan(dy/dx)</code>, הוא מבחין בין ארבעת הרביעים ולא נכשל כש-dx=0."],
+    ["math", "איך מחושבת זווית המרפק?", "<code>angleAtPoint(כתף, מרפק, שורש כף יד)</code>: מחשבים את הכיוון מהמרפק לכתף ואת הכיוון מהמרפק לשורש כף היד עם atan2, מחסירים, לוקחים ערך מוחלט וממירים למעלות. אם יצא מעל 180, מחזירים <code>360 פחות</code> התוצאה."],
+    ["math", "למה \"אם מעל 180 אז 360 פחות\"?", "ההפרש בין שני כיוונים יכול להגיע עד 360 מעלות. אנחנו רוצים את הזווית הפנימית בין שני הקטעים, שהיא תמיד בין 0 ל-180."],
+    ["math", "למה ב-releaseAngle הופכים את dy?", "בתמונה ציר ה-Y גדל כלפי מטה. כשהיד מעל המרפק, ה-y שלה קטן יותר. <code>elbowY - wristY</code> יוצא חיובי כשהיד למעלה, כמו בציר רגיל."],
+    ["math", "למה Math.abs על dx בזווית השחרור?", "כדי שהתוצאה תהיה זהה בין אם השחקן פונה ימינה או שמאלה בסרטון."],
+    ["math", "למה ב-torsoLean כתוב atan2(dx, dy) בסדר הפוך?", "כי מודדים מול הקו האנכי ולא מול האופקי. החלפת הארגומנטים נותנת את הזווית מהאנך: גוף זקוף נותן 0."],
+    ["math", "חשב ציון: שחרור 55°, נטייה 12°, מרפק בסוף 150°.", "שחרור: סטייה 6.5° ← 100 − 13 = 87. יציבות: 2° מעל 10 ← 96. המשך תנועה: 10° מתחת ל-160 ← 80. סה\"כ 0.6×87 + 0.2×96 + 0.2×80 = 87.4, אחרי עיגול 87."],
+    ["math", "מה קורה אם הירך לא זוהתה?", "נטיית הגוף היא <code>NaN</code> (\"לא מספר\"). בציון רכיב היציבות נחשב 100, כלומר בלי קנס, ובמסך מופיע \"הירך לא זוהתה\"."],
+    ["math", "מה עושה partScore?", "ציון של רכיב אחד: <code>100 - max(0, חריגה) × 2</code>, מעוגל ומוגבל ל-0–100. חריגה שלילית, כלומר בתוך הטווח, לא מורידה נקודות."],
+
+    ["release", "איך מוצאים את רגע השחרור?", "בשלושה צעדים. (1) חיפוש גס: פריים כל 250ms לאורך הסרטון, ומציאת הדגימה שבה היד הכי גבוהה ביחס לגוף. (2) חזרה אחורה לתחילת \"היד למעלה\": הדגימה הראשונה שבה היד כבר בגובה של לפחות 90% מהשיא. (3) חיפוש מדויק, כל 33ms, סביב הרגע הזה: לכל פריים שומרים את זווית המרפק, ו-<code>releaseIndex</code> בוחר את הפריים הראשון שבו המרפק כמעט ישר."],
+    ["release", "למה רגע השחרור הוא כשהמרפק מסיים להתיישר?", "בזריקת קפיצה היד דוחפת את הכדור למעלה ומיישרת את המרפק. הכדור עוזב את היד בסוף היישור. אחרי זה היד נשארת ישרה (follow-through), ורק כף היד מצליפה. לכן הפריים הראשון שבו המרפק כמעט ישר הוא רגע השחרור."],
+    ["release", "למה גובה היד מחולק באורך הגו?", "כדי שהגודל של השחקן בתמונה לא ישפיע. בסרטון הבדיקה, כשהשחקן עמד צמוד למצלמה הוא היה ענק בתמונה, וכל תזוזה של היד \"ניצחה\" בפיקסלים את הזריקה האמיתית שצולמה מרחוק. ביחידות של אורך גו (מרחק כתף-ירך) הגובה לא תלוי במרחק מהמצלמה."],
+    ["release", "למה פוסלים פריים אם נקודה מחוץ לתמונה?", "כשרק חלק מהגוף נראה, למשל רק רגליים או רק פנים וידיים, ML Kit מנחש איפה שאר הנקודות, לפעמים מחוץ לתמונה. החישובים על ניחוש כזה שגויים, ולכן <code>isInFrame</code> דורש שהכתף, המרפק, שורש כף היד והירך יהיו מזוהים ובתוך גבולות התמונה."],
+    ["release", "למה חוזרים אחורה מהשיא ולא מחפשים סביבו?", "כי אחרי זריקה טובה מחזיקים את היד למעלה, לפעמים יותר משנייה. הרגע שבו היד הכי גבוהה מגיע אז הרבה אחרי שהכדור עזב. בסרטון הבדיקה זה גרם לטעות של חצי שנייה. לכן <code>plateauStartIndex</code> הולך אחורה כל עוד היד עדיין למעלה, ומשם מחפשים."],
+    ["release", "למה מחליקים עם חציון ולא עם ממוצע?", "ML Kit לפעמים טועה בפריים בודד ונותן זווית לא הגיונית. חציון של 3 פריימים מתעלם מערך קיצוני אחד. ממוצע היה מושפע ממנו, וגם \"מאחר\" כשהזווית עולה בהדרגה: בסדרה עולה, החציון של שלושה ערכים הוא בדיוק הערך האמצעי, ולכן אין עיכוב."],
+    ["release", "איך בדקת שהזיהוי באמת עובד?", "על סרטון אמיתי של 27 שניות עם שתי זריקות. הרצתי את אותו אלגוריתם בסביבת בדיקה עם MediaPipe Pose (אותה משפחת מודלים כמו ML Kit), וסימנתי בעין, פריים אחרי פריים, את הרגע שבו הכדור נפרד מהאצבעות. אחרי התיקונים: בזריקה אחת מדויק, ובשנייה פריים אחד (33ms) מאוחר. לפני התיקונים האפליקציה בכלל לא מצאה את הזריקה."],
+    ["release", "מה עושים כפתורי \"פריים אחורה / קדימה\"?", "תיקון ידני של רגע השחרור. <code>ShotAnalyzer.stepFrame</code> מחלץ את הפריים השכן (33ms), מריץ עליו ML Kit עם אותה יד, ומחשב מחדש זוויות, ציון ומשוב. אם בפריים לא זוהתה היד, מדלגים עד 3 פריימים. זה רץ ב-thread ברקע, והתוצאה מעדכנת גם את המסך וגם את הזריקה במסד."],
+    ["release", "למה מרווח של 8 מעלות מהמקסימום ולא המקסימום עצמו?", "אחרי השחרור היד ממשיכה להתיישר עוד קצת, ולכן הזווית המקסימלית מגיעה מעט אחרי שהכדור כבר עזב. סף של 8° מתחת למקסימום תופס את הרגע שבו היד \"כבר כמעט ישרה\". בסרטון הבדיקה ניסיתי גם 12°: זה תיקן זריקה אחת וקלקל את השנייה, ולכן נשארתי עם 8."],
+    ["release", "למה לא לנתח את כל הפריימים?", "בסרטון של דקה ב-30 פריימים לשנייה יש 1,800 פריימים, וכל אחד לוקח זמן לחלץ ולזהות. בשיטה הדו-שלבית מנתחים כ-240 פריימים בחיפוש הגס ועוד כ-29 בחיפוש המדויק."],
+    ["release", "למה בחיפוש הגס מוחקים את התמונה מכל דגימה?", "כל פריים תופס כמה מגה-בייט. 240 דגימות היו תופסות מאות מגה-בייט, והאפליקציה הייתה עלולה לקרוס. לחישובים מספיקות נקודות הגוף, ואת התמונה של רגע השחרור מחלצים מחדש בסוף."],
+    ["release", "מה זה follow-through ואיך מודדים אותו?", "המשך התנועה אחרי השחרור: יד שנשארת מושטת אל הסל. מודדים את זווית המרפק בדגימה שבה היד הכי גבוהה. 160° ומעלה נחשב יד ישרה."],
+
+    ["view", "איך יוצרים View מותאם אישית?", "יורשים מ-<code>View</code>, כותבים בנאי שמקבל <code>(Context, AttributeSet)</code> כדי שאפשר יהיה לשים אותו ב-XML, ודורסים את <code>onDraw(Canvas)</code>."],
+    ["view", "מה ההבדל בין Canvas ל-Paint?", "Canvas הוא משטח הציור, עם הפקודות: <code>drawLine</code>, <code>drawCircle</code>, <code>drawText</code>, <code>drawBitmap</code>. Paint מגדיר את הסגנון: צבע, עובי קו, גודל ופונט."],
+    ["view", "מה עושה invalidate()?", "מסמן שה-View צריך ציור מחדש. המערכת תקרא ל-<code>onDraw</code> בפריים הבא. אף פעם לא קוראים ל-<code>onDraw</code> בעצמנו."],
+    ["view", "למה יוצרים את ה-Paint בבנאי ולא ב-onDraw?", "<code>onDraw</code> נקראת הרבה פעמים, למשל בכל תזוזה של זום. יצירת אובייקטים בתוכה מעמיסה על איסוף הזבל וגורמת לגמגום."],
+    ["view", "איך ממירים נקודה מהתמונה למסך?", "<code>scale = min(רוחב View / רוחב תמונה, גובה View / גובה תמונה)</code>, כדי שהתמונה תיכנס בלי עיוות. ההיסט ממרכז אותה. כל נקודה: <code>x × scale + offsetX</code>."],
+    ["view", "איך עובד הזום?", "<code>ScaleGestureDetector</code> מזהה צביטה ו-<code>GestureDetector</code> מזהה גרירה והקשה כפולה. השינוי נשמר ב-<code>Matrix</code>, וב-<code>onDraw</code> מחילים אותו עם <code>canvas.concat</code>, בין <code>save()</code> ל-<code>restore()</code>."],
+    ["view", "מה עושה requestDisallowInterceptTouchEvent?", "מבקש מה-ScrollView שמכיל את הרכיב לא \"לגנוב\" את הנגיעה. בזמן זום, גרירה מזיזה את התמונה ולא גוללת את המסך."],
+
+    ["recycler", "למה RecyclerView ולא סתם הרבה Views?", "הוא יוצר רק את השורות שנראות במסך וממחזר אותן בגלילה. ככה גם רשימה ארוכה מאוד לא צורכת הרבה זיכרון."],
+    ["recycler", "מה התפקיד של ה-Adapter?", "מחבר בין רשימת הנתונים לשורות במסך. <code>onCreateViewHolder</code> יוצר שורה מ-XML, <code>onBindViewHolder</code> ממלא אותה בנתוני זריקה, ו-<code>getItemCount</code> אומר כמה שורות יש."],
+    ["recycler", "מה זה ViewHolder?", "אובייקט ששומר הפניות לרכיבים של שורה אחת, כדי לא לקרוא ל-<code>findViewById</code> בכל גלילה."],
+    ["recycler", "מה זה LayoutManager?", "קובע איך השורות מסודרות על המסך. <code>LinearLayoutManager</code> יוצר רשימה אנכית אחת."],
+    ["recycler", "תאר מה קורה כשמוחקים זריקה.", "לחיצה על \"מחיקה\" ← ה-Adapter קורא ל-<code>listener.onDelete(shot)</code> ← <code>HistoryActivity</code> מציגה דיאלוג אישור ← באישור <code>dbHelper.deleteShot(id)</code> ← <code>refresh()</code> טוען מחדש את הרשימה והסטטיסטיקה ← <code>notifyDataSetChanged()</code> ← Snackbar \"הזריקה נמחקה\"."],
+
+    ["ui", "למה כל הטקסטים נמצאים ב-strings.xml?", "כדי שכל הטקסט יהיה במקום אחד: קל לשנות, לתרגם לשפה אחרת, ולשמור על עקביות. זו גם דרישה של המחוון: בלי מחרוזות קשיחות ב-layout."],
+    ["ui", "מה המשמעות של %1$.1f?", "הארגומנט הראשון, כמספר עשרוני עם ספרה אחת אחרי הנקודה. <code>%1$d</code> הוא מספר שלם ו-<code>%1$s</code> מחרוזת. ממלאים עם <code>getString(R.string.x, ערכים...)</code>."],
+    ["ui", "איך האפליקציה תומכת בעברית מימין לשמאל?", "<code>android:supportsRtl=\"true\"</code> ב-Manifest, <code>marginStart</code>/<code>marginEnd</code> במקום Left/Right, ואייקונים עם <code>autoMirrored</code> שמתהפכים לבד."],
+    ["ui", "מה זה Theme ו-Style?", "Theme הוא ערכת הנושא של כל האפליקציה (צבעים ראשיים, רקע, שורת סטטוס). Style הוא אוסף מאפיינים לרכיב, כמו <code>Widget.App.Button</code>, שמשתמשים בו בכמה מקומות במקום לחזור על אותם מאפיינים."],
+    ["ui", "מה ההבדל בין Toast ל-Snackbar?", "שניהם הודעה זמנית. Snackbar הוא רכיב של Material Design שמופיע בתחתית המסך ויכול לכלול כפתור פעולה. Toast הוא הודעה פשוטה של המערכת. השתמשתי ב-Snackbar לשגיאות ולמחיקה, וב-Toast להרשמה מוצלחת."],
+
+    ["ai", "האם כתבת את הקוד בעצמך?", "השתמשתי ב-Claude Code ככלי, וכל מחלקה שנכתבה כך מסומנת בהערה בראשה, לפי דרישת בית הספר. אני הגדרתי את הדרישות, בדקתי והרצתי את האפליקציה, ואני מבין כל שורה. (ענה כאן בכנות לפי מה שקרה אצלך.)"],
+    ["ai", "תסביר שורה שאני אבחר בקוד.", "התשובה הנכונה היא להסביר בדיוק מה השורה עושה ולמה היא שם. כדי להתכונן, עבור על המדריך פרק אחרי פרק, ותרגל עד שאתה מסמן \"אני יודע את זה\" על כל השאלות."]
+  ];
+
+  var GLOSS = [
+    ["Activity", "מסך אחד באפליקציה, עם מחזור חיים שהמערכת מנהלת (onCreate, onDestroy)."],
+    ["Intent", "בקשה להפעיל רכיב: מסך אחר, או אפליקציה אחרת כמו המצלמה."],
+    ["Manifest", "קובץ שמתאר את האפליקציה למערכת: מסכים, הרשאות, ערכת נושא."],
+    ["Layout (XML)", "קובץ שמתאר את מבנה המסך: אילו רכיבים יש ואיך הם מסודרים."],
+    ["View / ViewGroup", "רכיב מסך (כפתור, טקסט). ViewGroup מכיל רכיבים אחרים, כמו LinearLayout."],
+    ["Canvas / Paint", "משטח ציור ופקודות הציור / הגדרת הסגנון של מה שמצויר."],
+    ["Bitmap", "תמונה בזיכרון, מורכבת מפיקסלים."],
+    ["Uri", "כתובת של משאב, למשל סרטון בגלריה."],
+    ["UI thread", "ה-thread הראשי: מצייר את המסך ומגיב לנגיעות."],
+    ["ExecutorService", "מנגנון שמריץ משימות על threads ברקע."],
+    ["Handler / Looper", "Looper מריץ תור הודעות של thread. Handler שולח אליו קוד."],
+    ["ANR", "Application Not Responding: האפליקציה חסמה את ה-thread הראשי יותר מדי זמן."],
+    ["SQLite", "מסד נתונים יחסי קטן, שנשמר כקובץ בתוך האפליקציה."],
+    ["Primary / Foreign key", "מזהה ייחודי לשורה / עמודה שמפנה למזהה בטבלה אחרת."],
+    ["Cursor", "מצביע על שורות התוצאה של שאילתה."],
+    ["ContentValues", "מפה של עמודה ← ערך, להוספה ולעדכון."],
+    ["CRUD", "Create, Read, Update, Delete: ארבע הפעולות הבסיסיות על נתונים."],
+    ["Hash", "פונקציה חד-כיוונית: מסיסמה מקבלים מחרוזת, אבל לא להפך."],
+    ["Salt", "ערך אקראי שמצורף לסיסמה לפני ה-hash, שונה לכל משתמש."],
+    ["SharedPreferences", "אחסון קטן של זוגות מפתח-ערך."],
+    ["RecyclerView", "רשימה שממחזרת שורות בזמן גלילה."],
+    ["Adapter / ViewHolder", "מחבר נתונים לשורות / שומר הפניות לרכיבי שורה."],
+    ["ML Kit", "ספריית למידת מכונה של Google שרצה על המכשיר."],
+    ["Landmark", "נקודת גוף ש-ML Kit מזהה, כמו מרפק או כתף."],
+    ["atan2", "פונקציה שמחזירה את הכיוון של וקטור לפי dx ו-dy."],
+    ["Radian", "יחידת זווית: π רדיאנים = 180 מעלות."],
+    ["Gradle / AGP", "מערכת הבנייה של הפרויקט / הפלאגין שלה לאנדרואיד."],
+    ["Material Design", "שפת העיצוב של Google: רכיבים, צבעים וטיפוגרפיה אחידים."],
+    ["RTL", "Right-to-Left: תמיכה בשפות שנכתבות מימין לשמאל."]
+  ];
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  // ---- per-chapter Q&A ----
+  document.querySelectorAll(".qa[data-topic]").forEach(function (box) {
+    var t = box.getAttribute("data-topic");
+    var items = Q.filter(function (q) { return q[0] === t; });
+    if (!items.length) { box.remove(); return; }
+    var h = '<h4>שאלות בוחן</h4>';
+    items.forEach(function (q) { h += '<details><summary>' + esc(q[1]) + '</summary><div class="ans"><p>' + q[2] + '</p></div></details>'; });
+    box.innerHTML = h;
   });
-  document.getElementById("progress-label").textContent = `${totalDone} מתוך ${totalItems} הושלמו`;
-  const overallPct = totalItems ? Math.round((totalDone / totalItems) * 100) : 0;
-  document.getElementById("progress-pct").textContent = overallPct + "%";
-  document.getElementById("progress-fill").style.width = overallPct + "%";
-}
-document.addEventListener("change", e => {
-  const t = e.target;
-  if (!t.matches || !t.matches('input[type="checkbox"][data-page]')) return;
-  state[itemKey(t.dataset.page, +t.dataset.i)] = t.checked;
-  saveState(state);
-  const openIds = [...document.querySelectorAll(".stage-checklist[open] input")].map(i => i.dataset.page);
-  render();
-  document.querySelectorAll(".stage-checklist").forEach(d => {
-    const first = d.querySelector("input");
-    if (first && openIds.includes(first.dataset.page)) d.open = true;
+  document.getElementById("qcount").textContent = Q.length;
+
+  // ---- glossary ----
+  document.getElementById("glossList").innerHTML = GLOSS.map(function (g) { return "<dt>" + esc(g[0]) + "</dt><dd>" + esc(g[1]) + "</dd>"; }).join("");
+
+  // ---- math ports (identical to ShotMathUtils) ----
+  var IDEAL = 48.5, PPD = 2, GOOD_RANGE = 5, MAX_LEAN = 10, MIN_FOLLOW = 160;
+  function toDeg(r) { return r * 180 / Math.PI; }
+  function angleAtPoint(ax, ay, bx, by, cx, cy) {
+    var a = Math.atan2(ay - by, ax - bx), c = Math.atan2(cy - by, cx - bx);
+    var d = Math.abs(toDeg(a - c));
+    return d > 180 ? 360 - d : d;
+  }
+  function releaseAngle(ex, ey, wx, wy) { return toDeg(Math.atan2(ey - wy, Math.abs(wx - ex))); }
+  function partScore(over) { var s = Math.round(100 - Math.max(0, over) * PPD); return Math.max(0, Math.min(100, s)); }
+  function calcScore(rel) { return partScore(Math.abs(rel - IDEAL)); }
+  function totalScore(rel, lean, follow) {
+    var stab = isNaN(lean) ? 100 : partScore(lean - MAX_LEAN);
+    return Math.round(0.6 * calcScore(rel) + 0.2 * stab + 0.2 * partScore(MIN_FOLLOW - follow));
+  }
+  function feedback(rel, lean, follow) {
+    var dev = rel - IDEAL, f;
+    if (dev < -GOOD_RANGE) f = "זווית השחרור נמוכה מדי - נסה לשחרר את הכדור בקשת גבוהה יותר.";
+    else if (dev > GOOD_RANGE) f = "זווית השחרור גבוהה מדי - כוון יותר קדימה אל הסל.";
+    else f = "זווית שחרור מצוינת! המשך כך.";
+    if (lean > MAX_LEAN) f += "\nהגוף נוטה בזמן הזריקה - נסה לקפוץ ישר למעלה ולנחות באותה נקודה.";
+    if (follow < MIN_FOLLOW) f += "\nהיד לא נשארה ישרה אחרי השחרור - סיים את התנועה עם יד מושטת אל הסל.";
+    return f;
+  }
+  function f1(x) { return (Math.round(x * 10) / 10).toFixed(1); }
+  function f3(x) { return (Math.round(x * 1000) / 1000).toFixed(3); }
+
+  // ---- angle lab ----
+  var P = { A: { x: 110, y: 70 }, B: { x: 170, y: 160 }, C: { x: 250, y: 90 } };
+  var svg = document.getElementById("angleSvg");
+  function setLine(id, p, q) { var l = document.getElementById(id); l.setAttribute("x1", p.x); l.setAttribute("y1", p.y); l.setAttribute("x2", q.x); l.setAttribute("y2", q.y); }
+  function drawAngle() {
+    setLine("segBA", P.B, P.A); setLine("segBC", P.B, P.C);
+    setLine("hRef", { x: P.B.x - 90, y: P.B.y }, { x: P.B.x + 90, y: P.B.y });
+    ["A", "B", "C"].forEach(function (k) { document.getElementById("pt" + k).setAttribute("transform", "translate(" + P[k].x + "," + P[k].y + ")"); });
+    var a = Math.atan2(P.A.y - P.B.y, P.A.x - P.B.x), c = Math.atan2(P.C.y - P.B.y, P.C.x - P.B.x);
+    var ang = angleAtPoint(P.A.x, P.A.y, P.B.x, P.B.y, P.C.x, P.C.y);
+    var rel = releaseAngle(P.B.x, P.B.y, P.C.x, P.C.y);
+    document.getElementById("angleReadout").innerHTML =
+      '<div class="k">angleAtPoint(A, B, C)</div><div class="big">' + f1(ang) + '°</div>' +
+      '<div><span class="k">angleToA = atan2(' + Math.round(P.A.y - P.B.y) + ', ' + Math.round(P.A.x - P.B.x) + ') =</span> ' + f3(a) + ' rad (' + f1(toDeg(a)) + '°)</div>' +
+      '<div><span class="k">angleToC = atan2(' + Math.round(P.C.y - P.B.y) + ', ' + Math.round(P.C.x - P.B.x) + ') =</span> ' + f3(c) + ' rad (' + f1(toDeg(c)) + '°)</div>' +
+      '<div><span class="k">|toDegrees(A − C)| =</span> ' + f1(Math.abs(toDeg(a - c))) + '°' + (Math.abs(toDeg(a - c)) > 180 ? ' <span class="k">→ 360 − x</span>' : '') + '</div>' +
+      '<div style="margin-top:10px" class="k">releaseAngle(B, C) = atan2(B.y − C.y, |C.x − B.x|)</div>' +
+      '<div class="big" style="font-size:22px">' + f1(rel) + '°</div>';
+  }
+  var drag = null;
+  function toSvg(e) {
+    var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    var p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    return { x: Math.max(14, Math.min(346, p.x)), y: Math.max(14, Math.min(250, p.y)) };
+  }
+  ["A", "B", "C"].forEach(function (k) {
+    var g = document.getElementById("pt" + k);
+    g.style.cursor = "grab";
+    g.addEventListener("pointerdown", function (e) { drag = k; try { g.setPointerCapture(e.pointerId); } catch (_) {} e.preventDefault(); });
+    g.addEventListener("pointermove", function (e) { if (drag === k) { P[k] = toSvg(e); drawAngle(); } });
+    g.addEventListener("pointerup", function () { drag = null; });
+    g.addEventListener("pointercancel", function () { drag = null; });
   });
-});
-render();
+  drawAngle();
+
+  // ---- score lab ----
+  var inRel = document.getElementById("inRel"), inLean = document.getElementById("inLean"),
+      inFollow = document.getElementById("inFollow"), inNoHip = document.getElementById("inNoHip");
+  function scoreColor(s) { return s >= 80 ? "var(--good)" : s >= 60 ? "var(--medium)" : "var(--bad)"; }
+  function drawScore() {
+    var rel = +inRel.value, follow = +inFollow.value, lean = inNoHip.checked ? NaN : +inLean.value;
+    inLean.disabled = inNoHip.checked;
+    document.getElementById("outRel").textContent = f1(rel) + "°";
+    document.getElementById("outLean").textContent = inNoHip.checked ? "NaN" : f1(+inLean.value) + "°";
+    document.getElementById("outFollow").textContent = follow + "°";
+    var r = calcScore(rel), s = isNaN(lean) ? 100 : partScore(lean - MAX_LEAN), fo = partScore(MIN_FOLLOW - follow);
+    var t = totalScore(rel, lean, follow);
+    var tot = document.getElementById("scoreTotal");
+    tot.textContent = t; tot.style.color = scoreColor(t);
+    var bw = document.getElementById("scoreBarWrap"); bw.style.color = scoreColor(t);
+    document.getElementById("scoreBar").style.width = t + "%";
+    document.getElementById("scoreParts").innerHTML =
+      'release   = 100 − |' + f1(rel) + ' − 48.5| × 2 = ' + r + '<br>' +
+      'stability = ' + (isNaN(lean) ? '100 (NaN)' : '100 − max(0, ' + f1(lean) + ' − 10) × 2 = ' + s) + '<br>' +
+      'follow    = 100 − max(0, 160 − ' + follow + ') × 2 = ' + fo + '<br>' +
+      'total     = round(0.6×' + r + ' + 0.2×' + s + ' + 0.2×' + fo + ') = ' + t;
+    document.getElementById("scoreFb").textContent = feedback(rel, lean, follow);
+  }
+  [inRel, inLean, inFollow, inNoHip].forEach(function (el) { el.addEventListener("input", drawScore); });
+  drawScore();
+
+  // ---- release chart: real elbow angles from shot 2 of the test video (MediaPipe), same rule as ShotMathUtils.releaseIndex ----
+  (function () {
+    var T = [19050, 19083, 19116, 19149, 19182, 19215, 19248, 19281, 19314, 19347, 19380, 19413, 19446, 19479, 19512, 19545, 19578, 19611, 19644, 19677, 19710, 19743, 19776, 19809, 19842, 19875, 19908, 19941, 19974];
+    var A = [0.8, 10.5, 1.7, 2.1, 1.4, 6.5, 6.2, 7.6, 3.1, 1.0, 2.5, 0.3, 4.2, 3.6, 6.7, 8.8, 0.5, 151.1, 165.0, 170.1, 175.2, 177.2, 176.9, 158.8, 154.1, 151.8, 159.2, 163.3, 158.7];
+    var TRUE_MS = 19685, MARGIN = 8, n = A.length;
+    function med3(a, b, c) { return Math.max(Math.min(a, b), Math.min(Math.max(a, b), c)); }
+    var S = A.map(function (_, i) { var c = Math.max(1, Math.min(n - 2, i)); return med3(A[c - 1], A[c], A[c + 1]); });
+    var max = Math.max.apply(null, S), thr = max - MARGIN, idx = n - 1;
+    for (var i = 0; i < n; i++) { if (S[i] >= thr) { idx = i; break; } }
+    var L = 64, R = 620, Tp = 20, B = 250, yMin = 0, yMax = 190, t0 = T[0], t1 = T[n - 1];
+    function X(t) { return L + (R - L) * (t - t0) / (t1 - t0); }
+    function Y(v) { return B - (B - Tp) * (v - yMin) / (yMax - yMin); }
+    var s = '';
+    [0, 45, 90, 135, 180].forEach(function (v) {
+      s += '<line x1="' + L + '" x2="' + R + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--rule)" stroke-dasharray="3 5"/>';
+      s += '<text x="' + (L - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end" font-size="11" fill="var(--muted)" font-family="JetBrains Mono, monospace">' + v + '°</text>';
+    });
+    s += '<line x1="' + L + '" x2="' + R + '" y1="' + Y(thr) + '" y2="' + Y(thr) + '" stroke="var(--accent)" stroke-width="1.5"/>';
+    s += '<text x="' + L + '" y="' + (Y(thr) - 6) + '" font-size="11.5" fill="var(--accent)">max − 8° = ' + thr.toFixed(1) + '°</text>';
+    s += '<line x1="' + X(TRUE_MS) + '" x2="' + X(TRUE_MS) + '" y1="' + Tp + '" y2="' + B + '" stroke="var(--brass)" stroke-width="2" stroke-dasharray="6 4"/>';
+    s += '<text x="' + (X(TRUE_MS) + 6) + '" y="' + (Y(60)) + '" font-size="12" font-weight="700" fill="var(--brass)">' + 'true release ' + (TRUE_MS / 1000).toFixed(3) + 's</text>';
+    [19100, 19300, 19500, 19700, 19900].forEach(function (t) {
+      s += '<text x="' + X(t) + '" y="' + (B + 18) + '" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="JetBrains Mono, monospace">' + (t / 1000).toFixed(1) + 's</text>';
+    });
+    s += '<polyline fill="none" stroke="var(--ink)" stroke-width="2" points="' + S.map(function (v, i) { return X(T[i]) + "," + Y(v); }).join(" ") + '"/>';
+    A.forEach(function (v, i) { s += '<circle cx="' + X(T[i]) + '" cy="' + Y(v) + '" r="3.5" fill="var(--paper)" stroke="var(--muted)" stroke-width="1.5"/>'; });
+    s += '<circle cx="' + X(T[idx]) + '" cy="' + Y(S[idx]) + '" r="8" fill="var(--accent)"/>';
+    s += '<text x="' + (X(T[idx]) - 12) + '" y="' + (Y(S[idx]) + 4) + '" text-anchor="end" font-size="12.5" font-weight="700" fill="var(--accent)">releaseIndex</text>';
+    document.getElementById("releaseSvg").innerHTML = s;
+    document.getElementById("releaseReadout").innerHTML =
+      '<span class="k">max (median-of-3) =</span> ' + max.toFixed(1) + '°  <span class="k">threshold =</span> ' + thr.toFixed(1) + '°<br>' +
+      '<span class="k">chosen sample:</span> ' + (T[idx] / 1000).toFixed(3) + 's (' + A[idx] + '°) → frame 19.685s  ·  <span class="k">true release:</span> 19.685s';
+  })();
+
+  // ---- quiz ----
+  var KEY = "bsa-guide-known";
+  var known = {};
+  try { known = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (_) { known = {}; }
+  function saveKnown() { try { localStorage.setItem(KEY, JSON.stringify(known)); } catch (_) {} }
+  var sel = document.getElementById("quizTopic");
+  var opts = '<option value="all">כל הנושאים</option><option value="todo">שאלות שעוד לא סימנתי</option>';
+  Object.keys(TOPICS).forEach(function (k) { opts += '<option value="' + k + '">' + esc(TOPICS[k]) + '</option>'; });
+  sel.innerHTML = opts;
+  var order = Q.map(function (_, i) { return i; }), pos = 0, list = [];
+  function rebuild() {
+    var v = sel.value;
+    list = order.filter(function (i) { return v === "all" ? true : v === "todo" ? !known[i] : Q[i][0] === v; });
+    pos = 0; showQ();
+  }
+  function showQ() {
+    var a = document.getElementById("quizA"), chk = document.getElementById("quizKnown");
+    a.hidden = true; document.getElementById("quizShow").textContent = "הצג תשובה";
+    if (!list.length) {
+      document.getElementById("quizTag").textContent = "";
+      document.getElementById("quizQ").textContent = "אין כאן שאלות שנשארו. בחר נושא אחר או בטל סימונים.";
+      document.getElementById("quizCount").textContent = "";
+      chk.disabled = true; chk.checked = false; return;
+    }
+    var i = list[pos];
+    chk.disabled = false; chk.checked = !!known[i];
+    document.getElementById("quizTag").textContent = TOPICS[Q[i][0]];
+    document.getElementById("quizQ").textContent = Q[i][1];
+    a.innerHTML = "<p>" + Q[i][2] + "</p>";
+    var done = Object.keys(known).filter(function (k) { return known[k]; }).length;
+    document.getElementById("quizCount").textContent = "שאלה " + (pos + 1) + " מתוך " + list.length + " · סימנת " + done + " מתוך " + Q.length;
+  }
+  document.getElementById("quizShow").addEventListener("click", function () {
+    var a = document.getElementById("quizA"); a.hidden = !a.hidden;
+    this.textContent = a.hidden ? "הצג תשובה" : "הסתר תשובה";
+  });
+  document.getElementById("quizNext").addEventListener("click", function () { if (list.length) { pos = (pos + 1) % list.length; showQ(); } });
+  document.getElementById("quizShuffle").addEventListener("click", function () {
+    for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = order[i]; order[i] = order[j]; order[j] = t; }
+    rebuild();
+  });
+  document.getElementById("quizKnown").addEventListener("change", function () {
+    if (!list.length) return;
+    known[list[pos]] = this.checked; saveKnown(); showQ();
+  });
+  sel.addEventListener("change", rebuild);
+  rebuild();
+
+  // ---- active chapter in the index ----
+  var links = {};
+  document.querySelectorAll("#toc a").forEach(function (a) { links[a.getAttribute("href").slice(1)] = a; });
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          Object.keys(links).forEach(function (k) { links[k].classList.remove("active"); });
+          var l = links[en.target.id];
+          if (l) l.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+    document.querySelectorAll("section.ch").forEach(function (s) { io.observe(s); });
+  }
+})();
 </script>
+
 </body>
 </html>
